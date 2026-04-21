@@ -38,6 +38,7 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gomarkdown/markdown/ast"
 	highlight "github.com/jessp01/gohighlight"
+	syntaxhighlight "github.com/solworktech/md2pdf/v2/internal/highlight"
 	"github.com/mitchellh/go-wordwrap"
 )
 
@@ -100,12 +101,7 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 	currentStyle := r.cs.peek().textStyle
 	r.setStyler(currentStyle)
 
-	var isValidSyntaxHighlightBaseDir bool = false
-	if stat, err := os.Stat(r.SyntaxHighlightBaseDir); err == nil && stat.IsDir() {
-		isValidSyntaxHighlightBaseDir = true
-	}
-
-	if len(node.Info) < 1 || !isValidSyntaxHighlightBaseDir {
+	if len(node.Info) < 1 {
 		r.outputUnhighlightedCodeBlock(string(node.Literal))
 		return
 	}
@@ -113,7 +109,7 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 	if strings.HasPrefix(string(node.Literal), "<script") && string(node.Info) == "html" {
 		node.Info = []byte("javascript")
 	}
-	syntaxFile, lerr := os.ReadFile(r.SyntaxHighlightBaseDir + "/" + string(node.Info) + ".yaml")
+	syntaxFile, lerr := syntaxhighlight.Files.ReadFile(string(node.Info) + ".yaml")
 	if lerr != nil {
 		r.outputUnhighlightedCodeBlock(string(node.Literal))
 		return

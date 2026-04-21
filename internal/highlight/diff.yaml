@@ -1,0 +1,12 @@
+filetype: diff
+
+detect: 
+    filename: "\\.diff$"
+    header: "^((---.*)|(\\+\\+\\+.*))"
+
+rules:
+    - statement: "(^\\+\\+\\+.*)"
+    - statement: "(^---.*)"
+    - type: "(^@@.*)"
+    - constant.number: "(^\\+.*)"
+    - preproc: "(^-.*)"

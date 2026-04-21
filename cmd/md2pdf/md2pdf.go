@@ -21,7 +21,6 @@ import (
 var (
 	input                     = flag.String("i", "", "Input filename, dir consisting of .md|.markdown files or HTTP(s) URL; default is os.Stdin")
 	output                    = flag.String("o", "", "Output PDF filename; required")
-	pathToSyntaxFiles         = flag.String("s", "", "Path to github.com/jessp01/gohighlight/syntax_files")
 	title                     = flag.String("title", "", "Presentation title")
 	author                    = flag.String("author", "", "Author's name; used if -footer is passed")
 	themeArg                  = flag.String("theme", "light", "[light | dark | /path/to/custom/theme.json]")
@@ -86,16 +85,6 @@ func main() {
 
 	if *hrAsNewPage == true {
 		opts = append(opts, mdtopdf.IsHorizontalRuleNewPage(true))
-	}
-
-	if *pathToSyntaxFiles != "" {
-		opts = append(opts, mdtopdf.SetSyntaxHighlightBaseDir(*pathToSyntaxFiles))
-	} else {
-		if _, err := os.Stat("../../highlight/syntax_files"); err == nil {
-			opts = append(opts, mdtopdf.SetSyntaxHighlightBaseDir("../../highlight/syntax_files"))
-		} else if _, err := os.Stat("/usr/share/mdtopdf/syntax_files"); err == nil {
-			opts = append(opts, mdtopdf.SetSyntaxHighlightBaseDir("/usr/share/mdtopdf/syntax_files"))
-		}
 	}
 
 	// get text for PDF

@@ -44,7 +44,7 @@ func testit(inputf string, gohighlight bool, t *testing.T) {
 
 	var opts []RenderOption
 	if gohighlight {
-		opts = []RenderOption{IsHorizontalRuleNewPage(true), SetSyntaxHighlightBaseDir("./highlight/syntax_files")}
+		opts = []RenderOption{IsHorizontalRuleNewPage(true)}
 	}
 	params := PdfRendererParams{
 		Orientation:     "",

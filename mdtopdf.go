@@ -79,7 +79,6 @@ type PdfRenderer struct {
 	NeedCodeStyleUpdate       bool
 	NeedBlockquoteStyleUpdate bool
 	HorizontalRuleNewPage     bool
-	SyntaxHighlightBaseDir    string
 	InputBaseURL              string
 	Extensions                parser.Extensions
 	ColumnWidths              map[ast.Node][]float64
@@ -521,12 +520,5 @@ func dorect(doc *fpdf.Fpdf, x, y, w, h float64, color colors.Color) {
 func IsHorizontalRuleNewPage(value bool) RenderOption {
 	return func(r *PdfRenderer) {
 		r.HorizontalRuleNewPage = value
-	}
-}
-
-// SetSyntaxHighlightBaseDir path to https://github.com/jessp01/gohighlight/tree/master/syntax_files
-func SetSyntaxHighlightBaseDir(path string) RenderOption {
-	return func(r *PdfRenderer) {
-		r.SyntaxHighlightBaseDir = path
 	}
 }
