@@ -27,13 +27,13 @@ import (
 	"io"
 	"log"
 	"os"
-
 	"strings"
 
 	"codeberg.org/go-pdf/fpdf"
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/ast"
 	"github.com/gomarkdown/markdown/parser"
+	"github.com/solworktech/md2pdf/v2/fonts"
 )
 
 // Color is a RGB set of ints; for a nice picker
@@ -87,9 +87,8 @@ type PdfRenderer struct {
 	mleft, mtop, mright, mbottom float64
 
 	// normal text
-	Normal            Styler
-	em                float64
-	unicodeTranslator func(string) string
+	Normal Styler
+	em     float64
 
 	// link text
 	Link Styler
@@ -197,7 +196,6 @@ func ExtractTextFromNode(node ast.Node) string {
 
 // GetTOCEntries returns TOC entries
 func GetTOCEntries(content []byte) ([]TOCEntry, error) {
-
 	// Create parser with extensions
 	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
 	p := parser.NewWithExtensions(extensions)
@@ -225,50 +223,78 @@ func (r *PdfRenderer) SetLightTheme() {
 	r.BackgroundColor = Colorlookup("white")
 	r.SetPageBackground("", r.BackgroundColor)
 	// Normal Text
-	r.Normal = Styler{Font: "Arial", Style: "", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white")}
+	r.Normal = Styler{
+		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
+		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
+	}
 
 	// Link text
-	r.Link = Styler{Font: "Arial", Style: "b", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("cornflowerblue")}
+	r.Link = Styler{
+		Font: "LiberationSans", Style: "b", Size: 12, Spacing: 2,
+		TextColor: Colorlookup("cornflowerblue"),
+	}
 
 	// Backticked text
-	r.Backtick = Styler{Font: "Times", Style: "", Size: 12, Spacing: 2,
-		TextColor: Color{37, 27, 14}, FillColor: Color{200, 200, 200}}
+	r.Backtick = Styler{
+		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
+		TextColor: Color{37, 27, 14}, FillColor: Color{200, 200, 200},
+	}
 
 	// Quoted Text
 
-	r.Blockquote = Styler{Font: "Times", Style: "", Size: 12, Spacing: 2,
-		TextColor: Color{37, 27, 14}, FillColor: Color{200, 200, 200}}
+	r.Blockquote = Styler{
+		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
+		TextColor: Color{37, 27, 14}, FillColor: Color{200, 200, 200},
+	}
 
 	// Code text
-	r.Code = Styler{Font: "Times", Style: "", Size: 12, Spacing: 2,
-		TextColor: Color{37, 27, 14}, FillColor: Color{200, 200, 200}}
+	r.Code = Styler{
+		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
+		TextColor: Color{37, 27, 14}, FillColor: Color{200, 200, 200},
+	}
 
 	// Headings
-	r.H1 = Styler{Font: "Arial", Style: "b", Size: 24, Spacing: 5,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white")}
-	r.H2 = Styler{Font: "Arial", Style: "b", Size: 22, Spacing: 5,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white")}
-	r.H3 = Styler{Font: "Arial", Style: "b", Size: 20, Spacing: 5,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white")}
-	r.H4 = Styler{Font: "Arial", Style: "b", Size: 18, Spacing: 5,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white")}
-	r.H5 = Styler{Font: "Arial", Style: "b", Size: 16, Spacing: 5,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white")}
-	r.H6 = Styler{Font: "Arial", Style: "b", Size: 14, Spacing: 5,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white")}
+	r.H1 = Styler{
+		Font: "LiberationSans", Style: "b", Size: 24, Spacing: 5,
+		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
+	}
+	r.H2 = Styler{
+		Font: "LiberationSans", Style: "b", Size: 22, Spacing: 5,
+		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
+	}
+	r.H3 = Styler{
+		Font: "LiberationSans", Style: "b", Size: 20, Spacing: 5,
+		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
+	}
+	r.H4 = Styler{
+		Font: "LiberationSans", Style: "b", Size: 18, Spacing: 5,
+		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
+	}
+	r.H5 = Styler{
+		Font: "LiberationSans", Style: "b", Size: 16, Spacing: 5,
+		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
+	}
+	r.H6 = Styler{
+		Font: "LiberationSans", Style: "b", Size: 14, Spacing: 5,
+		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
+	}
 
-	r.Blockquote = Styler{Font: "Arial", Style: "i", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white")}
+	r.Blockquote = Styler{
+		Font: "LiberationSans", Style: "i", Size: 12, Spacing: 2,
+		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
+	}
 
 	// Table Header Text
-	r.THeader = Styler{Font: "Arial", Style: "b", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("black"), FillColor: Color{180, 180, 180}}
+	r.THeader = Styler{
+		Font: "LiberationSans", Style: "b", Size: 12, Spacing: 2,
+		TextColor: Colorlookup("black"), FillColor: Color{180, 180, 180},
+	}
 
 	// Table Body Text
-	r.TBody = Styler{Font: "Arial", Style: "", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("black"), FillColor: Color{240, 240, 240}}
+	r.TBody = Styler{
+		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
+		TextColor: Colorlookup("black"), FillColor: Color{240, 240, 240},
+	}
 }
 
 // SetDarkTheme sets theme to 'dark'
@@ -276,55 +302,81 @@ func (r *PdfRenderer) SetDarkTheme() {
 	r.BackgroundColor = Colorlookup("black")
 	r.SetPageBackground("", r.BackgroundColor)
 	// Normal Text
-	r.Normal = Styler{Font: "Arial", Style: "", Size: 12, Spacing: 2,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("white")}
+	r.Normal = Styler{
+		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
+		FillColor: Colorlookup("black"), TextColor: Colorlookup("white"),
+	}
 
 	// Quoted Text
-	r.Blockquote = Styler{Font: "Arial", Style: "", Size: 12, Spacing: 2,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("white")}
+	r.Blockquote = Styler{
+		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
+		FillColor: Colorlookup("black"), TextColor: Colorlookup("white"),
+	}
 
 	// Link text
-	r.Link = Styler{Font: "Arial", Style: "b", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("cornflowerblue")}
+	r.Link = Styler{
+		Font: "LiberationSans", Style: "b", Size: 12, Spacing: 2,
+		TextColor: Colorlookup("cornflowerblue"),
+	}
 
 	// Backticked text
-	r.Backtick = Styler{Font: "Times", Style: "", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("lightgrey"), FillColor: Color{32, 35, 37}}
+	r.Backtick = Styler{
+		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
+		TextColor: Colorlookup("lightgrey"), FillColor: Color{32, 35, 37},
+	}
 
 	// Code text
-	r.Code = Styler{Font: "Times", Style: "", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("lightgrey"), FillColor: Color{32, 35, 37}}
+	r.Code = Styler{
+		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
+		TextColor: Colorlookup("lightgrey"), FillColor: Color{32, 35, 37},
+	}
 
 	// Headings
-	r.H1 = Styler{Font: "Arial", Style: "b", Size: 24, Spacing: 5,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray")}
-	r.H2 = Styler{Font: "Arial", Style: "b", Size: 22, Spacing: 5,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray")}
-	r.H3 = Styler{Font: "Arial", Style: "b", Size: 20, Spacing: 5,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray")}
-	r.H4 = Styler{Font: "Arial", Style: "b", Size: 18, Spacing: 5,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray")}
-	r.H5 = Styler{Font: "Arial", Style: "b", Size: 16, Spacing: 5,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray")}
-	r.H6 = Styler{Font: "Arial", Style: "b", Size: 14, Spacing: 5,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray")}
+	r.H1 = Styler{
+		Font: "LiberationSans", Style: "b", Size: 24, Spacing: 5,
+		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray"),
+	}
+	r.H2 = Styler{
+		Font: "LiberationSans", Style: "b", Size: 22, Spacing: 5,
+		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray"),
+	}
+	r.H3 = Styler{
+		Font: "LiberationSans", Style: "b", Size: 20, Spacing: 5,
+		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray"),
+	}
+	r.H4 = Styler{
+		Font: "LiberationSans", Style: "b", Size: 18, Spacing: 5,
+		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray"),
+	}
+	r.H5 = Styler{
+		Font: "LiberationSans", Style: "b", Size: 16, Spacing: 5,
+		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray"),
+	}
+	r.H6 = Styler{
+		Font: "LiberationSans", Style: "b", Size: 14, Spacing: 5,
+		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray"),
+	}
 
-	r.Blockquote = Styler{Font: "Arial", Style: "i", Size: 12, Spacing: 2,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray")}
+	r.Blockquote = Styler{
+		Font: "LiberationSans", Style: "i", Size: 12, Spacing: 2,
+		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray"),
+	}
 
 	// Table Header Text
-	r.THeader = Styler{Font: "Arial", Style: "b", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("darkgray"), FillColor: Color{27, 27, 27}}
+	r.THeader = Styler{
+		Font: "LiberationSans", Style: "b", Size: 12, Spacing: 2,
+		TextColor: Colorlookup("darkgray"), FillColor: Color{27, 27, 27},
+	}
 
 	// Table Body Text
-	r.TBody = Styler{Font: "Arial", Style: "", Size: 12, Spacing: 2,
-		FillColor: Color{200, 200, 200}, TextColor: Color{128, 128, 128}}
-
+	r.TBody = Styler{
+		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
+		FillColor: Color{200, 200, 200}, TextColor: Color{128, 128, 128},
+	}
 }
 
 // SetCustomTheme sets a custom theme based on JSON config
 func (r *PdfRenderer) SetCustomTheme(themeJSONFile string) {
-
 	config, err := os.ReadFile(themeJSONFile)
 	if err != nil {
 		log.Fatal(err)
@@ -339,16 +391,15 @@ func (r *PdfRenderer) SetCustomTheme(themeJSONFile string) {
 
 // PdfRendererParams struct to hold params passed to NewPdfRenderer
 type PdfRendererParams struct {
-	Orientation, Papersz, PdfFile, TracerFile, FontFile, FontName string
-	Opts                                                          []RenderOption
-	Theme                                                         Theme
-	CustomThemeFile                                               string
+	Orientation, Papersz, PdfFile, TracerFile string
+	Opts                                      []RenderOption
+	Theme                                     Theme
+	CustomThemeFile                           string
 }
 
 // NewPdfRenderer creates and configures an PdfRenderer object,
 // which satisfies the Renderer interface.
 func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
-
 	r := new(PdfRenderer)
 
 	// set filenames
@@ -372,6 +423,13 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 	r.Theme = params.Theme
 
 	r.Pdf = fpdf.New(r.orientation, r.units, r.papersize, r.fontdir)
+
+	// Register Liberation Sans (SIL Open Font License) for all styles.
+	// This provides full UTF-8 support including all Latin characters.
+	r.Pdf.AddUTF8FontFromBytes("LiberationSans", "", fonts.LiberationSansRegular)
+	r.Pdf.AddUTF8FontFromBytes("LiberationSans", "B", fonts.LiberationSansBold)
+	r.Pdf.AddUTF8FontFromBytes("LiberationSans", "I", fonts.LiberationSansItalic)
+	r.Pdf.AddUTF8FontFromBytes("LiberationSans", "BI", fonts.LiberationSansBoldItalic)
 
 	r.Pdf.SetHeaderFunc(func() {
 		r.SetPageBackground("", r.BackgroundColor)
@@ -397,7 +455,8 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 	r.cs = states{stack: make([]*containerState, 0)}
 	initcurrent := &containerState{
 		listkind:  notlist,
-		textStyle: r.Normal, leftMargin: r.mleft}
+		textStyle: r.Normal, leftMargin: r.mleft,
+	}
 	r.cs.push(initcurrent)
 
 	for _, o := range params.Opts {
@@ -459,10 +518,6 @@ func (r *PdfRenderer) Run(content []byte) error {
 	// Preprocess content by changing all CRLF to LF
 	s := content
 	s = markdown.NormalizeNewlines(s)
-
-	if r.unicodeTranslator != nil {
-		s = []byte(r.unicodeTranslator(string(s)))
-	}
 
 	p := parser.NewWithExtensions(r.Extensions)
 	doc := markdown.Parse(s, p)
@@ -530,7 +585,8 @@ func setColumnWidths(doc ast.Node, r *PdfRenderer) {
 func (r *PdfRenderer) UpdateParagraphStyler(defaultStyler Styler) {
 	initcurrent := &containerState{
 		listkind:  notlist,
-		textStyle: defaultStyler, leftMargin: r.mleft}
+		textStyle: defaultStyler, leftMargin: r.mleft,
+	}
 	r.cs.push(initcurrent)
 }
 
@@ -683,13 +739,6 @@ func (r *PdfRenderer) SetPageBackground(colorStr string, color Color) {
 }
 
 // Options
-
-// WithUnicodeTranslator configures a unico translator to support characters for latin, russian, etc..
-func WithUnicodeTranslator(cp string) RenderOption {
-	return func(r *PdfRenderer) {
-		r.unicodeTranslator = r.Pdf.UnicodeTranslatorFromDescriptor(cp)
-	}
-}
 
 // IsHorizontalRuleNewPage if true, will start a new page when encountering a HR (---). Useful for presentations.
 func IsHorizontalRuleNewPage(value bool) RenderOption {
