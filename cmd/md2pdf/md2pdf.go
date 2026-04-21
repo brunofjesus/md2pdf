@@ -19,23 +19,23 @@ import (
 )
 
 var (
-	input             = flag.String("i", "", "Input filename, dir consisting of .md|.markdown files or HTTP(s) URL; default is os.Stdin")
-	output            = flag.String("o", "", "Output PDF filename; required")
-	pathToSyntaxFiles = flag.String("s", "", "Path to github.com/jessp01/gohighlight/syntax_files")
-	title             = flag.String("title", "", "Presentation title")
-	author            = flag.String("author", "", "Author's name; used if -footer is passed")
-	themeArg          = flag.String("theme", "light", "[light | dark | /path/to/custom/theme.json]")
-	hrAsNewPage       = flag.Bool("new-page-on-hr", false, "Interpret HR as a new page; useful for presentations")
-	printFooter       = flag.Bool("with-footer", false, "Print doc footer (<author>  <title>  <page number>)")
-	generateTOC       = flag.Bool("generate-toc", false, "Auto Generate Table of Contents (TOC)")
-	pageSize          = flag.String("page-size", "A4", "[A3 | A4 | A5]")
-	orientation       = flag.String("orientation", "portrait", "[portrait | landscape]")
-	logFile           = flag.String("log-file", "", "Path to log file")
-	help              = flag.Bool("help", false, "Show usage message")
-	ver               = flag.Bool("version", false, "Print version and build info")
-	version           = "dev"
-	commit            = "none"
-	date              = "unknown"
+	input                     = flag.String("i", "", "Input filename, dir consisting of .md|.markdown files or HTTP(s) URL; default is os.Stdin")
+	output                    = flag.String("o", "", "Output PDF filename; required")
+	pathToSyntaxFiles         = flag.String("s", "", "Path to github.com/jessp01/gohighlight/syntax_files")
+	title                     = flag.String("title", "", "Presentation title")
+	author                    = flag.String("author", "", "Author's name; used if -footer is passed")
+	themeArg                  = flag.String("theme", "light", "[light | dark | /path/to/custom/theme.json]")
+	hrAsNewPage               = flag.Bool("new-page-on-hr", false, "Interpret HR as a new page; useful for presentations")
+	printFooter               = flag.Bool("with-footer", false, "Print doc footer (<author>  <title>  <page number>)")
+	generateTOC               = flag.Bool("generate-toc", false, "Auto Generate Table of Contents (TOC)")
+	pageSize                  = flag.String("page-size", "A4", "[A3 | A4 | A5]")
+	orientation               = flag.String("orientation", "portrait", "[portrait | landscape]")
+	logFile                   = flag.String("log-file", "", "Path to log file")
+	help                      = flag.Bool("help", false, "Show usage message")
+	ver                       = flag.Bool("version", false, "Print version and build info")
+	version                   = "dev"
+	commit                    = "none"
+	date                      = "unknown"
 	_, fileName, fileLine, ok = runtime.Caller(0)
 )
 
@@ -169,6 +169,9 @@ func main() {
 
 	pf := mdtopdf.NewPdfRenderer(params)
 
+	pf.UpdateBlockquoteStyler()
+	pf.UpdateCodeStyler()
+
 	if *generateTOC == true {
 		headers, err := mdtopdf.GetTOCEntries(content)
 		if err != nil {
@@ -185,7 +188,7 @@ func main() {
 		}
 
 		pf.SetTOCLinks(headerLinks)
-		pf.Pdf.SetFont(pf.Normal.Font, "B", 24)
+		pf.Pdf.SetFont(pf.Theme.Normal.Font, "B", 24)
 
 		// Add a table of contents with clickable links
 		pf.Pdf.Cell(40, 10, "Table of Contents")
@@ -194,7 +197,7 @@ func main() {
 		for _, header := range headers {
 			if linkPtr, exists := headerLinks[header.Title]; exists {
 				link := *linkPtr
-				pf.Pdf.SetFont(pf.Normal.Font, "", 12)
+				pf.Pdf.SetFont(pf.Theme.Normal.Font, "", 12)
 				pf.Pdf.SetTextColor(100, 149, 237)
 				indent := strings.Repeat("  ", header.Level-1)
 				pf.Pdf.WriteLinkID(8, fmt.Sprintf("%s • %s", indent, header.Title), link)
@@ -213,11 +216,11 @@ func main() {
 
 	if *printFooter {
 		pf.Pdf.SetFooterFunc(func() {
-			pf.Pdf.SetFillColor(pf.BackgroundColor.Red, pf.BackgroundColor.Green, pf.BackgroundColor.Blue)
+			pf.Pdf.SetFillColor(pf.Theme.BackgroundColor.Red, pf.Theme.BackgroundColor.Green, pf.Theme.BackgroundColor.Blue)
 			// Position at 1.5 cm from bottom
 			pf.Pdf.SetY(-15)
 			// Arial italic 8
-			pf.Pdf.SetFont(pf.Normal.Font, "I", 8)
+			pf.Pdf.SetFont(pf.Theme.Normal.Font, "I", 8)
 			// Text color in gray
 			pf.Pdf.SetTextColor(128, 128, 128)
 			w, h, _ := pf.Pdf.PageSize(pf.Pdf.PageNo())

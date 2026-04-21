@@ -19,6 +19,8 @@
 
 package mdtopdf
 
+import "github.com/solworktech/md2pdf/v2/internal/theme"
+
 type listType int
 
 const (
@@ -31,10 +33,12 @@ const (
 // This slice of float64 contains the width of each cell
 // in the header of a table. These will be the widths used
 // in the table body as well.
-var cellwidths []float64
-var curdatacell int
-var fill = false
-var incell = false
+var (
+	cellwidths  []float64
+	curdatacell int
+	fill        = false
+	incell      = false
+)
 
 func (n listType) String() string {
 	switch n {
@@ -51,7 +55,7 @@ func (n listType) String() string {
 }
 
 type containerState struct {
-	textStyle      Styler
+	textStyle      theme.Styler
 	leftMargin     float64
 	firstParagraph bool
 
@@ -67,7 +71,7 @@ type containerState struct {
 
 	// populated if table cell (apply styles first)
 	cellInnerString      string
-	cellInnerStringStyle *Styler
+	cellInnerStringStyle *theme.Styler
 }
 
 type states struct {

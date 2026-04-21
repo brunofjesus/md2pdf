@@ -1,10 +1,24 @@
-package mdtopdf
+package colors
 
 import (
 	"math"
 	"strconv"
 	"strings"
 )
+
+// Color is a RGB set of ints; for a nice picker
+// see https://www.w3schools.com/colors/colors_picker.asp
+type Color struct {
+	Red, Green, Blue int
+}
+
+func New(red, green, blue int) Color {
+	return Color{
+		Red:   red,
+		Green: green,
+		Blue:  blue,
+	}
+}
 
 // The functions below were taken almost as is from https://github.com/ajstarks/deck/blob/master/cmd/pdfdeck/colors.go
 
@@ -162,9 +176,9 @@ var colornames = map[string]Color{
 	"yellowgreen":          {154, 205, 50},
 }
 
-// Colorlookup returns a RGB triple corresponding to the named color, "rgb(r,g,b)" or "#rrggbb" string.
+// Lookup returns a RGB triple corresponding to the named color, "rgb(r,g,b)" or "#rrggbb" string.
 // On error, return black.
-func Colorlookup(s string) Color {
+func Lookup(s string) Color {
 	color, ok := colornames[s]
 	if ok {
 		return Color{color.Red, color.Green, color.Blue}

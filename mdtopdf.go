@@ -22,10 +22,8 @@ package mdtopdf
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strings"
 
@@ -34,26 +32,9 @@ import (
 	"github.com/gomarkdown/markdown/ast"
 	"github.com/gomarkdown/markdown/parser"
 	"github.com/solworktech/md2pdf/v2/fonts"
+	"github.com/solworktech/md2pdf/v2/internal/colors"
+	"github.com/solworktech/md2pdf/v2/internal/theme"
 )
-
-// Color is a RGB set of ints; for a nice picker
-// see https://www.w3schools.com/colors/colors_picker.asp
-type Color struct {
-	Red, Green, Blue int
-}
-
-// Styler is the struct to capture the styling features for text
-// Size and Spacing are specified in points.
-// The sum of Size and Spacing is used as line height value
-// in the fpdf API
-type Styler struct {
-	Font      string
-	Style     string
-	Size      float64
-	Spacing   float64
-	TextColor Color
-	FillColor Color
-}
 
 // RenderOption allows to define functions to configure the renderer
 type RenderOption func(r *PdfRenderer)
@@ -86,36 +67,13 @@ type PdfRenderer struct {
 	// default margins for safe keeping
 	mleft, mtop, mright, mbottom float64
 
-	// normal text
-	Normal Styler
-	em     float64
-
-	// link text
-	Link Styler
-
-	// backticked text
-	Backtick Styler
-
-	// blockquote text
-	Blockquote  Styler
+	Theme *theme.Theme
+	// normal
+	NormalEm float64
+	// blockquote
 	IndentValue float64
 
-	// Headings
-	H1 Styler
-	H2 Styler
-	H3 Styler
-	H4 Styler
-	H5 Styler
-	H6 Styler
-
-	// Table styling
-	THeader Styler
-	TBody   Styler
-
 	cs states
-
-	// code styling
-	Code Styler
 
 	// update styling
 	NeedCodeStyleUpdate       bool
@@ -123,9 +81,6 @@ type PdfRenderer struct {
 	HorizontalRuleNewPage     bool
 	SyntaxHighlightBaseDir    string
 	InputBaseURL              string
-	Theme                     Theme
-	BackgroundColor           Color
-	documentMatter            ast.DocumentMatters // keep track of front/main/back matter.
 	Extensions                parser.Extensions
 	ColumnWidths              map[ast.Node][]float64
 
@@ -218,177 +173,6 @@ func (r *PdfRenderer) SetTOCLinks(tocHeaders map[string]*int) {
 	r.tocLinks = tocHeaders
 }
 
-// SetLightTheme sets theme to 'light'
-func (r *PdfRenderer) SetLightTheme() {
-	r.BackgroundColor = Colorlookup("white")
-	r.SetPageBackground("", r.BackgroundColor)
-	// Normal Text
-	r.Normal = Styler{
-		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
-	}
-
-	// Link text
-	r.Link = Styler{
-		Font: "LiberationSans", Style: "b", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("cornflowerblue"),
-	}
-
-	// Backticked text
-	r.Backtick = Styler{
-		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
-		TextColor: Color{37, 27, 14}, FillColor: Color{200, 200, 200},
-	}
-
-	// Quoted Text
-
-	r.Blockquote = Styler{
-		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
-		TextColor: Color{37, 27, 14}, FillColor: Color{200, 200, 200},
-	}
-
-	// Code text
-	r.Code = Styler{
-		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
-		TextColor: Color{37, 27, 14}, FillColor: Color{200, 200, 200},
-	}
-
-	// Headings
-	r.H1 = Styler{
-		Font: "LiberationSans", Style: "b", Size: 24, Spacing: 5,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
-	}
-	r.H2 = Styler{
-		Font: "LiberationSans", Style: "b", Size: 22, Spacing: 5,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
-	}
-	r.H3 = Styler{
-		Font: "LiberationSans", Style: "b", Size: 20, Spacing: 5,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
-	}
-	r.H4 = Styler{
-		Font: "LiberationSans", Style: "b", Size: 18, Spacing: 5,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
-	}
-	r.H5 = Styler{
-		Font: "LiberationSans", Style: "b", Size: 16, Spacing: 5,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
-	}
-	r.H6 = Styler{
-		Font: "LiberationSans", Style: "b", Size: 14, Spacing: 5,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
-	}
-
-	r.Blockquote = Styler{
-		Font: "LiberationSans", Style: "i", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("black"), FillColor: Colorlookup("white"),
-	}
-
-	// Table Header Text
-	r.THeader = Styler{
-		Font: "LiberationSans", Style: "b", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("black"), FillColor: Color{180, 180, 180},
-	}
-
-	// Table Body Text
-	r.TBody = Styler{
-		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("black"), FillColor: Color{240, 240, 240},
-	}
-}
-
-// SetDarkTheme sets theme to 'dark'
-func (r *PdfRenderer) SetDarkTheme() {
-	r.BackgroundColor = Colorlookup("black")
-	r.SetPageBackground("", r.BackgroundColor)
-	// Normal Text
-	r.Normal = Styler{
-		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("white"),
-	}
-
-	// Quoted Text
-	r.Blockquote = Styler{
-		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("white"),
-	}
-
-	// Link text
-	r.Link = Styler{
-		Font: "LiberationSans", Style: "b", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("cornflowerblue"),
-	}
-
-	// Backticked text
-	r.Backtick = Styler{
-		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("lightgrey"), FillColor: Color{32, 35, 37},
-	}
-
-	// Code text
-	r.Code = Styler{
-		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("lightgrey"), FillColor: Color{32, 35, 37},
-	}
-
-	// Headings
-	r.H1 = Styler{
-		Font: "LiberationSans", Style: "b", Size: 24, Spacing: 5,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray"),
-	}
-	r.H2 = Styler{
-		Font: "LiberationSans", Style: "b", Size: 22, Spacing: 5,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray"),
-	}
-	r.H3 = Styler{
-		Font: "LiberationSans", Style: "b", Size: 20, Spacing: 5,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray"),
-	}
-	r.H4 = Styler{
-		Font: "LiberationSans", Style: "b", Size: 18, Spacing: 5,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray"),
-	}
-	r.H5 = Styler{
-		Font: "LiberationSans", Style: "b", Size: 16, Spacing: 5,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray"),
-	}
-	r.H6 = Styler{
-		Font: "LiberationSans", Style: "b", Size: 14, Spacing: 5,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray"),
-	}
-
-	r.Blockquote = Styler{
-		Font: "LiberationSans", Style: "i", Size: 12, Spacing: 2,
-		FillColor: Colorlookup("black"), TextColor: Colorlookup("darkgray"),
-	}
-
-	// Table Header Text
-	r.THeader = Styler{
-		Font: "LiberationSans", Style: "b", Size: 12, Spacing: 2,
-		TextColor: Colorlookup("darkgray"), FillColor: Color{27, 27, 27},
-	}
-
-	// Table Body Text
-	r.TBody = Styler{
-		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
-		FillColor: Color{200, 200, 200}, TextColor: Color{128, 128, 128},
-	}
-}
-
-// SetCustomTheme sets a custom theme based on JSON config
-func (r *PdfRenderer) SetCustomTheme(themeJSONFile string) {
-	config, err := os.ReadFile(themeJSONFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// Fill the instance from the JSON file content
-	err = json.Unmarshal(config, &r)
-	// Check if is there any error while filling the instance
-	if err != nil {
-		log.Fatal("Error parsing ", themeJSONFile, ":\n", err)
-	}
-}
-
 // PdfRendererParams struct to hold params passed to NewPdfRenderer
 type PdfRendererParams struct {
 	Orientation, Papersz, PdfFile, TracerFile string
@@ -420,8 +204,6 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 
 	r.fontdir = "."
 
-	r.Theme = params.Theme
-
 	r.Pdf = fpdf.New(r.orientation, r.units, r.papersize, r.fontdir)
 
 	// Register Liberation Sans (SIL Open Font License) for all styles.
@@ -431,31 +213,35 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 	r.Pdf.AddUTF8FontFromBytes("LiberationSans", "I", fonts.LiberationSansItalic)
 	r.Pdf.AddUTF8FontFromBytes("LiberationSans", "BI", fonts.LiberationSansBoldItalic)
 
-	r.Pdf.SetHeaderFunc(func() {
-		r.SetPageBackground("", r.BackgroundColor)
-	})
-
-	switch r.Theme {
+	switch params.Theme {
 	case DARK:
-		r.SetDarkTheme()
+		r.Theme = theme.DarkTheme()
 	case LIGHT:
-		r.SetLightTheme()
+		r.Theme = theme.LightTheme()
 	case CUSTOM:
 		if params.CustomThemeFile != "" {
-			r.SetCustomTheme(params.CustomThemeFile)
+			r.Theme = theme.CustomTheme(params.CustomThemeFile)
 		}
+	default:
+		r.Theme = theme.LightTheme()
 	}
+
+	r.Pdf.SetHeaderFunc(func() {
+		w, h := r.Pdf.GetPageSize()
+		dorect(r.Pdf, 0, 0, w, h, r.Theme.BackgroundColor)
+	})
+
 	r.Pdf.AddPage()
 	// set default font
-	r.setStyler(r.Normal)
+	r.setStyler(r.Theme.Normal)
 	r.mleft, r.mtop, r.mright, r.mbottom = r.Pdf.GetMargins()
-	r.em = r.Pdf.GetStringWidth("m")
-	r.IndentValue = 3 * r.em
+	r.NormalEm = r.Pdf.GetStringWidth("m")
+	r.IndentValue = 3 * r.NormalEm
 
 	r.cs = states{stack: make([]*containerState, 0)}
 	initcurrent := &containerState{
 		listkind:  notlist,
-		textStyle: r.Normal, leftMargin: r.mleft,
+		textStyle: r.Theme.Normal, leftMargin: r.mleft,
 	}
 	r.cs.push(initcurrent)
 
@@ -469,9 +255,9 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 // NewPdfRendererWithDefaultStyler creates and configures an PdfRenderer object,
 // which satisfies the Renderer interface.
 // update default styler for normal
-func NewPdfRendererWithDefaultStyler(orient, papersz, pdfFile, tracerFile string, defaultStyler Styler, opts []RenderOption, theme Theme) *PdfRenderer {
+func NewPdfRendererWithDefaultStyler(orient, papersz, pdfFile, tracerFile string, defaultStyler theme.Styler, opts []RenderOption, theme Theme) *PdfRenderer {
 	opts = append(opts, func(r *PdfRenderer) {
-		r.Normal = defaultStyler
+		r.Theme.Normal = defaultStyler
 	})
 	params := PdfRendererParams{
 		Orientation: orient,
@@ -582,7 +368,7 @@ func setColumnWidths(doc ast.Node, r *PdfRenderer) {
 }
 
 // UpdateParagraphStyler - update with default styler
-func (r *PdfRenderer) UpdateParagraphStyler(defaultStyler Styler) {
+func (r *PdfRenderer) UpdateParagraphStyler(defaultStyler theme.Styler) {
 	initcurrent := &containerState{
 		listkind:  notlist,
 		textStyle: defaultStyler, leftMargin: r.mleft,
@@ -600,7 +386,7 @@ func (r *PdfRenderer) UpdateBlockquoteStyler() {
 	r.NeedBlockquoteStyleUpdate = true
 }
 
-func (r *PdfRenderer) setStyler(s Styler) {
+func (r *PdfRenderer) setStyler(s theme.Styler) {
 	// see https://github.com/solworktech/md2pdf/issues/18#issuecomment-2179694815
 	// This does not address the root cause
 	// (https://github.com/solworktech/md2pdf/issues/18#issuecomment-2179694815)
@@ -613,16 +399,16 @@ func (r *PdfRenderer) setStyler(s Styler) {
 	r.Pdf.SetFillColor(s.FillColor.Red, s.FillColor.Green, s.FillColor.Blue)
 }
 
-func (r *PdfRenderer) write(s Styler, t string) {
+func (r *PdfRenderer) write(s theme.Styler, t string) {
 	// fmt.Printf("%s, %#v\n",t, s)
 	r.Pdf.Write(s.Size+s.Spacing, t)
 }
 
-func (r *PdfRenderer) multiCell(s Styler, t string) {
+func (r *PdfRenderer) multiCell(s theme.Styler, t string) {
 	r.Pdf.MultiCell(0, s.Size+s.Spacing, t, "", "", true)
 }
 
-func (r *PdfRenderer) writeLink(s Styler, display, url string) {
+func (r *PdfRenderer) writeLink(s theme.Styler, display, url string) {
 	r.Pdf.WriteLinkString(s.Size+s.Spacing, display, url)
 }
 
@@ -720,22 +506,13 @@ func (r *PdfRenderer) cr() {
 func (r *PdfRenderer) tracer(source, msg string) {
 	if r.tracerFile != "" {
 		indent := strings.Repeat("-", len(r.cs.stack)-1)
-		r.w.WriteString(fmt.Sprintf("%v[%v] %v\n", indent, source, msg))
+		_, _ = fmt.Fprintf(r.w, "%v[%v] %v\n", indent, source, msg)
 	}
 }
 
-func dorect(doc *fpdf.Fpdf, x, y, w, h float64, color Color) {
+func dorect(doc *fpdf.Fpdf, x, y, w, h float64, color colors.Color) {
 	doc.SetFillColor(color.Red, color.Green, color.Blue)
 	doc.Rect(x, y, w, h, "F")
-}
-
-// SetPageBackground - sets background colour of page. String IDs ("blue", "grey", etc) and `Color` structs are both supported
-func (r *PdfRenderer) SetPageBackground(colorStr string, color Color) {
-	w, h := r.Pdf.GetPageSize()
-	if colorStr != "" {
-		color = Colorlookup(colorStr)
-	}
-	dorect(r.Pdf, 0, 0, w, h, color)
 }
 
 // Options
