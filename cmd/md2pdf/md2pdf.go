@@ -19,23 +19,23 @@ import (
 )
 
 var (
-	input                     = flag.String("i", "", "Input filename, dir consisting of .md|.markdown files or HTTP(s) URL; default is os.Stdin")
-	output                    = flag.String("o", "", "Output PDF filename; required")
-	title                     = flag.String("title", "", "Presentation title")
-	author                    = flag.String("author", "", "Author's name; used if -footer is passed")
-	themeArg                  = flag.String("theme", "light", "[light | dark | /path/to/custom/theme.json]")
-	hrAsNewPage               = flag.Bool("new-page-on-hr", false, "Interpret HR as a new page; useful for presentations")
-	printFooter               = flag.Bool("with-footer", false, "Print doc footer (<author>  <title>  <page number>)")
-	generateTOC               = flag.Bool("generate-toc", false, "Auto Generate Table of Contents (TOC)")
-	pageSize                  = flag.String("page-size", "A4", "[A3 | A4 | A5]")
-	orientation               = flag.String("orientation", "portrait", "[portrait | landscape]")
-	logFile                   = flag.String("log-file", "", "Path to log file")
-	help                      = flag.Bool("help", false, "Show usage message")
-	ver                       = flag.Bool("version", false, "Print version and build info")
-	version                   = "dev"
-	commit                    = "none"
-	date                      = "unknown"
-	_, fileName, fileLine, ok = runtime.Caller(0)
+	input             = flag.String("i", "", "Input filename, dir consisting of .md|.markdown files or HTTP(s) URL; default is os.Stdin")
+	output            = flag.String("o", "", "Output PDF filename; required")
+	title             = flag.String("title", "", "Presentation title")
+	author            = flag.String("author", "", "Author's name; used if -footer is passed")
+	themeArg          = flag.String("theme", "light", "[light | dark | /path/to/custom/theme.json]")
+	hrAsNewPage       = flag.Bool("new-page-on-hr", false, "Interpret HR as a new page; useful for presentations")
+	printFooter       = flag.Bool("with-footer", false, "Print doc footer (<author>  <title>  <page number>)")
+	generateTOC       = flag.Bool("generate-toc", false, "Auto Generate Table of Contents (TOC)")
+	pageSize          = flag.String("page-size", "A4", "[A3 | A4 | A5]")
+	orientation       = flag.String("orientation", "portrait", "[portrait | landscape]")
+	logFile           = flag.String("log-file", "", "Path to log file")
+	help              = flag.Bool("help", false, "Show usage message")
+	ver               = flag.Bool("version", false, "Print version and build info")
+	version           = "dev"
+	commit            = "none"
+	date              = "unknown"
+	_, fileName, _, _ = runtime.Caller(0)
 )
 
 var opts []renderer.RenderOption
@@ -45,7 +45,8 @@ func processRemoteInputFile(url string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
+
 	if resp.StatusCode != 200 {
 		return nil, errors.New("Received non 200 response code: " + fmt.Sprintf("HTTP %d", resp.StatusCode))
 	}
@@ -83,7 +84,7 @@ func main() {
 		usage("Output PDF filename is required")
 	}
 
-	if *hrAsNewPage == true {
+	if *hrAsNewPage {
 		opts = append(opts, renderer.IsHorizontalRuleNewPage(true))
 	}
 
@@ -129,13 +130,13 @@ func main() {
 					}
 				}
 			} else {
-			content, err = os.ReadFile(*input)
-			if err != nil {
-				log.Fatal(err)
-			}
-			if absInput, absErr := filepath.Abs(*input); absErr == nil {
-				inputBaseURL = filepath.Dir(absInput)
-			}
+				content, err = os.ReadFile(*input)
+				if err != nil {
+					log.Fatal(err)
+				}
+				if absInput, absErr := filepath.Abs(*input); absErr == nil {
+					inputBaseURL = filepath.Dir(absInput)
+				}
 			}
 		}
 	}
@@ -182,13 +183,13 @@ func main() {
 			pf.Pdf.SetTextColor(128, 128, 128)
 			w, h, _ := pf.Pdf.PageSize(pf.Pdf.PageNo())
 			pf.Pdf.SetX(4)
-			pf.Pdf.CellFormat(0, 10, fmt.Sprintf("%s", *author), "", 0, "", true, 0, "")
+			pf.Pdf.CellFormat(0, 10, *author, "", 0, "", true, 0, "")
 			middle := w / 2
 			if *orientation == "landscape" {
 				middle = h / 2
 			}
 			pf.Pdf.SetX(middle - float64(len(*title)))
-			pf.Pdf.CellFormat(0, 10, fmt.Sprintf("%s", *title), "", 0, "", true, 0, "")
+			pf.Pdf.CellFormat(0, 10, *title, "", 0, "", true, 0, "")
 			pf.Pdf.SetX(-40)
 			pf.Pdf.CellFormat(0, 10, fmt.Sprintf("Page %d", pf.Pdf.PageNo()), "", 0, "", true, 0, "")
 		})
