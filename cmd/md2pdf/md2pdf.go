@@ -164,41 +164,6 @@ func main() {
 	pf.UpdateBlockquoteStyler()
 	pf.UpdateCodeStyler()
 
-	if *generateTOC == true {
-		headers, err := renderer.GetTOCEntries(content)
-		if err != nil {
-			log.Fatal(err)
-		}
-		headerLinks := make(map[string]*int)
-		for _, header := range headers {
-			linkID := pf.Pdf.AddLink()
-			headerLinks[header.Title] = &linkID
-
-			// debug
-			// log.Printf("Header: '%s' (Level %d) -> Link ID: %d\n",
-			// header.Title, header.Level, linkID)
-		}
-
-		pf.SetTOCLinks(headerLinks)
-		pf.Pdf.SetFont(pf.Theme.Normal.Font, "B", 24)
-
-		// Add a table of contents with clickable links
-		pf.Pdf.Cell(40, 10, "Table of Contents")
-		pf.Pdf.Ln(30)
-
-		for _, header := range headers {
-			if linkPtr, exists := headerLinks[header.Title]; exists {
-				link := *linkPtr
-				pf.Pdf.SetFont(pf.Theme.Normal.Font, "", 12)
-				pf.Pdf.SetTextColor(100, 149, 237)
-				indent := strings.Repeat("  ", header.Level-1)
-				pf.Pdf.WriteLinkID(8, fmt.Sprintf("%s • %s", indent, header.Title), link)
-				pf.Pdf.Ln(15)
-			}
-		}
-		pf.Pdf.AddPage()
-	}
-
 	if inputBaseURL != "" {
 		pf.InputBaseURL = inputBaseURL
 	}
@@ -216,7 +181,6 @@ func main() {
 			// Text color in gray
 			pf.Pdf.SetTextColor(128, 128, 128)
 			w, h, _ := pf.Pdf.PageSize(pf.Pdf.PageNo())
-			// fmt.Printf("Width: %f, height: %f, unit: %s\n", w, h, u)
 			pf.Pdf.SetX(4)
 			pf.Pdf.CellFormat(0, 10, fmt.Sprintf("%s", *author), "", 0, "", true, 0, "")
 			middle := w / 2
@@ -230,7 +194,11 @@ func main() {
 		})
 	}
 
-	err = pf.Process(content)
+	var p renderer.Processor = pf
+	if *generateTOC {
+		p = renderer.NewTOCDecorator(pf)
+	}
+	err = p.Process(content)
 	if err != nil {
 		fmt.Printf("error: %v\n", err)
 	}
