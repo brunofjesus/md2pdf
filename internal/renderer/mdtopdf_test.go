@@ -17,18 +17,20 @@
  *   Available at https://codeberg.org/go-pdf/fpdf
  */
 
-package mdtopdf
+package renderer
 
 import (
-	"github.com/gomarkdown/markdown/parser"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/gomarkdown/markdown/parser"
 )
 
 func testit(inputf string, gohighlight bool, t *testing.T) {
-	inputd := "./testdata/"
+	inputd := "../../testdata/"
 	input := path.Join(inputd, inputf)
 
 	tracerfile := path.Join(inputd, strings.TrimSuffix(path.Base(input), path.Ext(input)))
@@ -56,6 +58,9 @@ func testit(inputf string, gohighlight bool, t *testing.T) {
 		CustomThemeFile: "",
 	}
 	r := NewPdfRenderer(params)
+	if absInput, err := filepath.Abs(input); err == nil {
+		r.InputBaseURL = filepath.Dir(absInput)
+	}
 	r.Extensions = parser.NoIntraEmphasis | parser.Tables | parser.FencedCode | parser.Autolink | parser.Strikethrough | parser.SpaceHeadings | parser.HeadingIDs | parser.BackslashLineBreak | parser.DefinitionLists
 	err = r.Process(content)
 	if err != nil {

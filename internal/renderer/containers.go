@@ -17,7 +17,7 @@
  *   Available at https://codeberg.org/go-pdf/fpdf
  */
 
-package mdtopdf
+package renderer
 
 import "github.com/solworktech/md2pdf/v2/internal/theme"
 

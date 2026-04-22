@@ -37,7 +37,8 @@ type Theme struct {
 	TBody   Styler
 
 	// code styling
-	Code Styler
+	Code         Styler
+	CodeTabWidth int
 }
 
 // Styler is the struct to capture the styling features for text
@@ -87,6 +88,7 @@ func LightTheme() *Theme {
 		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
 		TextColor: colors.New(37, 27, 14), FillColor: colors.New(200, 200, 200),
 	}
+	r.CodeTabWidth = 4
 
 	// Headings
 	r.H1 = Styler{
@@ -168,6 +170,7 @@ func DarkTheme() *Theme {
 		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
 		TextColor: colors.Lookup("lightgrey"), FillColor: colors.New(32, 35, 37),
 	}
+	r.CodeTabWidth = 4
 
 	// Headings
 	r.H1 = Styler{

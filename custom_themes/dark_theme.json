@@ -209,6 +209,7 @@
     }
   },
   "Theme": 3,
+  "CodeTabWidth": 4,
   "BackgroundColor": {
     "Red": 0,
     "Green": 0,

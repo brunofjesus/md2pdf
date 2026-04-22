@@ -17,7 +17,7 @@
  *   Available at https://codeberg.org/go-pdf/fpdf
  */
 
-package mdtopdf
+package renderer
 
 import (
 	"errors"
@@ -27,8 +27,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-
-	// "reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -38,8 +36,8 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gomarkdown/markdown/ast"
 	highlight "github.com/jessp01/gohighlight"
-	syntaxhighlight "github.com/solworktech/md2pdf/v2/internal/highlight"
 	"github.com/mitchellh/go-wordwrap"
+	syntaxhighlight "github.com/solworktech/md2pdf/v2/internal/highlight"
 )
 
 func (r *PdfRenderer) processText(node *ast.Text) {
@@ -82,16 +80,12 @@ func (r *PdfRenderer) processText(node *ast.Text) {
 	}
 }
 
-// This is a stub implementation. For now, the MathAjax extension is disabled.
-func (r *PdfRenderer) processMath(node *ast.Math) {
-	currentStyle := r.cs.peek().textStyle
-	s := string(node.Literal)
-	r.write(currentStyle, s)
-}
-
 func (r *PdfRenderer) outputUnhighlightedCodeBlock(codeBlock string) {
 	r.cr() // start on next line!
 	r.setStyler(r.Theme.Backtick)
+	if r.Theme.CodeTabWidth > 0 {
+		codeBlock = strings.ReplaceAll(codeBlock, "\t", strings.Repeat(" ", r.Theme.CodeTabWidth))
+	}
 	r.multiCell(r.Theme.Backtick, codeBlock)
 }
 
@@ -117,6 +111,9 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 	syntaxDef, _ := highlight.ParseDef(syntaxFile)
 	h := highlight.NewHighlighter(syntaxDef)
 	linesWrapped := wordwrap.WrapString(string(node.Literal), 90)
+	if r.Theme.CodeTabWidth > 0 {
+		linesWrapped = strings.ReplaceAll(linesWrapped, "\t", strings.Repeat(" ", r.Theme.CodeTabWidth))
+	}
 	matches := h.HighlightString(linesWrapped)
 	r.cr()
 	lines := strings.Split(linesWrapped, "\n")
@@ -371,6 +368,16 @@ func (r *PdfRenderer) processImage(node ast.Image, entering bool) {
 		destination := string(node.Destination)
 		tempDir := os.TempDir() + "/" + filepath.Base(os.Args[0])
 		_, err := os.Stat(destination)
+		if errors.Is(err, os.ErrNotExist) &&
+			!strings.HasPrefix(destination, "http") &&
+			r.InputBaseURL != "" &&
+			!strings.HasPrefix(r.InputBaseURL, "http") {
+			localPath := filepath.Join(r.InputBaseURL, destination)
+			if _, lerr := os.Stat(localPath); lerr == nil {
+				destination = localPath
+				err = nil
+			}
+		}
 		if errors.Is(err, os.ErrNotExist) {
 			// download the image so we can use it
 			var source string = destination
@@ -441,6 +448,7 @@ func (r *PdfRenderer) processImage(node ast.Image, entering bool) {
 }
 
 func (r *PdfRenderer) processCode(node ast.Node) {
+	// TODO: codeblock
 	r.tracer("processCode", fmt.Sprintf("%s", string(node.AsLeaf().Literal)))
 	if r.NeedCodeStyleUpdate {
 		r.tracer("Code (entering)", "")

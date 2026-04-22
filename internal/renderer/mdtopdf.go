@@ -17,8 +17,8 @@
  *   Available at https://codeberg.org/go-pdf/fpdf
  */
 
-// Package mdtopdf converts markdown to PDF.
-package mdtopdf
+// Package renderer converts markdown to PDF.
+package renderer
 
 import (
 	"bufio"
@@ -478,8 +478,6 @@ func (r *PdfRenderer) RenderNode(w io.Writer, node ast.Node, entering bool) ast.
 		r.processTableRow(node, entering)
 	case *ast.TableCell:
 		r.processTableCell(*node, entering)
-	/*case *ast.Math:
-	r.processMath(node)*/
 	default:
 		fmt.Printf("Unknown node type: %T. Skipping\n", node)
 	}
@@ -512,13 +510,4 @@ func (r *PdfRenderer) tracer(source, msg string) {
 func dorect(doc *fpdf.Fpdf, x, y, w, h float64, color colors.Color) {
 	doc.SetFillColor(color.Red, color.Green, color.Blue)
 	doc.Rect(x, y, w, h, "F")
-}
-
-// Options
-
-// IsHorizontalRuleNewPage if true, will start a new page when encountering a HR (---). Useful for presentations.
-func IsHorizontalRuleNewPage(value bool) RenderOption {
-	return func(r *PdfRenderer) {
-		r.HorizontalRuleNewPage = value
-	}
 }

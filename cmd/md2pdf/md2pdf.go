@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	"github.com/gomarkdown/markdown/parser"
-	mdtopdf "github.com/solworktech/md2pdf/v2"
+	"github.com/solworktech/md2pdf/v2/internal/renderer"
 	"golang.org/x/exp/slices"
 )
 
@@ -38,7 +38,7 @@ var (
 	_, fileName, fileLine, ok = runtime.Caller(0)
 )
 
-var opts []mdtopdf.RenderOption
+var opts []renderer.RenderOption
 
 func processRemoteInputFile(url string) ([]byte, error) {
 	resp, err := http.Get(url)
@@ -84,7 +84,7 @@ func main() {
 	}
 
 	if *hrAsNewPage == true {
-		opts = append(opts, mdtopdf.IsHorizontalRuleNewPage(true))
+		opts = append(opts, renderer.IsHorizontalRuleNewPage(true))
 	}
 
 	// get text for PDF
@@ -112,7 +112,7 @@ func main() {
 			}
 
 			if fileInfo.IsDir() {
-				opts = append(opts, mdtopdf.IsHorizontalRuleNewPage(true))
+				opts = append(opts, renderer.IsHorizontalRuleNewPage(true))
 				validExts := []string{".md", ".markdown"}
 				files, err := glob(*input, validExts)
 				if err != nil {
@@ -129,24 +129,27 @@ func main() {
 					}
 				}
 			} else {
-				content, err = os.ReadFile(*input)
-				if err != nil {
-					log.Fatal(err)
-				}
+			content, err = os.ReadFile(*input)
+			if err != nil {
+				log.Fatal(err)
+			}
+			if absInput, absErr := filepath.Abs(*input); absErr == nil {
+				inputBaseURL = filepath.Dir(absInput)
+			}
 			}
 		}
 	}
 
-	theme := mdtopdf.LIGHT
+	theme := renderer.LIGHT
 	themeFile := ""
 	if *themeArg == "dark" {
-		theme = mdtopdf.DARK
+		theme = renderer.DARK
 	} else if _, err := os.Stat(*themeArg); err == nil {
-		theme = mdtopdf.CUSTOM
+		theme = renderer.CUSTOM
 		themeFile = *themeArg
 	}
 
-	params := mdtopdf.PdfRendererParams{
+	params := renderer.PdfRendererParams{
 		Orientation:     *orientation,
 		Papersz:         *pageSize,
 		PdfFile:         *output,
@@ -156,13 +159,13 @@ func main() {
 		CustomThemeFile: themeFile,
 	}
 
-	pf := mdtopdf.NewPdfRenderer(params)
+	pf := renderer.NewPdfRenderer(params)
 
 	pf.UpdateBlockquoteStyler()
 	pf.UpdateCodeStyler()
 
 	if *generateTOC == true {
-		headers, err := mdtopdf.GetTOCEntries(content)
+		headers, err := renderer.GetTOCEntries(content)
 		if err != nil {
 			log.Fatal(err)
 		}
