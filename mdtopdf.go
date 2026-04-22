@@ -31,8 +31,8 @@ import (
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/ast"
 	"github.com/gomarkdown/markdown/parser"
-	"github.com/solworktech/md2pdf/v2/fonts"
 	"github.com/solworktech/md2pdf/v2/internal/colors"
+	"github.com/solworktech/md2pdf/v2/internal/fonts"
 	"github.com/solworktech/md2pdf/v2/internal/theme"
 )
 
