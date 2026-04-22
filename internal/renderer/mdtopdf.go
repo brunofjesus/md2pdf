@@ -135,6 +135,12 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 	r.Pdf.AddUTF8FontFromBytes("LiberationSans", "I", fonts.LiberationSansItalic)
 	r.Pdf.AddUTF8FontFromBytes("LiberationSans", "BI", fonts.LiberationSansBoldItalic)
 
+	// Register Liberation Mono (SIL Open Font License) for code and code blocks.
+	r.Pdf.AddUTF8FontFromBytes("LiberationMono", "", fonts.LiberationMonoRegular)
+	r.Pdf.AddUTF8FontFromBytes("LiberationMono", "B", fonts.LiberationMonoBold)
+	r.Pdf.AddUTF8FontFromBytes("LiberationMono", "I", fonts.LiberationMonoItalic)
+	r.Pdf.AddUTF8FontFromBytes("LiberationMono", "BI", fonts.LiberationMonoBoldItalic)
+
 	switch params.Theme {
 	case DARK:
 		r.Theme = theme.DarkTheme()

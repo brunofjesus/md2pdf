@@ -72,7 +72,7 @@ func LightTheme() *Theme {
 
 	// Backticked text
 	r.Backtick = Styler{
-		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
+		Font: "LiberationMono", Style: "", Size: 12, Spacing: 2,
 		TextColor: colors.New(37, 27, 14), FillColor: colors.New(200, 200, 200),
 	}
 
@@ -85,7 +85,7 @@ func LightTheme() *Theme {
 
 	// Code text
 	r.Code = Styler{
-		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
+		Font: "LiberationMono", Style: "", Size: 12, Spacing: 2,
 		TextColor: colors.New(37, 27, 14), FillColor: colors.New(200, 200, 200),
 	}
 	r.CodeTabWidth = 4
@@ -161,13 +161,13 @@ func DarkTheme() *Theme {
 
 	// Backticked text
 	r.Backtick = Styler{
-		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
+		Font: "LiberationMono", Style: "", Size: 12, Spacing: 2,
 		TextColor: colors.Lookup("lightgrey"), FillColor: colors.New(32, 35, 37),
 	}
 
 	// Code text
 	r.Code = Styler{
-		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
+		Font: "LiberationMono", Style: "", Size: 12, Spacing: 2,
 		TextColor: colors.Lookup("lightgrey"), FillColor: colors.New(32, 35, 37),
 	}
 	r.CodeTabWidth = 4

@@ -1,5 +1,5 @@
 /*
-Package mdtopdf implements a PDF document generator for markdown documents.
+Package renderer implements a PDF document generator for markdown documents.
 
 # Introduction
 

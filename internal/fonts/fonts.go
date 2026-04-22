@@ -16,3 +16,18 @@ var LiberationSansItalic []byte
 
 //go:embed LiberationSans-BoldItalic.ttf
 var LiberationSansBoldItalic []byte
+
+// Liberation Mono - SIL Open Font License
+// https://github.com/liberationfonts/liberation-fonts
+
+//go:embed LiberationMono-Regular.ttf
+var LiberationMonoRegular []byte
+
+//go:embed LiberationMono-Bold.ttf
+var LiberationMonoBold []byte
+
+//go:embed LiberationMono-Italic.ttf
+var LiberationMonoItalic []byte
+
+//go:embed LiberationMono-BoldItalic.ttf
+var LiberationMonoBoldItalic []byte
