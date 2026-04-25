@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -111,24 +112,32 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 		linesWrapped = strings.ReplaceAll(linesWrapped, "\t", strings.Repeat(" ", r.Theme.CodeTabWidth))
 	}
 	matches := h.HighlightString(linesWrapped)
+
+	r.setStyler(r.Theme.Code)
 	r.cr()
 	lines := strings.Split(linesWrapped, "\n")
-	// strings.Split on a newline-terminated string produces a trailing empty
-	// element; drop it so we don't paint a spurious extra background line.
-	if len(lines) > 0 && lines[len(lines)-1] == "" {
-		lines = lines[:len(lines)-1]
-	}
-
-	// Draw a single background rectangle covering the entire code block now,
-	// before any text is written.  This avoids per-line Y drift that occurs
-	// when the rect height and cr()'s line-advance don't match.
-	startX, startY := r.Pdf.GetXY()
-	lm, _, rm, _ := r.Pdf.GetMargins()
-	pw, _ := r.Pdf.GetPageSize()
 	lineH := r.Theme.Code.Size + r.Theme.Code.Spacing
-	r.setStyler(r.Theme.Code)
-	r.Pdf.Rect(lm, startY-(lineH/2), pw-lm-rm, (float64(len(lines))*lineH)+(lineH/2), "F")
-	r.Pdf.SetXY(startX, startY)
+	if r.Theme.Code.FillColor != r.Theme.BackgroundColor {
+		if len(lines) > 0 && lines[len(lines)-1] == "" {
+			lines = lines[:len(lines)-1]
+		}
+
+		startX, startY := r.Pdf.GetXY()
+		lm, _, rm, _ := r.Pdf.GetMargins()
+		pw, _ := r.Pdf.GetPageSize()
+
+		fillWidth := pw - lm - rm
+		fillLines := 0.0
+		for _, line := range lines {
+			lineWidth := r.Pdf.GetStringWidth(line)
+			fillLines += math.Ceil(lineWidth / fillWidth)
+		}
+
+		fillHeight := fillLines * lineH
+
+		r.Pdf.Rect(lm, startY, fillWidth, fillHeight, "F")
+		r.Pdf.SetXY(startX, startY)
+	}
 
 	for lineN, l := range lines {
 		colN := 0
