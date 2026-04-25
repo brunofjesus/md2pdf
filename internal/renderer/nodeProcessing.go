@@ -451,10 +451,11 @@ func (r *PdfRenderer) processCode(node ast.Node) {
 	// TODO: codeblock
 	r.tracer("processCode", fmt.Sprintf("%s", string(node.AsLeaf().Literal)))
 	if r.NeedCodeStyleUpdate {
+		r.write(r.Theme.Normal, " ") // fix: no margin
 		r.tracer("Code (entering)", "")
 		r.setStyler(r.Theme.Code)
 		s := string(node.AsLeaf().Literal)
-		hw := r.Pdf.GetStringWidth(s) + (1 * r.NormalEm)
+		hw := r.Pdf.GetStringWidth(s)
 		h := r.Theme.Code.Size
 		r.Pdf.CellFormat(hw, h, s, "", 0, "C", true, 0, "")
 	} else {
