@@ -86,6 +86,66 @@ func (r *PdfRenderer) outputUnhighlightedCodeBlock(codeBlock string) {
 	r.multiCell(r.Theme.Code, codeBlock)
 }
 
+// drawCodeFill manages the light-gray background rectangles and page breaks
+// for a highlighted code block.  It disables fpdf's automatic page breaking
+// for the duration of the block so it can draw a correctly-sized rectangle on
+// every page the block spans.  renderLine is called for each logical line and
+// is responsible for writing the actual text characters.
+func (r *PdfRenderer) drawCodeFill(lines []string, lineHeights []float64, renderLine func(lineN int, l string)) {
+	lm, _, rm, bm := r.Pdf.GetMargins()
+	pw, ph := r.Pdf.GetPageSize()
+	availW := pw - lm - rm
+	usableH := ph - bm
+
+	drawBg := func(y, height float64) {
+		r.setStyler(r.Theme.Code)
+		r.Pdf.Rect(lm, y, availW, height, "F")
+	}
+
+	// rectHeightFrom returns the height needed to cover lines[from..] that
+	// still fit on a page whose printable area starts at pageTopY.
+	rectHeightFrom := func(from int, pageTopY float64) float64 {
+		h := 0.0
+		for i := from; i < len(lines); i++ {
+			if pageTopY+h+lineHeights[i] > usableH {
+				break
+			}
+			h += lineHeights[i]
+		}
+		return h
+	}
+
+	autoBreak, pbMargin := r.Pdf.GetAutoPageBreak()
+	r.Pdf.SetAutoPageBreak(false, pbMargin)
+	defer r.Pdf.SetAutoPageBreak(autoBreak, pbMargin)
+
+	startX, startY := r.Pdf.GetXY()
+	if r.Theme.Code.FillColor != r.Theme.BackgroundColor {
+		if h := rectHeightFrom(0, startY); h > 0 {
+			drawBg(startY, h)
+			r.Pdf.SetXY(startX, startY)
+		}
+	}
+
+	for lineN, l := range lines {
+		// If this line would exceed the printable area, break to a new page
+		// and draw a fresh background rectangle for the remaining lines.
+		if r.Pdf.GetY()+lineHeights[lineN] > usableH {
+			r.Pdf.AddPage()
+			newY := r.Pdf.GetY()
+			if r.Theme.Code.FillColor != r.Theme.BackgroundColor {
+				if h := rectHeightFrom(lineN, newY); h > 0 {
+					drawBg(newY, h)
+				}
+			}
+			r.Pdf.SetX(lm)
+		}
+
+		renderLine(lineN, l)
+		r.cr()
+	}
+}
+
 func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 	r.tracer("Codeblock", fmt.Sprintf("%v", ast.ToString(node.AsLeaf())))
 
@@ -115,31 +175,30 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 
 	r.setStyler(r.Theme.Code)
 	r.cr()
+
 	lines := strings.Split(linesWrapped, "\n")
-	lineH := r.Theme.Code.Size + r.Theme.Code.Spacing
-	if r.Theme.Code.FillColor != r.Theme.BackgroundColor {
-		if len(lines) > 0 && lines[len(lines)-1] == "" {
-			lines = lines[:len(lines)-1]
-		}
-
-		startX, startY := r.Pdf.GetXY()
-		lm, _, rm, _ := r.Pdf.GetMargins()
-		pw, _ := r.Pdf.GetPageSize()
-
-		fillWidth := pw - lm - rm
-		fillLines := 0.0
-		for _, line := range lines {
-			lineWidth := r.Pdf.GetStringWidth(line)
-			fillLines += math.Ceil(lineWidth / fillWidth)
-		}
-
-		fillHeight := fillLines * lineH
-
-		r.Pdf.Rect(lm, startY, fillWidth, fillHeight, "F")
-		r.Pdf.SetXY(startX, startY)
+	// Trim the trailing empty element produced by a newline-terminated string.
+	if len(lines) > 0 && lines[len(lines)-1] == "" {
+		lines = lines[:len(lines)-1]
 	}
 
-	for lineN, l := range lines {
+	lineH := r.Theme.Code.Size + r.Theme.Code.Spacing
+	lm, _, rm, _ := r.Pdf.GetMargins()
+	pw, _ := r.Pdf.GetPageSize()
+	availW := pw - lm - rm
+
+	// Pre-compute per-line rendered heights (accounting for soft-wrapping).
+	lineHeights := make([]float64, len(lines))
+	for i, l := range lines {
+		w := r.Pdf.GetStringWidth(l)
+		if w <= 0 {
+			lineHeights[i] = lineH
+		} else {
+			lineHeights[i] = math.Ceil(w/availW) * lineH
+		}
+	}
+
+	r.drawCodeFill(lines, lineHeights, func(lineN int, l string) {
 		colN := 0
 		for _, c := range l {
 			if group, ok := matches[lineN][colN]; ok {
@@ -206,9 +265,8 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 			r.Pdf.Write(lineH, string(c))
 			colN++
 		}
+	})
 
-		r.cr()
-	}
 	// Restore fill color to what the theme expects.
 	r.setStyler(r.Theme.Code)
 }
