@@ -126,7 +126,6 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 	lm, _, rm, _ := r.Pdf.GetMargins()
 	pw, _ := r.Pdf.GetPageSize()
 	lineH := r.Theme.Code.Size + r.Theme.Code.Spacing
-	// r.Pdf.SetFillColor(r.)
 	r.setStyler(r.Theme.Code)
 	r.Pdf.Rect(lm, startY-(lineH/2), pw-lm-rm, (float64(len(lines))*lineH)+(lineH/2), "F")
 	r.Pdf.SetXY(startX, startY)
@@ -195,7 +194,7 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 					r.setStyler(r.Theme.Code)
 				}
 			}
-			r.Pdf.Write(5, string(c))
+			r.Pdf.Write(lineH, string(c))
 			colN++
 		}
 
