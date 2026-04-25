@@ -61,7 +61,8 @@ func LightTheme() *Theme {
 	// Normal Text
 	r.Normal = Styler{
 		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
-		TextColor: colors.Lookup("black"), FillColor: colors.Lookup("white"),
+		TextColor: colors.Lookup("black"),
+		FillColor: colors.Lookup("white"),
 	}
 
 	// Link text

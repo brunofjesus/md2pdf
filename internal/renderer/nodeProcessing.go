@@ -82,7 +82,7 @@ func (r *PdfRenderer) outputUnhighlightedCodeBlock(codeBlock string) {
 	if r.Theme.CodeTabWidth > 0 {
 		codeBlock = strings.ReplaceAll(codeBlock, "\t", strings.Repeat(" ", r.Theme.CodeTabWidth))
 	}
-	r.multiCell(r.Theme.Backtick, codeBlock)
+	r.multiCell(r.Theme.Code, codeBlock)
 }
 
 func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
@@ -113,6 +113,24 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 	matches := h.HighlightString(linesWrapped)
 	r.cr()
 	lines := strings.Split(linesWrapped, "\n")
+	// strings.Split on a newline-terminated string produces a trailing empty
+	// element; drop it so we don't paint a spurious extra background line.
+	if len(lines) > 0 && lines[len(lines)-1] == "" {
+		lines = lines[:len(lines)-1]
+	}
+
+	// Draw a single background rectangle covering the entire code block now,
+	// before any text is written.  This avoids per-line Y drift that occurs
+	// when the rect height and cr()'s line-advance don't match.
+	startX, startY := r.Pdf.GetXY()
+	lm, _, rm, _ := r.Pdf.GetMargins()
+	pw, _ := r.Pdf.GetPageSize()
+	lineH := r.Theme.Code.Size + r.Theme.Code.Spacing
+	// r.Pdf.SetFillColor(r.)
+	r.setStyler(r.Theme.Code)
+	r.Pdf.Rect(lm, startY-(lineH/2), pw-lm-rm, (float64(len(lines))*lineH)+(lineH/2), "F")
+	r.Pdf.SetXY(startX, startY)
+
 	for lineN, l := range lines {
 		colN := 0
 		for _, c := range l {
@@ -121,7 +139,7 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 				case highlight.Groups["default"]:
 					fallthrough
 				case highlight.Groups[""]:
-					r.setStyler(r.Theme.Normal)
+					r.setStyler(r.Theme.Code)
 				case highlight.Groups["statement"]:
 					fallthrough
 				case highlight.Groups["green"]:
@@ -130,17 +148,14 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 					fallthrough
 				case highlight.Groups["blue"]:
 					r.Pdf.SetTextColor(137, 207, 240)
-
 				case highlight.Groups["preproc"]:
 					r.Pdf.SetTextColor(255, 80, 80)
-
 				case highlight.Groups["special"]:
 					fallthrough
 				case highlight.Groups["type.keyword"]:
 					fallthrough
 				case highlight.Groups["red"]:
 					r.Pdf.SetTextColor(255, 80, 80)
-
 				case highlight.Groups["constant"]:
 					fallthrough
 				case highlight.Groups["constant.number"]:
@@ -153,7 +168,6 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 					fallthrough
 				case highlight.Groups["cyan"]:
 					r.Pdf.SetTextColor(0, 136, 163)
-
 				case highlight.Groups["constant.specialChar"]:
 					fallthrough
 				case highlight.Groups["constant.string.url"]:
@@ -162,8 +176,9 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 					fallthrough
 				case highlight.Groups["magenta"]:
 					r.Pdf.SetTextColor(255, 0, 255)
-
 				case highlight.Groups["type"]:
+					fallthrough
+				case highlight.Groups["symbol"]:
 					fallthrough
 				case highlight.Groups["symbol.operator"]:
 					fallthrough
@@ -171,13 +186,13 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 					fallthrough
 				case highlight.Groups["yellow"]:
 					r.Pdf.SetTextColor(255, 165, 0)
-
 				case highlight.Groups["comment"]:
 					fallthrough
 				case highlight.Groups["high.green"]:
 					r.Pdf.SetTextColor(82, 204, 0)
 				default:
-					r.setStyler(r.Theme.Normal)
+					fmt.Printf("Unknown group: %s\n", group)
+					r.setStyler(r.Theme.Code)
 				}
 			}
 			r.Pdf.Write(5, string(c))
@@ -186,6 +201,8 @@ func (r *PdfRenderer) processCodeblock(node ast.CodeBlock) {
 
 		r.cr()
 	}
+	// Restore fill color to what the theme expects.
+	r.setStyler(r.Theme.Code)
 }
 
 func (r *PdfRenderer) processList(node ast.List, entering bool) {
