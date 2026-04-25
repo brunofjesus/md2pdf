@@ -162,9 +162,6 @@ func main() {
 
 	pf := renderer.NewPdfRenderer(params)
 
-	pf.UpdateBlockquoteStyler()
-	pf.UpdateCodeStyler()
-
 	if inputBaseURL != "" {
 		pf.InputBaseURL = inputBaseURL
 	}

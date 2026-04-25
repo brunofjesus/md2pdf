@@ -44,9 +44,7 @@ func (r *PdfRenderer) processText(node *ast.Text) {
 	currentStyle := r.cs.peek().textStyle
 	r.setStyler(currentStyle)
 	s := string(node.Literal)
-	if !r.NeedBlockquoteStyleUpdate {
-		s = strings.ReplaceAll(s, "\n", " ")
-	}
+	s = strings.ReplaceAll(s, "\n", " ")
 	r.tracer("Text", s)
 
 	if incell {
@@ -71,10 +69,8 @@ func (r *PdfRenderer) processText(node *ast.Text) {
 		}
 		r.write(currentStyle, s)
 	case *ast.BlockQuote:
-		if r.NeedBlockquoteStyleUpdate {
-			r.tracer("Text BlockQuote", s)
-			r.multiCell(currentStyle, s)
-		}
+		r.tracer("Text BlockQuote", s)
+		r.multiCell(currentStyle, s)
 	default:
 		r.write(currentStyle, s)
 	}
@@ -448,21 +444,14 @@ func (r *PdfRenderer) processImage(node ast.Image, entering bool) {
 }
 
 func (r *PdfRenderer) processCode(node ast.Node) {
-	// TODO: codeblock
 	r.tracer("processCode", fmt.Sprintf("%s", string(node.AsLeaf().Literal)))
-	if r.NeedCodeStyleUpdate {
-		r.write(r.Theme.Normal, " ") // fix: no margin
-		r.tracer("Code (entering)", "")
-		r.setStyler(r.Theme.Code)
-		s := string(node.AsLeaf().Literal)
-		hw := r.Pdf.GetStringWidth(s)
-		h := r.Theme.Code.Size
-		r.Pdf.CellFormat(hw, h, s, "", 0, "C", true, 0, "")
-	} else {
-		r.tracer("Backtick (entering)", "")
-		r.setStyler(r.Theme.Backtick)
-		r.write(r.Theme.Backtick, string(node.AsLeaf().Literal))
-	}
+	r.write(r.Theme.Normal, " ") // fix: no margin
+	r.tracer("Code (entering)", "")
+	r.setStyler(r.Theme.Code)
+	s := string(node.AsLeaf().Literal)
+	hw := r.Pdf.GetStringWidth(s)
+	h := r.Theme.Code.Size
+	r.Pdf.CellFormat(hw, h, s, "", 0, "C", true, 0, "")
 }
 
 func (r *PdfRenderer) processParagraph(node *ast.Paragraph, entering bool) {

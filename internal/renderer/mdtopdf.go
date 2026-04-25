@@ -79,12 +79,10 @@ type PdfRenderer struct {
 	cs states
 
 	// update styling
-	NeedCodeStyleUpdate       bool
-	NeedBlockquoteStyleUpdate bool
-	HorizontalRuleNewPage     bool
-	InputBaseURL              string
-	Extensions                parser.Extensions
-	ColumnWidths              map[ast.Node][]float64
+	HorizontalRuleNewPage bool
+	InputBaseURL          string
+	Extensions            parser.Extensions
+	ColumnWidths          map[ast.Node][]float64
 
 	tocLinks map[string]*int
 }
@@ -302,16 +300,6 @@ func (r *PdfRenderer) UpdateParagraphStyler(defaultStyler theme.Styler) {
 		textStyle: defaultStyler, leftMargin: r.mleft,
 	}
 	r.cs.push(initcurrent)
-}
-
-// UpdateCodeStyler - update code fill styler
-func (r *PdfRenderer) UpdateCodeStyler() {
-	r.NeedCodeStyleUpdate = true
-}
-
-// UpdateBlockquoteStyler - update Blockquote fill styler
-func (r *PdfRenderer) UpdateBlockquoteStyler() {
-	r.NeedBlockquoteStyleUpdate = true
 }
 
 func (r *PdfRenderer) setStyler(s theme.Styler) {
