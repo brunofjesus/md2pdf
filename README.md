@@ -1,11 +1,15 @@
-[![CI][badge-build]][build]
-[![GoDoc][go-docs-badge]][go-docs]
-[![GoReportCard][go-report-card-badge]][go-report-card]
-[![License][badge-license]][license]
-
 ## Markdown to PDF
 
 A CLI utility which, as the name implies, generates a PDF from Markdown.
+
+This is a fork of [solworktech/md2pdf](https://github.com/solworktech/md2pdf).
+
+### Key differences from the original
+
+- **Built-in UTF-8 support** — Liberation Sans and Liberation Mono fonts are embedded; no need for external font files or unicode encoding flags
+- **Embedded syntax highlighting** — syntax definition files are bundled into the binary; no git submodule or `-s` flag needed
+- **Code block improvements** — code blocks use Liberation Mono with background highlighting
+- **Restructured internals** — renderer, theme, colors, fonts and highlight logic moved into `internal/` packages
 
 This package depends on two other packages:
 - [gomarkdown](https://github.com/gomarkdown/markdown) parser to read the markdown source
@@ -13,11 +17,11 @@ This package depends on two other packages:
 
 ## Features
 
-- [Syntax highlighting (for code blocks)](#syntax-highlighting)
+- Syntax highlighting (for code blocks) — built-in, no configuration needed
 - [Dark and light themes](#custom-themes)
 - [Customised themes (by passing a JSON file to `md2pdf`)](#custom-themes)
 - [Auto Generation of Table of Contents](#auto-generation-of-table-of-contents)
-- [Support of non-Latin charsets and multiple fonts](#using-non-ascii-glyphsfonts)
+- Built-in UTF-8 support (Liberation Sans / Liberation Mono)
 - [Pagination control (using horizontal lines - especially useful for presentations)](#additional-options)
 - [Page Footer (consisting of author, title and page number)](#additional-options)
 
@@ -34,26 +38,18 @@ This package depends on two other packages:
 
 ## Installation 
 
-You can obtain the pre-built `md2pdf` binary for your OS and arch
-[here](https://github.com/solworktech/md2pdf/releases); 
-you can also install the `md2pdf` binary directly onto your `$GOBIN` dir with:
+Build from source:
 
 ```sh
 $ go install github.com/solworktech/md2pdf/v2/cmd/md2pdf@latest
 ```
 
-`md2pdf` is also available via [Homebrew](https://formulae.brew.sh/formula/md2pdf):
-
-```sh
-$ brew install md2pdf
-```
-
 ## Syntax highlighting
 
-`md2pdf` supports colourised output via the [gohighlight module](https://github.com/jessp01/gohighlight).
+`md2pdf` includes built-in syntax highlighting for code blocks via embedded [gohighlight](https://github.com/jessp01/gohighlight) syntax files. No external files or configuration needed — just annotate your code blocks with the language name.
 
-For examples, see [testdata/syntax_highlighting.md](./testdata/syntax_highlighting.md) and 
-[testdata/syntax_highlighting.pdf](./testdata/syntax_highlighting.pdf)
+*Note: when annotating the code block to specify the language, the
+annotation name must match the syntax base filename.*
 
 ## Custom themes
 
@@ -71,47 +67,20 @@ To make use of this feature, simply pass `--generate-toc` as an argument.
 
 ## Quick start
 
-```
-$ cd cmd/md2pdf
-$ go run md2pdf.go -i test.md -o test.pdf
-```
-
-To benefit from Syntax highlighting, invoke thusly:
-
-```
-$ go run md2pdf.go -i syn_test.md -s /path/to/syntax_files -o test.pdf
+```sh
+$ go run ./cmd/md2pdf -i input.md -o output.pdf
 ```
 
 To convert multiple MD files into a single PDF, use:
-```
-$ go run md2pdf.go -i /path/to/md/directory -o test.pdf
-```
-
-This repo has the [gohighlight module](https://github.com/jessp01/gohighlight) configured as a submodule, so if you clone
-with `--recursive`, you will have the `highlight` dir in its root. Alternatively, you may issue the following command to update an
-existing clone:
-
 ```sh
-git submodule update --remote  --init
+$ go run ./cmd/md2pdf -i /path/to/md/directory -o output.pdf
 ```
-
-*Note 1: the `cmd` folder has an example for the syntax highlighting. 
-See the script `run_syntax_highlighting.sh`. This example assumes that
-the folder with the syntax files is located at a relative location:
-`../../../jessp01/gohighlight/syntax_files`.*
-
-*Note 2: when annotating the code block to specify the language, the
-annotation name must match the syntax base filename.*
 
 ### Additional options
 
 ```sh
   -author string
-    	Author name; used if -footer is passed
-  -font-file string
-    	path to font file to use
-  -font-name string
-    	Font name ID; e.g 'Helvetica-1251'
+    	Author name; used if -with-footer is passed
   -generate-toc
     	Auto Generate Table of Contents (TOC)
   -help
@@ -128,14 +97,10 @@ annotation name must match the syntax base filename.*
     	[portrait | landscape] (default "portrait")
   -page-size string
     	[A3 | A4 | A5] (default "A4")
-  -s string
-    	Path to github.com/jessp01/gohighlight/syntax_files
   -theme string
     	[light | dark | /path/to/custom/theme.json] (default "light")
   -title string
     	Presentation title
-  -unicode-encoding string
-    	e.g 'cp1251'
   -version
     	Print version and build info
   -with-footer
@@ -151,30 +116,9 @@ For example, the below will:
 - Print a footer (`author name, title, page number`)
 
 ```sh
-$ go run md2pdf.go  -i /path/to/md \
+$ go run ./cmd/md2pdf -i /path/to/md \
     -o /path/to/pdf --title "My Grand Title" --author "Random Bloke" \
     --theme dark --new-page-on-hr --with-footer
-```
-
-## Using non-ASCII Glyphs/Fonts
-
-To use a non-ASCII language, the PDF generator must be configured with `WithUnicodeTranslator`:
-
-```go
-// https://en.wikipedia.org/wiki/Windows-1251
-pf := mdtopdf.NewPdfRenderer("", "", *output, "trace.log", mdtopdf.WithUnicodeTranslator("cp1251")) 
-```
-
-In addition, this package's `Styler` must be used to set the font to match what is configured with the PDF generator.
-
-A complete working example can be found for Russian in the `cmd` folder named
-`russian.go`.
-
-For a full example, run:
-
-```sh
-$ go run md2pdf.go -i russian.md -o russian.pdf \
-    --unicode-encoding cp1251 --font-file helvetica_1251.json --font-name Helvetica_1251
 ```
 
 ## Tests
@@ -193,7 +137,7 @@ and the data provided while the AST is presented.
 - Github-flavoured Markdown permits strikethrough using tildes. This is not supported by `fpdf` as a font style at present.
 - The markdown link title (which would show when converted to HTML as hover-over text) is not supported. The generated PDF will show the URL, but this is a function of the PDF viewer.
 - Definition lists are not supported
-- The following text features may be tweaked: font, size, spacing, style, fill colour, and text colour. These are exported and available via the `Styler` struct. Note that fill colour only works when using `CellFormat()`. This is the case for tables, code blocks, and backticked text.
+- Text styling (font, size, spacing, style, fill colour, text colour) can be customised via the theme system. Note that fill colour only works when using `CellFormat()`. This is the case for tables, code blocks, and backticked text.
 
 ## Contributions
 
@@ -223,12 +167,3 @@ go-critic................................................................Passed
 ```
 
 - Submit a pull request and include a succinct description of the feature or issue it addresses 
-
-[license]: ./LICENSE
-[badge-license]: https://img.shields.io/github/license/solworktech/md2pdf.svg
-[go-docs-badge]: https://godoc.org/github.com/solworktech/md2pdf?status.svg
-[go-docs]: https://godoc.org/github.com/solworktech/md2pdf/v2
-[badge-build]: https://github.com/solworktech/md2pdf/actions/workflows/go.yml/badge.svg
-[build]: https://github.com/solworktech/md2pdf/actions/workflows/go.yml
-[go-report-card-badge]: https://goreportcard.com/badge/github.com/solworktech/md2pdf/v2
-[go-report-card]: https://goreportcard.com/report/github.com/solworktech/md2pdf/v2
