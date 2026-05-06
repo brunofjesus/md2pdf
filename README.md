@@ -2,7 +2,7 @@
 
 A CLI utility which, as the name implies, generates a PDF from Markdown.
 
-This is a fork of [solworktech/md2pdf](https://github.com/solworktech/md2pdf).
+This is a fork of [solworktech/md2pdf](https://github.com/solworktech/md2pdf). I started doing some little tweaks for my own usage, it ended up deviating a lot from the original project, so I decided to start refactoring some more stuff, share it and probably mantain my own forked version.
 
 ### Key differences from the original
 
