@@ -1,6 +1,6 @@
 /*
  * Markdown to PDF Converter
- * Available at http://github.com/solworktech/md2pdf
+ * Available at http://github.com/brunofjesus/md2pdf
  *
  * Copyright © Cecil New <cecil.new@gmail.com>, Jesse Portnoy <jesse@packman.io>.
  * Distributed under the MIT License.
@@ -31,9 +31,9 @@ import (
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/ast"
 	"github.com/gomarkdown/markdown/parser"
-	"github.com/solworktech/md2pdf/v2/internal/colors"
-	"github.com/solworktech/md2pdf/v2/internal/fonts"
-	"github.com/solworktech/md2pdf/v2/internal/theme"
+	"github.com/brunofjesus/md2pdf/internal/colors"
+	"github.com/brunofjesus/md2pdf/internal/fonts"
+	"github.com/brunofjesus/md2pdf/internal/theme"
 )
 
 // Ensure PdfRenderer satisfies the Processor interface.
@@ -303,9 +303,9 @@ func (r *PdfRenderer) UpdateParagraphStyler(defaultStyler theme.Styler) {
 }
 
 func (r *PdfRenderer) setStyler(s theme.Styler) {
-	// see https://github.com/solworktech/md2pdf/issues/18#issuecomment-2179694815
+	// see https://github.com/brunofjesus/md2pdf/issues/18#issuecomment-2179694815
 	// This does not address the root cause
-	// (https://github.com/solworktech/md2pdf/issues/18#issuecomment-2179694815)
+	// (https://github.com/brunofjesus/md2pdf/issues/18#issuecomment-2179694815)
 	// but it will correct all cases and is safer.
 	if s.Style == "bb" {
 		s.Style = "b"

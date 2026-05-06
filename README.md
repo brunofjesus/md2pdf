@@ -41,7 +41,7 @@ This package depends on two other packages:
 Build from source:
 
 ```sh
-$ go install github.com/solworktech/md2pdf/v2/cmd/md2pdf@latest
+$ go install github.com/brunofjesus/md2pdf/cmd/md2pdf@latest
 ```
 
 ## Syntax highlighting

@@ -1,6 +1,6 @@
 /*
  * Markdown to PDF Converter
- * Available at http://github.com/solworktech/md2pdf
+ * Available at http://github.com/brunofjesus/md2pdf
  *
  * Copyright © 2018 Cecil New <cecil.new@gmail.com>.
  * Distributed under the MIT License.

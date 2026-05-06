@@ -1,6 +1,6 @@
 /*
  * Markdown to PDF Converter
- * Available at http://github.com/solworktech/md2pdf
+ * Available at http://github.com/brunofjesus/md2pdf
  *
  * Copyright © Cecil New <cecil.new@gmail.com>, Jesse Portnoy <jesse@packman.io>.
  * Distributed under the MIT License.
@@ -19,7 +19,7 @@
 
 package renderer
 
-import "github.com/solworktech/md2pdf/v2/internal/theme"
+import "github.com/brunofjesus/md2pdf/internal/theme"
 
 type listType int
 
