@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	"github.com/gomarkdown/markdown/parser"
-	"github.com/solworktech/md2pdf/v2/internal/renderer"
+	"github.com/brunofjesus/md2pdf/internal/renderer"
 	"golang.org/x/exp/slices"
 )
 

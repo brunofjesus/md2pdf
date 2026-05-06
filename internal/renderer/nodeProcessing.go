@@ -1,6 +1,6 @@
 /*
  * Markdown to PDF Converter
- * Available at http://github.com/solworktech/md2pdf
+ * Available at http://github.com/brunofjesus/md2pdf
  *
  * Copyright © Cecil New <cecil.new@gmail.com>, Jesse Portnoy <jesse@packman.io>.
  * Distributed under the MIT License.
@@ -38,7 +38,7 @@ import (
 	"github.com/gomarkdown/markdown/ast"
 	highlight "github.com/jessp01/gohighlight"
 	"github.com/mitchellh/go-wordwrap"
-	syntaxhighlight "github.com/solworktech/md2pdf/v2/internal/highlight"
+	syntaxhighlight "github.com/brunofjesus/md2pdf/internal/highlight"
 )
 
 func (r *PdfRenderer) processText(node *ast.Text) {

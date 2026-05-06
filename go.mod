@@ -1,4 +1,4 @@
-module github.com/solworktech/md2pdf/v2
+module github.com/brunofjesus/md2pdf
 
 go 1.23.0
 

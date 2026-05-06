@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/solworktech/md2pdf/v2/internal/colors"
+	"github.com/brunofjesus/md2pdf/internal/colors"
 )
 
 type Theme struct {

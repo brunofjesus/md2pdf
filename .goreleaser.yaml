@@ -4,14 +4,12 @@
 project_name: mdtopdf
 before:
   hooks:
-    - git submodule update --remote  --init
-    # You may remove this if you don't use go modules.
     - go mod tidy
     # you may remove this if you don't need go generate
     - go generate ./...
-    - go install github.com/cpuguy83/go-md2man@latest
-    - go-md2man -in md2pdf.1.md -out md2pdf.1
-    - gzip md2pdf.1
+    #- go install github.com/cpuguy83/go-md2man@latest
+    #- go-md2man -in md2pdf.1.md -out md2pdf.1
+    #- gzip md2pdf.1
 
 builds:
   - env: [CGO_ENABLED=0]
@@ -54,7 +52,7 @@ nfpms:
   - package_name: mdtopdf
   - file_name_template: "{{ .ConventionalFileName }}"
     id: packages
-    homepage: https://github.com/solworktech/md2pdf
+    homepage: https://github.com/brunofjesus/md2pdf
     description: |-
       Markdown to PDF converter
       A CLI utility which, as the name implies, generates PDF from Markdown.
@@ -63,9 +61,9 @@ nfpms:
       pagination control (using horizontal lines - useful for presentations),
       page Footer (consisting of author, title and page number),
       support of non-Latin charsets and multiple fonts
-    maintainer: Jesse Portnoy <jesse@packman.io>
+    maintainer: Bruno Jesus <bruno.fl.jesus@gmail.com>
     license: MIT
-    vendor: Solworktech
+    vendor: Bruno Jesus
     bindir: /usr/bin
     section: utils
     contents:
