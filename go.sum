@@ -11,6 +11,8 @@ github.com/gomarkdown/markdown v0.0.0-20250311123330-531bef5e742b h1:EY/KpStFl60
 github.com/gomarkdown/markdown v0.0.0-20250311123330-531bef5e742b/go.mod h1:JDGcbDT52eL4fju3sZ4TeHGsQwhG9nbDV21aMyhwPoA=
 github.com/jessp01/gohighlight v0.21.2 h1:radLDWQMJeDwzn6b8cduio7kVXhy3zkYFsWxkr/3CRI=
 github.com/jessp01/gohighlight v0.21.2/go.mod h1:52r0Yxd1+T9f7uLenaO2/34K3gPOejxCxXwdNc/2Z8Y=
+github.com/jessp01/gohighlight v0.21.4 h1:FTL/svY7bjy94A0wIP10q1AdzqT7D7jH/e7KGnaLRts=
+github.com/jessp01/gohighlight v0.21.4/go.mod h1:52r0Yxd1+T9f7uLenaO2/34K3gPOejxCxXwdNc/2Z8Y=
 github.com/mcuadros/go-version v0.0.0-20190830083331-035f6764e8d2 h1:YocNLcTBdEdvY3iDK6jfWXvEaM5OCKkjxPKoJRdB3Gg=
 github.com/mcuadros/go-version v0.0.0-20190830083331-035f6764e8d2/go.mod h1:76rfSfYPWj01Z85hUf/ituArm797mNKcvINh1OlsZKo=
 github.com/mitchellh/go-wordwrap v1.0.1 h1:TLuKupo69TCn6TQSyGxwI1EblZZEsQ0vMlAFQflz0v0=
