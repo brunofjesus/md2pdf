@@ -1,97 +1,26 @@
-/*
- * Markdown to PDF Converter
- * Available at http://github.com/brunofjesus/md2pdf
- *
- * Copyright © Cecil New <cecil.new@gmail.com>, Jesse Portnoy <jesse@packman.io>.
- * Distributed under the MIT License.
- * See README.md for details.
- *
- * Dependencies
- * This package depends on two other packages:
- *
- * Go Markdown processor
- *   Available at https://github.com/gomarkdown/markdown
- *
- * fpdf - a PDF document generator with high level support for
- *   text, drawing and images.
- *   Available at https://codeberg.org/go-pdf/fpdf
- */
-
 package renderer
 
-import "github.com/brunofjesus/md2pdf/internal/theme"
+import "github.com/brunofjesus/md2pdf/internal/renderer/node"
 
-type listType int
-
-const (
-	notlist listType = iota
-	unordered
-	ordered
-	definition
-)
-
-// This slice of float64 contains the width of each cell
-// in the header of a table. These will be the widths used
-// in the table body as well.
-var (
-	cellwidths  []float64
-	curdatacell int
-	fill        = false
-	incell      = false
-)
-
-func (n listType) String() string {
-	switch n {
-	case notlist:
-		return "Not a List"
-	case unordered:
-		return "Unordered"
-	case ordered:
-		return "Ordered"
-	case definition:
-		return "Definition"
-	}
-	return ""
-}
-
-type containerState struct {
-	textStyle      theme.Styler
-	leftMargin     float64
-	firstParagraph bool
-
-	// populated if node type is a list
-	listkind   listType
-	itemNumber int // only if an ordered list
-
-	// populated if node type is a link
-	destination string
-
-	// populated if table cell
-	isHeader bool
-
-	// populated if table cell (apply styles first)
-	cellInnerString      string
-	cellInnerStringStyle *theme.Styler
-}
-
+// states wraps a stack of node.ContainerState pointers.
 type states struct {
-	stack []*containerState
+	stack []*node.ContainerState
 }
 
-func (s *states) push(c *containerState) {
+func (s *states) push(c *node.ContainerState) {
 	s.stack = append(s.stack, c)
 }
 
-func (s *states) pop() *containerState {
-	var x *containerState
+func (s *states) pop() *node.ContainerState {
+	var x *node.ContainerState
 	x, s.stack = s.stack[len(s.stack)-1], s.stack[:len(s.stack)-1]
 	return x
 }
 
-func (s *states) peek() *containerState {
+func (s *states) peek() *node.ContainerState {
 	return s.stack[len(s.stack)-1]
 }
 
-func (s *states) parent() *containerState {
+func (s *states) parent() *node.ContainerState {
 	return s.stack[len(s.stack)-2]
 }

@@ -15,6 +15,8 @@ This package depends on two other packages:
 - [gomarkdown](https://github.com/gomarkdown/markdown) parser to read the markdown source
 - [fpdf](https://codeberg.org/go-pdf/fpdf) to generate the PDF
 
+---
+
 ## Features
 
 - Syntax highlighting (for code blocks) — built-in, no configuration needed

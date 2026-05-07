@@ -13,8 +13,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/gomarkdown/markdown/parser"
 	"github.com/brunofjesus/md2pdf/internal/renderer"
+	"github.com/gomarkdown/markdown/parser"
 	"golang.org/x/exp/slices"
 )
 
@@ -85,7 +85,7 @@ func main() {
 	}
 
 	if *hrAsNewPage {
-		opts = append(opts, renderer.IsHorizontalRuleNewPage(true))
+		opts = append(opts, renderer.WithHorizontalRuleAsNewPage())
 	}
 
 	// get text for PDF
@@ -113,7 +113,7 @@ func main() {
 			}
 
 			if fileInfo.IsDir() {
-				opts = append(opts, renderer.IsHorizontalRuleNewPage(true))
+				opts = append(opts, renderer.WithHorizontalRuleAsNewPage())
 				validExts := []string{".md", ".markdown"}
 				files, err := glob(*input, validExts)
 				if err != nil {
