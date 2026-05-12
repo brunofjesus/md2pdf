@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log"
 	"os"
 
@@ -21,6 +21,18 @@ func main() {
 			flagTitle := cmd.String("title")
 			flagTOC := cmd.Bool("table-of-contents")
 			flagHRNewPage := cmd.Bool("horizontal-rule-new-page")
+			flagTheme := cmd.String("theme")
+			flagForceOverwrite := cmd.Bool("force-overwrite")
+
+			if !flagForceOverwrite {
+				outFile, err := os.Stat(flatOutput)
+				if err != nil && !errors.Is(err, os.ErrNotExist) {
+					log.Fatalf("error: failed to check output file: %v\n", err)
+				}
+				if outFile != nil {
+					log.Fatalf("error: output file already exists: %s; use -f to overwrite.\n", flatOutput)
+				}
+			}
 
 			inputProcessor, err := cliutil.GetInputProcessor(flagInput)
 			if err != nil {
@@ -47,6 +59,16 @@ func main() {
 				CustomThemeFile: "",
 			}
 
+			switch flagTheme {
+			case "light":
+				params.Theme = renderer.LIGHT
+			case "dark":
+				params.Theme = renderer.DARK
+			case "custom":
+				params.Theme = renderer.CUSTOM
+				params.CustomThemeFile = flagTheme
+			}
+
 			pf := renderer.NewPdfRenderer(params)
 
 			var p renderer.Processor = pf
@@ -56,7 +78,7 @@ func main() {
 
 			err = p.Process(content)
 			if err != nil {
-				fmt.Printf("error: %v\n", err)
+				log.Fatal(err)
 			}
 
 			return nil
@@ -69,15 +91,20 @@ func main() {
 				Usage:   "Input filename, dir consisting of .md|.markdown files or HTTP(s) URL; default is os.Stdin",
 			},
 			&cli.StringFlag{
-				Name:     "output",
-				Aliases:  []string{"o"},
-				Usage:    "Output PDF filename; required",
-				Required: true,
+				Name:    "output",
+				Aliases: []string{"o"},
+				Usage:   "Output PDF filename; required",
+				Value:   "out.pdf",
 			},
 			&cli.StringFlag{
 				Name:    "title",
 				Aliases: []string{"t"},
 				Usage:   "PDF title; default is empty string",
+			},
+			&cli.StringFlag{
+				Name:  "theme",
+				Usage: "Theme to use for the PDF; Can be 'light', 'dark' or the path for a custom theme file; default is 'light'",
+				Value: "light",
 			},
 			&cli.BoolFlag{
 				Name:    "table-of-contents",
@@ -89,6 +116,12 @@ func main() {
 				Name:    "horizontal-rule-new-page",
 				Aliases: []string{"hr-new-page"},
 				Usage:   "Start a new page on horizontal rules (---); useful for presentations",
+				Value:   false,
+			},
+			&cli.BoolFlag{
+				Name:    "force-overwrite",
+				Aliases: []string{"f"},
+				Usage:   "Force overwrite of output file if it already exists",
 				Value:   false,
 			},
 		},
