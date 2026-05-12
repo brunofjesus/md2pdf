@@ -23,6 +23,9 @@ func main() {
 			flagHRNewPage := cmd.Bool("horizontal-rule-new-page")
 			flagTheme := cmd.String("theme")
 			flagForceOverwrite := cmd.Bool("force-overwrite")
+			flagFooter := cmd.Bool("footer")
+			flagOrientation := cmd.String("orientation")
+			flagAuthor := cmd.String("author")
 
 			if !flagForceOverwrite {
 				outFile, err := os.Stat(flatOutput)
@@ -48,9 +51,13 @@ func main() {
 				opts = append(opts, renderer.WithHorizontalRuleAsNewPage())
 			}
 
+			if flagFooter {
+				opts = append(opts, renderer.WithDefaultFooter(flagOrientation, flagAuthor, flagTitle))
+			}
+
 			params := renderer.PdfRendererParams{
 				Title:           flagTitle,
-				Orientation:     "",
+				Orientation:     flagOrientation,
 				Papersz:         "",
 				PdfFile:         flatOutput,
 				TracerFile:      "",
@@ -123,6 +130,27 @@ func main() {
 				Aliases: []string{"f"},
 				Usage:   "Force overwrite of output file if it already exists",
 				Value:   false,
+			},
+			&cli.BoolFlag{
+				Name:  "footer",
+				Usage: "Print doc footer (<author>  <title>  <page number>)",
+				Value: false,
+			},
+			&cli.StringFlag{
+				Name:  "orientation",
+				Usage: "Page orientation for the PDF; can be 'portrait' or 'landscape'; default is 'portrait'",
+				Value: "portrait",
+				Validator: func(value string) error {
+					if value != "portrait" && value != "landscape" {
+						return errors.New("orientation must be either 'portrait' or 'landscape'")
+					}
+					return nil
+				},
+			},
+			&cli.StringFlag{
+				Name:  "author",
+				Usage: "Author's name",
+				Value: "",
 			},
 		},
 	}
