@@ -81,32 +81,20 @@ $ go run ./cmd/md2pdf -i /path/to/md/directory -o output.pdf
 ### Additional options
 
 ```sh
-  -author string
-    	Author name; used if -with-footer is passed
-  -generate-toc
-    	Auto Generate Table of Contents (TOC)
-  -help
-    	Show usage message
-  -i string
-    	Input filename, dir consisting of .md|.markdown files or HTTP(s) URL; default is os.Stdin
-  -log-file string
-    	Path to log file
-  -new-page-on-hr
-    	Interpret HR as a new page; useful for presentations
-  -o string
-    	Output PDF filename; required
-  -orientation string
-    	[portrait | landscape] (default "portrait")
-  -page-size string
-    	[A3 | A4 | A5] (default "A4")
-  -theme string
-    	[light | dark | /path/to/custom/theme.json] (default "light")
-  -title string
-    	Presentation title
-  -version
-    	Print version and build info
-  -with-footer
-    	Print doc footer (<author>  <title>  <page number>)
+--input string, -i string                  Input filename, dir consisting of .md|.markdown files or HTTP(s) URL; default is os.Stdin
+--output string, -o string                 Output PDF filename; required (default: "out.pdf")
+--title string, -t string                  PDF title
+--theme string                             Theme to use for the PDF; Can be 'light', 'dark' or the path for a custom theme file (default: "light")
+--table-of-contents, --toc                 Generate a table of contents page based on the headings in the input markdown
+--horizontal-rule-new-page, --hr-new-page  Start a new page on horizontal rules (---); useful for presentations
+--force-overwrite, -f                      Force overwrite of output file if it already exists
+--footer                                   Print doc footer (<author>  <title>  <page number>)
+--page-size string                         Page size for the PDF; can be 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'Letter', 'Legal' or 'Tabloid' (default: A4)
+--orientation string                       Page orientation for the PDF; can be 'portrait' or 'landscape'; default is 'portrait' (default: "portrait")
+--author string                            Author name
+--log-file string                          Path to log file
+--help, -h                                 show help
+--version, -v                              print the version
 ```
 
 For example, the below will:
