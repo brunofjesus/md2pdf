@@ -1,218 +1,149 @@
 {
-  "Normal": {
-    "Font": "Arial",
+  "background_color": "#ffffff",
+  "normal": {
+    "Font": "LiberationSans",
     "Style": "",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    },
-    "FillColor": {
-      "Red": 255,
-      "Green": 255,
-      "Blue": 255
-    }
+    "TextColor": "#1f2328",
+    "FillColor": "#ffffff"
   },
-  "Link": {
-    "Font": "Arial",
-    "Style": "b",
-    "Size": 12,
-    "Spacing": 2,
-    "TextColor": {
-      "Red": 100,
-      "Green": 149,
-      "Blue": 237
-    },
-    "FillColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    }
-  },
-  "Backtick": {
-    "Font": "Times",
+  "link": {
+    "Font": "LiberationSans",
     "Style": "",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": {
-      "Red": 37,
-      "Green": 27,
-      "Blue": 14
-    },
-    "FillColor": {
-      "Red": 200,
-      "Green": 200,
-      "Blue": 200
-    }
+    "TextColor": "#0969da",
+    "FillColor": "#000000"
   },
-  "Blockquote": {
-    "Font": "Arial",
+  "backtick": {
+    "Font": "LiberationMono",
+    "Style": "",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": "#1f2328",
+    "FillColor": "#eff1f3"
+  },
+  "blockquote": {
+    "Font": "LiberationSans",
     "Style": "i",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
+    "TextColor": "#656d76",
+    "FillColor": "#ffffff"
+  },
+  "indent_value": 0,
+  "heading": {
+    "h1": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 32,
+      "Spacing": 5,
+      "TextColor": "#1f2328",
+      "FillColor": "#ffffff"
     },
-    "FillColor": {
-      "Red": 255,
-      "Green": 255,
-      "Blue": 255
+    "h2": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 24,
+      "Spacing": 5,
+      "TextColor": "#1f2328",
+      "FillColor": "#ffffff"
+    },
+    "h3": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 20,
+      "Spacing": 5,
+      "TextColor": "#1f2328",
+      "FillColor": "#ffffff"
+    },
+    "h4": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 16,
+      "Spacing": 5,
+      "TextColor": "#1f2328",
+      "FillColor": "#ffffff"
+    },
+    "h5": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 14,
+      "Spacing": 5,
+      "TextColor": "#1f2328",
+      "FillColor": "#ffffff"
+    },
+    "h6": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 13.6,
+      "Spacing": 5,
+      "TextColor": "#656d76",
+      "FillColor": "#ffffff"
+    },
+    "line": {
+      "height": 0.75,
+      "color": "#d1d9e0"
     }
   },
-  "IndentValue": 0,
-  "H1": {
-    "Font": "Arial",
-    "Style": "b",
-    "Size": 24,
-    "Spacing": 5,
-    "TextColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    },
-    "FillColor": {
-      "Red": 255,
-      "Green": 255,
-      "Blue": 255
-    }
-  },
-  "H2": {
-    "Font": "Arial",
-    "Style": "b",
-    "Size": 21,
-    "Spacing": 5,
-    "TextColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    },
-    "FillColor": {
-      "Red": 255,
-      "Green": 255,
-      "Blue": 255
-    }
-  },
-  "H3": {
-    "Font": "Arial",
-    "Style": "b",
-    "Size": 20,
-    "Spacing": 5,
-    "TextColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    },
-    "FillColor": {
-      "Red": 255,
-      "Green": 255,
-      "Blue": 255
-    }
-  },
-  "H4": {
-    "Font": "Arial",
-    "Style": "b",
-    "Size": 18,
-    "Spacing": 5,
-    "TextColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    },
-    "FillColor": {
-      "Red": 255,
-      "Green": 255,
-      "Blue": 255
-    }
-  },
-  "H5": {
-    "Font": "Arial",
-    "Style": "b",
-    "Size": 16,
-    "Spacing": 5,
-    "TextColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    },
-    "FillColor": {
-      "Red": 255,
-      "Green": 255,
-      "Blue": 255
-    }
-  },
-  "H6": {
-    "Font": "Arial",
-    "Style": "b",
-    "Size": 14,
-    "Spacing": 5,
-    "TextColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    },
-    "FillColor": {
-      "Red": 255,
-      "Green": 255,
-      "Blue": 255
-    }
-  },
-  "THeader": {
-    "Font": "Arial",
+  "table_header": {
+    "Font": "LiberationSans",
     "Style": "b",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    },
-    "FillColor": {
-      "Red": 180,
-      "Green": 180,
-      "Blue": 180
-    }
+    "TextColor": "#1f2328",
+    "FillColor": "#f6f8fa"
   },
-  "TBody": {
-    "Font": "Arial",
+  "table_body": {
+    "Font": "LiberationSans",
     "Style": "",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
+    "TextColor": "#1f2328",
+    "FillColor": "#ffffff"
+  },
+  "code": {
+    "text": {
+      "Font": "LiberationMono",
+      "Style": "",
+      "Size": 12,
+      "Spacing": 2,
+      "TextColor": "#1f2328",
+      "FillColor": "#f6f8fa"
     },
-    "FillColor": {
-      "Red": 240,
-      "Green": 240,
-      "Blue": 240
+    "tab_width": 4,
+    "colors": {
+      "default": "#1f2328",
+      "statement": "#8250df",
+      "green": "#8250df",
+      "identifier": "#0550ae",
+      "blue": "#0550ae",
+      "preproc": "#cf222e",
+      "special": "#cf222e",
+      "type.keyword": "#cf222e",
+      "red": "#cf222e",
+      "constant": "#0550ae",
+      "constant.number": "#0550ae",
+      "constant.bool": "#0550ae",
+      "symbol.brackets": "#1f2328",
+      "identifier.var": "#0550ae",
+      "cyan": "#0550ae",
+      "constant.specialChar": "#0a3069",
+      "constant.string.url": "#0a3069",
+      "constant.string": "#0a3069",
+      "magenta": "#0a3069",
+      "type": "#953800",
+      "symbol": "#953800",
+      "symbol.operator": "#1f2328",
+      "symbol.tag.extended": "#0550ae",
+      "yellow": "#953800",
+      "comment": "#6e7781",
+      "high.green": "#6e7781"
     }
   },
-  "Code": {
-    "Font": "Times",
-    "Style": "",
-    "Size": 12,
-    "Spacing": 2,
-    "TextColor": {
-      "Red": 37,
-      "Green": 27,
-      "Blue": 14
-    },
-    "FillColor": {
-      "Red": 200,
-      "Green": 200,
-      "Blue": 200
-    }
-  },
-  "Theme": 3,
-  "CodeTabWidth": 4,
-  "BackgroundColor": {
-    "Red": 255,
-    "Green": 255,
-    "Blue": 255
+  "horizontal_rule": {
+    "height": 3,
+    "color": "#d1d9e0"
   }
 }

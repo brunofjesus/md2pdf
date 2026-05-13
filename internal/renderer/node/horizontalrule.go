@@ -16,17 +16,23 @@ func HorizontalRulePageBreakProcessor(ctx PdfContext, _ ast.Node, _ bool) {
 func HorizontalRuleLineProcessor(ctx PdfContext, _ ast.Node, _ bool) {
 	ctx.Tracer("HorizontalRuleLineProcessor", "")
 	ctx.Cr()
-	pdf := ctx.GetPdf()
-	x, y := pdf.GetXY()
-	lm, _, _, _ := pdf.GetMargins()
-	w, _ := pdf.GetPageSize()
-	newx := w - lm
-	ctx.Tracer("... From X,Y", fmt.Sprintf("%v,%v", x, y))
-	pdf.MoveTo(x, y)
-	ctx.Tracer("...   To X,Y", fmt.Sprintf("%v,%v", newx, y))
-	pdf.LineTo(newx, y)
-	pdf.SetLineWidth(3)
-	pdf.SetFillColor(200, 200, 200)
-	pdf.DrawPath("F")
-	ctx.Cr()
+
+	lineHeight := ctx.GetTheme().HorizontalRule.Height
+	if lineHeight > 0 {
+		lineColor := ctx.GetTheme().HorizontalRule.Color
+
+		pdf := ctx.GetPdf()
+		x, y := pdf.GetXY()
+		lm, _, _, _ := pdf.GetMargins()
+		w, _ := pdf.GetPageSize()
+		newx := w - lm
+		ctx.Tracer("... From X,Y", fmt.Sprintf("%v,%v", x, y))
+		pdf.MoveTo(x, y)
+		ctx.Tracer("...   To X,Y", fmt.Sprintf("%v,%v", newx, y))
+		pdf.LineTo(newx, y)
+		pdf.SetLineWidth(lineHeight)
+		pdf.SetDrawColor(lineColor.Red, lineColor.Green, lineColor.Blue)
+		pdf.DrawPath("D")
+		ctx.Cr()
+	}
 }

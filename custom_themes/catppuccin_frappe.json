@@ -1,0 +1,149 @@
+{
+  "background_color": "#303446",
+  "normal": {
+    "Font": "LiberationSans",
+    "Style": "",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": "#c6d0f5",
+    "FillColor": "#303446"
+  },
+  "link": {
+    "Font": "LiberationSans",
+    "Style": "",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": "#8caaee",
+    "FillColor": "#000000"
+  },
+  "backtick": {
+    "Font": "LiberationMono",
+    "Style": "",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": "#c6d0f5",
+    "FillColor": "#414559"
+  },
+  "blockquote": {
+    "Font": "LiberationSans",
+    "Style": "i",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": "#a5adce",
+    "FillColor": "#303446"
+  },
+  "indent_value": 0,
+  "heading": {
+    "h1": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 32,
+      "Spacing": 5,
+      "TextColor": "#c6d0f5",
+      "FillColor": "#303446"
+    },
+    "h2": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 24,
+      "Spacing": 5,
+      "TextColor": "#c6d0f5",
+      "FillColor": "#303446"
+    },
+    "h3": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 20,
+      "Spacing": 5,
+      "TextColor": "#c6d0f5",
+      "FillColor": "#303446"
+    },
+    "h4": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 16,
+      "Spacing": 5,
+      "TextColor": "#c6d0f5",
+      "FillColor": "#303446"
+    },
+    "h5": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 14,
+      "Spacing": 5,
+      "TextColor": "#c6d0f5",
+      "FillColor": "#303446"
+    },
+    "h6": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 13.6,
+      "Spacing": 5,
+      "TextColor": "#a5adce",
+      "FillColor": "#303446"
+    },
+    "line": {
+      "height": 0.5,
+      "color": "#51576d"
+    }
+  },
+  "table_header": {
+    "Font": "LiberationSans",
+    "Style": "b",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": "#c6d0f5",
+    "FillColor": "#414559"
+  },
+  "table_body": {
+    "Font": "LiberationSans",
+    "Style": "",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": "#c6d0f5",
+    "FillColor": "#303446"
+  },
+  "code": {
+    "text": {
+      "Font": "LiberationMono",
+      "Style": "",
+      "Size": 12,
+      "Spacing": 2,
+      "TextColor": "#c6d0f5",
+      "FillColor": "#414559"
+    },
+    "tab_width": 4,
+    "colors": {
+      "default": "#c6d0f5",
+      "statement": "#e78284",
+      "green": "#e78284",
+      "identifier": "#8caaee",
+      "blue": "#8caaee",
+      "preproc": "#e78284",
+      "special": "#e78284",
+      "type.keyword": "#e78284",
+      "red": "#e78284",
+      "constant": "#8caaee",
+      "constant.number": "#8caaee",
+      "constant.bool": "#8caaee",
+      "symbol.brackets": "#c6d0f5",
+      "identifier.var": "#8caaee",
+      "cyan": "#8caaee",
+      "constant.specialChar": "#a6d189",
+      "constant.string.url": "#a6d189",
+      "constant.string": "#a6d189",
+      "magenta": "#a6d189",
+      "type": "#ef9f76",
+      "symbol": "#ef9f76",
+      "symbol.operator": "#c6d0f5",
+      "symbol.tag.extended": "#8caaee",
+      "yellow": "#ef9f76",
+      "comment": "#838ba7",
+      "high.green": "#838ba7"
+    }
+  },
+  "horizontal_rule": {
+    "height": 0.5,
+    "color": "#51576d"
+  }
+}
