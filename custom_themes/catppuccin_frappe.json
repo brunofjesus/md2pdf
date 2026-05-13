@@ -33,53 +33,59 @@
     "FillColor": "#303446"
   },
   "indent_value": 0,
-  "h1": {
-    "Font": "LiberationSans",
-    "Style": "b",
-    "Size": 32,
-    "Spacing": 5,
-    "TextColor": "#c6d0f5",
-    "FillColor": "#303446"
-  },
-  "h2": {
-    "Font": "LiberationSans",
-    "Style": "b",
-    "Size": 24,
-    "Spacing": 5,
-    "TextColor": "#c6d0f5",
-    "FillColor": "#303446"
-  },
-  "h3": {
-    "Font": "LiberationSans",
-    "Style": "b",
-    "Size": 20,
-    "Spacing": 5,
-    "TextColor": "#c6d0f5",
-    "FillColor": "#303446"
-  },
-  "h4": {
-    "Font": "LiberationSans",
-    "Style": "b",
-    "Size": 16,
-    "Spacing": 5,
-    "TextColor": "#c6d0f5",
-    "FillColor": "#303446"
-  },
-  "h5": {
-    "Font": "LiberationSans",
-    "Style": "b",
-    "Size": 14,
-    "Spacing": 5,
-    "TextColor": "#c6d0f5",
-    "FillColor": "#303446"
-  },
-  "h6": {
-    "Font": "LiberationSans",
-    "Style": "b",
-    "Size": 13.6,
-    "Spacing": 5,
-    "TextColor": "#a5adce",
-    "FillColor": "#303446"
+  "heading": {
+    "h1": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 32,
+      "Spacing": 5,
+      "TextColor": "#c6d0f5",
+      "FillColor": "#303446"
+    },
+    "h2": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 24,
+      "Spacing": 5,
+      "TextColor": "#c6d0f5",
+      "FillColor": "#303446"
+    },
+    "h3": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 20,
+      "Spacing": 5,
+      "TextColor": "#c6d0f5",
+      "FillColor": "#303446"
+    },
+    "h4": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 16,
+      "Spacing": 5,
+      "TextColor": "#c6d0f5",
+      "FillColor": "#303446"
+    },
+    "h5": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 14,
+      "Spacing": 5,
+      "TextColor": "#c6d0f5",
+      "FillColor": "#303446"
+    },
+    "h6": {
+      "Font": "LiberationSans",
+      "Style": "b",
+      "Size": 13.6,
+      "Spacing": 5,
+      "TextColor": "#a5adce",
+      "FillColor": "#303446"
+    },
+    "line": {
+      "height": 0.5,
+      "color": "#51576d"
+    }
   },
   "table_header": {
     "Font": "LiberationSans",
@@ -135,5 +141,9 @@
       "comment": "#838ba7",
       "high.green": "#838ba7"
     }
+  },
+  "horizontal_rule": {
+    "height": 0.5,
+    "color": "#51576d"
   }
 }

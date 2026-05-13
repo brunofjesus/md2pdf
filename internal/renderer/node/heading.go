@@ -11,21 +11,22 @@ func ProcessHeading(ctx PdfContext, n ast.Node, entering bool) {
 	node := n.(*ast.Heading)
 	if entering {
 		ctx.Cr()
-		var style = ctx.GetTheme().Normal
+		style := ctx.GetTheme().Normal
 		switch node.Level {
 		case 1:
-			style = ctx.GetTheme().H1
+			style = ctx.GetTheme().Heading.H1
 		case 2:
-			style = ctx.GetTheme().H2
+			style = ctx.GetTheme().Heading.H2
 		case 3:
-			style = ctx.GetTheme().H3
+			style = ctx.GetTheme().Heading.H3
 		case 4:
-			style = ctx.GetTheme().H4
+			style = ctx.GetTheme().Heading.H4
 		case 5:
-			style = ctx.GetTheme().H5
+			style = ctx.GetTheme().Heading.H5
 		case 6:
-			style = ctx.GetTheme().H6
+			style = ctx.GetTheme().Heading.H6
 		}
+
 		ctx.Tracer(fmt.Sprintf("Heading (%d, entering)", node.Level),
 			fmt.Sprintf("%v", ast.ToString(node.AsContainer())))
 		x := &ContainerState{
@@ -35,8 +36,27 @@ func ProcessHeading(ctx PdfContext, n ast.Node, entering bool) {
 		}
 		ctx.PushState(x)
 	} else {
-		ctx.Tracer("Heading (leaving)", "")
 		ctx.Cr()
+
+		lineHeight := ctx.GetTheme().Heading.Line.Height
+		if ctx.GetTheme().Heading.Line.Height > 0 {
+			lineColor := ctx.GetTheme().Heading.Line.Color
+
+			pdf := ctx.GetPdf()
+			x, y := pdf.GetXY()
+			lm, _, _, _ := pdf.GetMargins()
+			w, _ := pdf.GetPageSize()
+			newx := w - lm
+			ctx.Tracer("... Drawing underline from X,Y", fmt.Sprintf("%v,%v", x, y))
+			pdf.MoveTo(x, y)
+			ctx.Tracer("...   To X,Y", fmt.Sprintf("%v,%v", newx, y))
+			pdf.LineTo(newx, y)
+			pdf.SetLineWidth(lineHeight)
+			pdf.SetDrawColor(lineColor.Red, lineColor.Green, lineColor.Blue)
+			pdf.DrawPath("D")
+		}
+
 		ctx.PopState()
+		ctx.Tracer("Heading (leaving)", "")
 	}
 }
