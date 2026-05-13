@@ -1,218 +1,141 @@
 {
+  "BackgroundColor": {
+    "Red": 13,
+    "Green": 17,
+    "Blue": 23
+  },
   "Normal": {
-    "Font": "Arial",
+    "Font": "LiberationSans",
     "Style": "",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": {
-      "Red": 255,
-      "Green": 255,
-      "Blue": 255
-    },
-    "FillColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    }
+    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
+    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
   },
   "Link": {
-    "Font": "Arial",
-    "Style": "b",
-    "Size": 12,
-    "Spacing": 2,
-    "TextColor": {
-      "Red": 100,
-      "Green": 149,
-      "Blue": 237
-    },
-    "FillColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    }
-  },
-  "Backtick": {
-    "Font": "Times",
+    "Font": "LiberationSans",
     "Style": "",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": {
-      "Red": 211,
-      "Green": 211,
-      "Blue": 211
-    },
-    "FillColor": {
-      "Red": 32,
-      "Green": 35,
-      "Blue": 37
-    }
+    "TextColor": { "Red": 74, "Green": 158, "Blue": 255 },
+    "FillColor": { "Red": 0, "Green": 0, "Blue": 0 }
+  },
+  "Backtick": {
+    "Font": "LiberationMono",
+    "Style": "",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
+    "FillColor": { "Red": 52, "Green": 59, "Blue": 66 }
   },
   "Blockquote": {
-    "Font": "Arial",
+    "Font": "LiberationSans",
     "Style": "i",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": {
-      "Red": 169,
-      "Green": 169,
-      "Blue": 169
-    },
-    "FillColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    }
+    "TextColor": { "Red": 125, "Green": 133, "Blue": 144 },
+    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
   },
   "IndentValue": 0,
   "H1": {
-    "Font": "Arial",
+    "Font": "LiberationSans",
+    "Style": "b",
+    "Size": 32,
+    "Spacing": 5,
+    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
+    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
+  },
+  "H2": {
+    "Font": "LiberationSans",
     "Style": "b",
     "Size": 24,
     "Spacing": 5,
-    "TextColor": {
-      "Red": 169,
-      "Green": 169,
-      "Blue": 169
-    },
-    "FillColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    }
-  },
-  "H2": {
-    "Font": "Arial",
-    "Style": "b",
-    "Size": 21,
-    "Spacing": 5,
-    "TextColor": {
-      "Red": 169,
-      "Green": 169,
-      "Blue": 169
-    },
-    "FillColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    }
+    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
+    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
   },
   "H3": {
-    "Font": "Arial",
+    "Font": "LiberationSans",
     "Style": "b",
     "Size": 20,
     "Spacing": 5,
-    "TextColor": {
-      "Red": 169,
-      "Green": 169,
-      "Blue": 169
-    },
-    "FillColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    }
+    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
+    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
   },
   "H4": {
-    "Font": "Arial",
-    "Style": "b",
-    "Size": 18,
-    "Spacing": 5,
-    "TextColor": {
-      "Red": 169,
-      "Green": 169,
-      "Blue": 169
-    },
-    "FillColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    }
-  },
-  "H5": {
-    "Font": "Arial",
+    "Font": "LiberationSans",
     "Style": "b",
     "Size": 16,
     "Spacing": 5,
-    "TextColor": {
-      "Red": 169,
-      "Green": 169,
-      "Blue": 169
-    },
-    "FillColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    }
+    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
+    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
   },
-  "H6": {
-    "Font": "Arial",
+  "H5": {
+    "Font": "LiberationSans",
     "Style": "b",
     "Size": 14,
     "Spacing": 5,
-    "TextColor": {
-      "Red": 169,
-      "Green": 169,
-      "Blue": 169
-    },
-    "FillColor": {
-      "Red": 0,
-      "Green": 0,
-      "Blue": 0
-    }
+    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
+    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
+  },
+  "H6": {
+    "Font": "LiberationSans",
+    "Style": "b",
+    "Size": 13.6,
+    "Spacing": 5,
+    "TextColor": { "Red": 125, "Green": 133, "Blue": 144 },
+    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
   },
   "THeader": {
-    "Font": "Arial",
+    "Font": "LiberationSans",
     "Style": "b",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": {
-      "Red": 169,
-      "Green": 169,
-      "Blue": 169
-    },
-    "FillColor": {
-      "Red": 27,
-      "Green": 27,
-      "Blue": 27
-    }
+    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
+    "FillColor": { "Red": 22, "Green": 27, "Blue": 34 }
   },
   "TBody": {
-    "Font": "Arial",
+    "Font": "LiberationSans",
     "Style": "",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": {
-      "Red": 128,
-      "Green": 128,
-      "Blue": 128
-    },
-    "FillColor": {
-      "Red": 200,
-      "Green": 200,
-      "Blue": 200
-    }
+    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
+    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
   },
   "Code": {
-    "Font": "Times",
+    "Font": "LiberationMono",
     "Style": "",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": {
-      "Red": 211,
-      "Green": 211,
-      "Blue": 211
-    },
-    "FillColor": {
-      "Red": 32,
-      "Green": 35,
-      "Blue": 37
-    }
+    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
+    "FillColor": { "Red": 22, "Green": 27, "Blue": 34 }
   },
-  "Theme": 3,
   "CodeTabWidth": 4,
-  "BackgroundColor": {
-    "Red": 0,
-    "Green": 0,
-    "Blue": 0
+  "Codeblock": {
+    "default":              { "Red": 230, "Green": 237, "Blue": 243 },
+    "statement":            { "Red": 255, "Green": 123, "Blue": 114 },
+    "green":                { "Red": 255, "Green": 123, "Blue": 114 },
+    "identifier":           { "Red": 121, "Green": 192, "Blue": 255 },
+    "blue":                 { "Red": 121, "Green": 192, "Blue": 255 },
+    "preproc":              { "Red": 255, "Green": 123, "Blue": 114 },
+    "special":              { "Red": 255, "Green": 123, "Blue": 114 },
+    "type.keyword":         { "Red": 255, "Green": 123, "Blue": 114 },
+    "red":                  { "Red": 255, "Green": 123, "Blue": 114 },
+    "constant":             { "Red": 121, "Green": 192, "Blue": 255 },
+    "constant.number":      { "Red": 121, "Green": 192, "Blue": 255 },
+    "constant.bool":        { "Red": 121, "Green": 192, "Blue": 255 },
+    "symbol.brackets":      { "Red": 230, "Green": 237, "Blue": 243 },
+    "identifier.var":       { "Red": 121, "Green": 192, "Blue": 255 },
+    "cyan":                 { "Red": 121, "Green": 192, "Blue": 255 },
+    "constant.specialChar": { "Red": 165, "Green": 214, "Blue": 255 },
+    "constant.string.url":  { "Red": 165, "Green": 214, "Blue": 255 },
+    "constant.string":      { "Red": 165, "Green": 214, "Blue": 255 },
+    "magenta":              { "Red": 165, "Green": 214, "Blue": 255 },
+    "type":                 { "Red": 255, "Green": 166, "Blue": 87 },
+    "symbol":               { "Red": 255, "Green": 166, "Blue": 87 },
+    "symbol.operator":      { "Red": 230, "Green": 237, "Blue": 243 },
+    "symbol.tag.extended":  { "Red": 255, "Green": 166, "Blue": 87 },
+    "yellow":               { "Red": 255, "Green": 166, "Blue": 87 },
+    "comment":              { "Red": 139, "Green": 148, "Blue": 158 },
+    "high.green":           { "Red": 139, "Green": 148, "Blue": 158 }
   }
 }

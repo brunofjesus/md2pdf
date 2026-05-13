@@ -48,7 +48,14 @@ func ProcessCodeBlock(ctx PdfContext, n ast.Node, _ bool) {
 		lines = lines[:len(lines)-1]
 	}
 
+	// Build reverse lookup from group ID to group name
+	reverseGroups := make(map[highlight.Group]string, len(highlight.Groups))
+	for name, id := range highlight.Groups {
+		reverseGroups[id] = name
+	}
+
 	codeTheme := ctx.GetTheme().Code
+	cbColors := ctx.GetTheme().Codeblock
 	lineH := codeTheme.Size + codeTheme.Spacing
 	lm, _, rm, _ := ctx.GetPdf().GetMargins()
 	pw, _ := ctx.GetPdf().GetPageSize()
@@ -68,45 +75,10 @@ func ProcessCodeBlock(ctx PdfContext, n ast.Node, _ bool) {
 		colN := 0
 		for _, c := range l {
 			if group, ok := matches[lineN][colN]; ok {
-				switch group {
-				case highlight.Groups["default"],
-					highlight.Groups[""]:
-					ctx.SetStyler(codeTheme)
-				case highlight.Groups["statement"],
-					highlight.Groups["green"]:
-					ctx.GetPdf().SetTextColor(42, 170, 138)
-				case highlight.Groups["identifier"],
-					highlight.Groups["blue"]:
-					ctx.GetPdf().SetTextColor(137, 207, 240)
-				case highlight.Groups["preproc"]:
-					ctx.GetPdf().SetTextColor(255, 80, 80)
-				case highlight.Groups["special"],
-					highlight.Groups["type.keyword"],
-					highlight.Groups["red"]:
-					ctx.GetPdf().SetTextColor(255, 80, 80)
-				case highlight.Groups["constant"],
-					highlight.Groups["constant.number"],
-					highlight.Groups["constant.bool"],
-					highlight.Groups["symbol.brackets"],
-					highlight.Groups["identifier.var"],
-					highlight.Groups["cyan"]:
-					ctx.GetPdf().SetTextColor(0, 136, 163)
-				case highlight.Groups["constant.specialChar"],
-					highlight.Groups["constant.string.url"],
-					highlight.Groups["constant.string"],
-					highlight.Groups["magenta"]:
-					ctx.GetPdf().SetTextColor(255, 0, 255)
-				case highlight.Groups["type"],
-					highlight.Groups["symbol"],
-					highlight.Groups["symbol.operator"],
-					highlight.Groups["symbol.tag.extended"],
-					highlight.Groups["yellow"]:
-					ctx.GetPdf().SetTextColor(255, 165, 0)
-				case highlight.Groups["comment"],
-					highlight.Groups["high.green"]:
-					ctx.GetPdf().SetTextColor(82, 204, 0)
-				default:
-					fmt.Printf("Unknown group: %s\n", group)
+				groupName := reverseGroups[group]
+				if color, found := cbColors[groupName]; found {
+					ctx.GetPdf().SetTextColor(color.Red, color.Green, color.Blue)
+				} else {
 					ctx.SetStyler(codeTheme)
 				}
 			}
