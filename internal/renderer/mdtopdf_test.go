@@ -50,7 +50,7 @@ func testit(inputf string, gohighlight bool, t *testing.T) {
 	}
 	params := PdfRendererParams{
 		Orientation:     "",
-		Papersz:         "",
+		PageSize:        "",
 		PdfFile:         pdffile,
 		TracerFile:      tracerfile,
 		Opts:            opts,

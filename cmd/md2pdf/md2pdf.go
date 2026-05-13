@@ -1,209 +1,202 @@
 package main
 
 import (
+	"context"
 	"errors"
-	"flag"
-	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"os"
-	"path/filepath"
-	"regexp"
-	"runtime"
+	"runtime/debug"
+	"slices"
 	"strings"
 
+	cliutil "github.com/brunofjesus/md2pdf/internal/cli"
 	"github.com/brunofjesus/md2pdf/internal/renderer"
-	"github.com/gomarkdown/markdown/parser"
-	"golang.org/x/exp/slices"
+	"github.com/urfave/cli/v3"
 )
-
-var (
-	input             = flag.String("i", "", "Input filename, dir consisting of .md|.markdown files or HTTP(s) URL; default is os.Stdin")
-	output            = flag.String("o", "", "Output PDF filename; required")
-	title             = flag.String("title", "", "Presentation title")
-	author            = flag.String("author", "", "Author's name; used if -footer is passed")
-	themeArg          = flag.String("theme", "light", "[light | dark | /path/to/custom/theme.json]")
-	hrAsNewPage       = flag.Bool("new-page-on-hr", false, "Interpret HR as a new page; useful for presentations")
-	printFooter       = flag.Bool("with-footer", false, "Print doc footer (<author>  <title>  <page number>)")
-	generateTOC       = flag.Bool("generate-toc", false, "Auto Generate Table of Contents (TOC)")
-	pageSize          = flag.String("page-size", "A4", "[A3 | A4 | A5]")
-	orientation       = flag.String("orientation", "portrait", "[portrait | landscape]")
-	logFile           = flag.String("log-file", "", "Path to log file")
-	help              = flag.Bool("help", false, "Show usage message")
-	ver               = flag.Bool("version", false, "Print version and build info")
-	version           = "dev"
-	commit            = "none"
-	date              = "unknown"
-	_, fileName, _, _ = runtime.Caller(0)
-)
-
-var opts []renderer.RenderOption
-
-func processRemoteInputFile(url string) ([]byte, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer func() { _ = resp.Body.Close() }()
-
-	if resp.StatusCode != 200 {
-		return nil, errors.New("Received non 200 response code: " + fmt.Sprintf("HTTP %d", resp.StatusCode))
-	}
-	content, rerr := io.ReadAll(resp.Body)
-	return content, rerr
-}
-
-func glob(dir string, validExts []string) ([]string, error) {
-	files := []string{}
-	err := filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
-		if slices.Contains(validExts, filepath.Ext(path)) {
-			files = append(files, path)
-		}
-		return nil
-	})
-
-	return files, err
-}
 
 func main() {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	flag.Parse()
+	cmd := &cli.Command{
+		Name:    "md2pdf",
+		Usage:   "Convert Markdown files to PDF",
+		Version: version(),
+		Action: func(_ context.Context, cmd *cli.Command) error {
+			flagInput := cmd.String("input")
+			flatOutput := cmd.String("output")
+			flagTitle := cmd.String("title")
+			flagTOC := cmd.Bool("table-of-contents")
+			flagHRNewPage := cmd.Bool("horizontal-rule-new-page")
+			flagTheme := cmd.String("theme")
+			flagForceOverwrite := cmd.Bool("force-overwrite")
+			flagFooter := cmd.Bool("footer")
+			flagPageSize := cmd.String("page-size")
+			flagOrientation := cmd.String("orientation")
+			flagAuthor := cmd.String("author")
+			flagLogFile := cmd.String("log-file")
 
-	if *help {
-		usage("")
-		return
-	}
-
-	if *ver {
-		fmt.Printf("md2pdf version: %s, commit: %s, built on: %s\n", version, commit, date)
-		return
-	}
-
-	if *output == "" {
-		usage("Output PDF filename is required")
-	}
-
-	if *hrAsNewPage {
-		opts = append(opts, renderer.WithHorizontalRuleAsNewPage())
-	}
-
-	// get text for PDF
-	var content []byte
-	var err error
-	var inputBaseURL string
-	if *input == "" {
-		content, err = io.ReadAll(os.Stdin)
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		httpRegex := regexp.MustCompile("^http(s)?://")
-		if httpRegex.Match([]byte(*input)) {
-			content, err = processRemoteInputFile(*input)
-			if err != nil {
-				log.Fatal(err)
-			}
-			// get the base URL so we can adjust relative links and images
-			inputBaseURL = strings.Replace(filepath.Dir(*input), ":/", "://", 1)
-		} else {
-			fileInfo, err := os.Stat(*input)
-			if err != nil {
-				log.Fatal(err)
+			if !flagForceOverwrite {
+				outFile, err := os.Stat(flatOutput)
+				if err != nil && !errors.Is(err, os.ErrNotExist) {
+					log.Fatalf("error: failed to check output file: %v\n", err)
+				}
+				if outFile != nil {
+					log.Fatalf("error: output file already exists: %s; use -f to overwrite.\n", flatOutput)
+				}
 			}
 
-			if fileInfo.IsDir() {
+			inputProcessor, err := cliutil.GetInputProcessor(flagInput)
+			if err != nil {
+				return err
+			}
+
+			opts, content, err := inputProcessor(flagInput)
+			if err != nil {
+				return err
+			}
+
+			if flagHRNewPage {
 				opts = append(opts, renderer.WithHorizontalRuleAsNewPage())
-				validExts := []string{".md", ".markdown"}
-				files, err := glob(*input, validExts)
-				if err != nil {
-					log.Fatal(err)
-				}
-				for i, filePath := range files {
-					fileContents, err := os.ReadFile(filePath)
-					if err != nil {
-						log.Fatal(err)
-					}
-					content = append(content, fileContents...)
-					if i < len(files)-1 {
-						content = append(content, []byte("---\n")...)
-					}
-				}
-			} else {
-				content, err = os.ReadFile(*input)
-				if err != nil {
-					log.Fatal(err)
-				}
-				if absInput, absErr := filepath.Abs(*input); absErr == nil {
-					inputBaseURL = filepath.Dir(absInput)
-				}
 			}
-		}
-	}
 
-	theme := renderer.LIGHT
-	themeFile := ""
-	if *themeArg == "dark" {
-		theme = renderer.DARK
-	} else if _, err := os.Stat(*themeArg); err == nil {
-		theme = renderer.CUSTOM
-		themeFile = *themeArg
-	}
-
-	params := renderer.PdfRendererParams{
-		Orientation:     *orientation,
-		Papersz:         *pageSize,
-		PdfFile:         *output,
-		TracerFile:      *logFile,
-		Opts:            opts,
-		Theme:           theme,
-		CustomThemeFile: themeFile,
-	}
-
-	pf := renderer.NewPdfRenderer(params)
-
-	if inputBaseURL != "" {
-		pf.InputBaseURL = inputBaseURL
-	}
-	pf.Pdf.SetSubject(*title, true)
-	pf.Pdf.SetTitle(*title, true)
-	pf.Extensions = parser.NoIntraEmphasis | parser.Tables | parser.FencedCode | parser.Autolink | parser.Strikethrough | parser.SpaceHeadings | parser.HeadingIDs | parser.BackslashLineBreak | parser.DefinitionLists
-
-	if *printFooter {
-		pf.Pdf.SetFooterFunc(func() {
-			pf.Pdf.SetFillColor(pf.Theme.BackgroundColor.Red, pf.Theme.BackgroundColor.Green, pf.Theme.BackgroundColor.Blue)
-			// Position at 1.5 cm from bottom
-			pf.Pdf.SetY(-15)
-			// Arial italic 8
-			pf.Pdf.SetFont(pf.Theme.Normal.Font, "I", 8)
-			// Text color in gray
-			pf.Pdf.SetTextColor(128, 128, 128)
-			w, h, _ := pf.Pdf.PageSize(pf.Pdf.PageNo())
-			pf.Pdf.SetX(4)
-			pf.Pdf.CellFormat(0, 10, *author, "", 0, "", true, 0, "")
-			middle := w / 2
-			if *orientation == "landscape" {
-				middle = h / 2
+			if flagFooter {
+				opts = append(opts, renderer.WithDefaultFooter(flagOrientation, flagAuthor, flagTitle))
 			}
-			pf.Pdf.SetX(middle - float64(len(*title)))
-			pf.Pdf.CellFormat(0, 10, *title, "", 0, "", true, 0, "")
-			pf.Pdf.SetX(-40)
-			pf.Pdf.CellFormat(0, 10, fmt.Sprintf("Page %d", pf.Pdf.PageNo()), "", 0, "", true, 0, "")
-		})
+
+			if flagTOC {
+				opts = append(opts, renderer.WithTableOfContents())
+			}
+
+			params := renderer.PdfRendererParams{
+				Title:           flagTitle,
+				Orientation:     flagOrientation,
+				PageSize:        flagPageSize,
+				PdfFile:         flatOutput,
+				TracerFile:      flagLogFile,
+				Opts:            opts,
+				Theme:           renderer.LIGHT,
+				CustomThemeFile: "",
+			}
+
+			switch flagTheme {
+			case "light":
+				params.Theme = renderer.LIGHT
+			case "dark":
+				params.Theme = renderer.DARK
+			default:
+				params.Theme = renderer.CUSTOM
+				params.CustomThemeFile = flagTheme
+			}
+
+			pf := renderer.NewPdfRenderer(params)
+
+			err = pf.Process(content)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			return nil
+		},
+		UseShortOptionHandling: true,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "input",
+				Aliases: []string{"i"},
+				Usage:   "Input filename, dir consisting of .md|.markdown files or HTTP(s) URL; default is os.Stdin",
+			},
+			&cli.StringFlag{
+				Name:    "output",
+				Aliases: []string{"o"},
+				Usage:   "Output PDF filename; required",
+				Value:   "out.pdf",
+			},
+			&cli.StringFlag{
+				Name:    "title",
+				Aliases: []string{"t"},
+				Usage:   "PDF title",
+			},
+			&cli.StringFlag{
+				Name:  "theme",
+				Usage: "Theme to use for the PDF; Can be 'light', 'dark' or the path for a custom theme file",
+				Value: "light",
+			},
+			&cli.BoolFlag{
+				Name:    "table-of-contents",
+				Aliases: []string{"toc"},
+				Usage:   "Generate a table of contents page based on the headings in the input markdown",
+				Value:   false,
+			},
+			&cli.BoolFlag{
+				Name:    "horizontal-rule-new-page",
+				Aliases: []string{"hr-new-page"},
+				Usage:   "Start a new page on horizontal rules (---); useful for presentations",
+				Value:   false,
+			},
+			&cli.BoolFlag{
+				Name:    "force-overwrite",
+				Aliases: []string{"f"},
+				Usage:   "Force overwrite of output file if it already exists",
+				Value:   false,
+			},
+			&cli.BoolFlag{
+				Name:  "footer",
+				Usage: "Print doc footer (<author>  <title>  <page number>)",
+				Value: false,
+			},
+			&cli.StringFlag{
+				Name:        "page-size",
+				Usage:       "Page size for the PDF; can be 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'Letter', 'Legal' or 'Tabloid'",
+				DefaultText: "A4",
+				Value:       "A4",
+				Validator: func(value string) error {
+					acceptedSizes := []string{"A1", "A2", "A3", "A4", "A5", "A6", "A7", "Letter", "Legal", "Tabloid"}
+					if !slices.Contains(acceptedSizes, value) {
+						return errors.New("page-size must be one of: " + strings.Join(acceptedSizes, ", "))
+					}
+					return nil
+				},
+			},
+			&cli.StringFlag{
+				Name:  "orientation",
+				Usage: "Page orientation for the PDF; can be 'portrait' or 'landscape'; default is 'portrait'",
+				Value: "portrait",
+				Validator: func(value string) error {
+					if value != "portrait" && value != "landscape" {
+						return errors.New("orientation must be either 'portrait' or 'landscape'")
+					}
+					return nil
+				},
+			},
+			&cli.StringFlag{
+				Name:  "author",
+				Usage: "Author's name",
+				Value: "",
+			},
+			&cli.StringFlag{
+				Name:  "log-file",
+				Usage: "Path to log file",
+			},
+		},
 	}
 
-	if *generateTOC {
-		renderer.WithTableOfContents()(pf)
-	}
-	err = pf.Process(content)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
+	if err := cmd.Run(context.Background(), os.Args); err != nil {
+		log.Fatal(err)
 	}
 }
 
-func usage(msg string) {
-	fmt.Println(msg + "\n")
-	fmt.Printf("Usage: %s (%s) [options]\n", filepath.Base(fileName), version)
-	flag.PrintDefaults()
-	os.Exit(0)
+func version() string {
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return "unknown"
+	}
+
+	if len(info.Main.Version) > 0 {
+		return info.Main.Version
+	}
+
+	for _, s := range info.Settings {
+		if s.Key == "vcs.revision" {
+			return s.Value
+		}
+	}
+
+	return "dev"
 }

@@ -170,11 +170,11 @@ func (r *PdfRenderer) SetTOCLinks(tocHeaders map[string]*int) {
 
 // PdfRendererParams struct to hold params passed to NewPdfRenderer
 type PdfRendererParams struct {
-	Title                                     string
-	Orientation, Papersz, PdfFile, TracerFile string
-	Opts                                      []RenderOption
-	Theme                                     Theme
-	CustomThemeFile                           string
+	Title                                      string
+	Orientation, PageSize, PdfFile, TracerFile string
+	Opts                                       []RenderOption
+	Theme                                      Theme
+	CustomThemeFile                            string
 }
 
 // NewPdfRenderer creates and configures an PdfRenderer object,
@@ -193,9 +193,9 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 	}
 
 	r.units = "pt"
-	r.papersize = "Letter"
-	if params.Papersz != "" {
-		r.papersize = params.Papersz
+	r.papersize = "A4"
+	if params.PageSize != "" {
+		r.papersize = params.PageSize
 	}
 
 	r.fontdir = "."
@@ -302,7 +302,7 @@ func NewPdfRendererWithDefaultStyler(orient, papersz, pdfFile, tracerFile string
 	})
 	params := PdfRendererParams{
 		Orientation: orient,
-		Papersz:     papersz,
+		PageSize:    papersz,
 		PdfFile:     pdfFile,
 		TracerFile:  tracerFile,
 		Opts:        opts,
