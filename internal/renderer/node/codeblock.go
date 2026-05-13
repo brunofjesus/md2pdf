@@ -35,12 +35,12 @@ func ProcessCodeBlock(ctx PdfContext, n ast.Node, _ bool) {
 	syntaxDef, _ := highlight.ParseDef(syntaxFile)
 	h := highlight.NewHighlighter(syntaxDef)
 	linesWrapped := wordwrap.WrapString(string(node.Literal), 90)
-	if ctx.GetTheme().CodeTabWidth > 0 {
-		linesWrapped = strings.ReplaceAll(linesWrapped, "\t", strings.Repeat(" ", ctx.GetTheme().CodeTabWidth))
+	if ctx.GetTheme().Code.TabWidth > 0 {
+		linesWrapped = strings.ReplaceAll(linesWrapped, "\t", strings.Repeat(" ", ctx.GetTheme().Code.TabWidth))
 	}
 	matches := h.HighlightString(linesWrapped)
 
-	ctx.SetStyler(ctx.GetTheme().Code)
+	ctx.SetStyler(ctx.GetTheme().Code.Text)
 	ctx.Cr()
 
 	lines := strings.Split(linesWrapped, "\n")
@@ -55,8 +55,8 @@ func ProcessCodeBlock(ctx PdfContext, n ast.Node, _ bool) {
 	}
 
 	codeTheme := ctx.GetTheme().Code
-	cbColors := ctx.GetTheme().Codeblock
-	lineH := codeTheme.Size + codeTheme.Spacing
+	cbColors := ctx.GetTheme().Code.Colors
+	lineH := codeTheme.Text.Size + codeTheme.Text.Spacing
 	lm, _, rm, _ := ctx.GetPdf().GetMargins()
 	pw, _ := ctx.GetPdf().GetPageSize()
 	availW := pw - lm - rm
@@ -79,7 +79,7 @@ func ProcessCodeBlock(ctx PdfContext, n ast.Node, _ bool) {
 				if color, found := cbColors[groupName]; found {
 					ctx.GetPdf().SetTextColor(color.Red, color.Green, color.Blue)
 				} else {
-					ctx.SetStyler(codeTheme)
+					ctx.SetStyler(codeTheme.Text)
 				}
 			}
 			ctx.GetPdf().Write(lineH, string(c))
@@ -87,16 +87,16 @@ func ProcessCodeBlock(ctx PdfContext, n ast.Node, _ bool) {
 		}
 	})
 
-	ctx.SetStyler(codeTheme)
+	ctx.SetStyler(codeTheme.Text)
 }
 
 func outputUnhighlightedCodeBlock(ctx PdfContext, codeBlock string) {
 	ctx.Cr()
 	ctx.SetStyler(ctx.GetTheme().Backtick)
-	if ctx.GetTheme().CodeTabWidth > 0 {
-		codeBlock = strings.ReplaceAll(codeBlock, "\t", strings.Repeat(" ", ctx.GetTheme().CodeTabWidth))
+	if ctx.GetTheme().Code.TabWidth > 0 {
+		codeBlock = strings.ReplaceAll(codeBlock, "\t", strings.Repeat(" ", ctx.GetTheme().Code.TabWidth))
 	}
-	ctx.MultiCell(ctx.GetTheme().Code, codeBlock)
+	ctx.MultiCell(ctx.GetTheme().Code.Text, codeBlock)
 }
 
 // drawCodeFill manages background rectangles and page breaks for highlighted code blocks.
@@ -111,7 +111,7 @@ func drawCodeFill(ctx PdfContext, lines []string, lineHeights []float64, renderL
 	usableH := ph - bm
 
 	drawBg := func(y, height float64) {
-		ctx.SetStyler(codeTheme)
+		ctx.SetStyler(codeTheme.Text)
 		pdf.Rect(lm, y, availW, height, "F")
 	}
 
@@ -131,7 +131,7 @@ func drawCodeFill(ctx PdfContext, lines []string, lineHeights []float64, renderL
 	defer pdf.SetAutoPageBreak(autoBreak, pbMargin)
 
 	startX, startY := pdf.GetXY()
-	if codeTheme.FillColor != bgColor {
+	if codeTheme.Text.FillColor != bgColor {
 		if h := rectHeightFrom(0, startY); h > 0 {
 			drawBg(startY, h)
 			pdf.SetXY(startX, startY)
@@ -142,7 +142,7 @@ func drawCodeFill(ctx PdfContext, lines []string, lineHeights []float64, renderL
 		if pdf.GetY()+lineHeights[lineN] > usableH {
 			pdf.AddPage()
 			newY := pdf.GetY()
-			if codeTheme.FillColor != bgColor {
+			if codeTheme.Text.FillColor != bgColor {
 				if h := rectHeightFrom(lineN, newY); h > 0 {
 					drawBg(newY, h)
 				}
@@ -157,13 +157,13 @@ func drawCodeFill(ctx PdfContext, lines []string, lineHeights []float64, renderL
 
 // ProcessCode handles inline *ast.Code nodes.
 func ProcessCode(ctx PdfContext, n ast.Node, _ bool) {
-	ctx.Tracer("processCode", fmt.Sprintf("%s", string(n.AsLeaf().Literal)))
+	ctx.Tracer("processCode", string(n.AsLeaf().Literal))
 	ctx.Write(ctx.GetTheme().Normal, " ")
 	ctx.Tracer("Code (entering)", "")
 	codeTheme := ctx.GetTheme().Code
-	ctx.SetStyler(codeTheme)
+	ctx.SetStyler(codeTheme.Text)
 	s := string(n.AsLeaf().Literal)
 	hw := ctx.GetPdf().GetStringWidth(s)
-	h := codeTheme.Size
+	h := codeTheme.Text.Size
 	ctx.GetPdf().CellFormat(hw, h, s, "", 0, "C", true, 0, "")
 }

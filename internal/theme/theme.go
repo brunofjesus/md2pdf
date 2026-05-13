@@ -9,39 +9,41 @@ import (
 )
 
 type Theme struct {
-	BackgroundColor colors.Color
+	BackgroundColor colors.Color `json:"background_color"`
+
 	// Normal
-	Normal   Styler
-	NormalEm float64
+	Normal Styler `json:"normal"`
 
 	// Link
-	Link Styler
+	Link Styler `json:"link"`
 
 	// backticked text
-	Backtick Styler
+	Backtick Styler `json:"backtick"`
 
 	// blockquote text
-	Blockquote  Styler
-	IndentValue float64
+	Blockquote  Styler  `json:"blockquote"`
+	IndentValue float64 `json:"indent_value"`
 
 	// Headings
-	H1 Styler
-	H2 Styler
-	H3 Styler
-	H4 Styler
-	H5 Styler
-	H6 Styler
+	H1 Styler `json:"h1"`
+	H2 Styler `json:"h2"`
+	H3 Styler `json:"h3"`
+	H4 Styler `json:"h4"`
+	H5 Styler `json:"h5"`
+	H6 Styler `json:"h6"`
 
 	// Table styling
-	THeader Styler
-	TBody   Styler
+	THeader Styler `json:"table_header"`
+	TBody   Styler `json:"table_body"`
 
 	// code styling
-	Code         Styler
-	CodeTabWidth int
+	Code Code `json:"code"`
+}
 
-	// Codeblock syntax highlight colors keyed by highlight group name
-	Codeblock map[string]colors.Color
+type Code struct {
+	Text     Styler                  `json:"text"`
+	TabWidth int                     `json:"tab_width"`
+	Colors   map[string]colors.Color `json:"colors"`
 }
 
 // Styler is the struct to capture the styling features for text
@@ -88,11 +90,49 @@ func LightTheme() *Theme {
 	}
 
 	// Code text
-	r.Code = Styler{
-		Font: "LiberationMono", Style: "", Size: 12, Spacing: 2,
-		TextColor: ghText, FillColor: ghCodeBg,
+	// Codeblock syntax highlight colors (GitHub Light)
+	ghPurple := colors.New(130, 80, 223)   // #8250df
+	ghDkBlue := colors.New(5, 80, 174)     // #0550ae
+	ghRed := colors.New(207, 34, 46)       // #cf222e
+	ghStrBlue := colors.New(10, 48, 105)   // #0a3069
+	ghBrown := colors.New(149, 56, 0)      // #953800
+	ghComment := colors.New(110, 119, 129) // #6e7781
+
+	r.Code = Code{
+		Text: Styler{
+			Font: "LiberationMono", Style: "", Size: 12, Spacing: 2,
+			TextColor: ghText, FillColor: ghCodeBg,
+		},
+		TabWidth: 4,
+		Colors: map[string]colors.Color{
+			"default":              ghText,
+			"statement":            ghPurple,
+			"green":                ghPurple,
+			"identifier":           ghDkBlue,
+			"blue":                 ghDkBlue,
+			"preproc":              ghRed,
+			"special":              ghRed,
+			"type.keyword":         ghRed,
+			"red":                  ghRed,
+			"constant":             ghDkBlue,
+			"constant.number":      ghDkBlue,
+			"constant.bool":        ghDkBlue,
+			"symbol.brackets":      ghText,
+			"identifier.var":       ghDkBlue,
+			"cyan":                 ghDkBlue,
+			"constant.specialChar": ghStrBlue,
+			"constant.string.url":  ghStrBlue,
+			"constant.string":      ghStrBlue,
+			"magenta":              ghStrBlue,
+			"type":                 ghBrown,
+			"symbol":               ghBrown,
+			"symbol.operator":      ghText,
+			"symbol.tag.extended":  ghDkBlue,
+			"yellow":               ghBrown,
+			"comment":              ghComment,
+			"high.green":           ghComment,
+		},
 	}
-	r.CodeTabWidth = 4
 
 	// Headings
 	r.H1 = Styler{
@@ -135,43 +175,6 @@ func LightTheme() *Theme {
 	r.TBody = Styler{
 		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
 		TextColor: ghText, FillColor: ghWhite,
-	}
-
-	// Codeblock syntax highlight colors (GitHub Light)
-	ghPurple := colors.New(130, 80, 223)   // #8250df
-	ghDkBlue := colors.New(5, 80, 174)     // #0550ae
-	ghRed := colors.New(207, 34, 46)       // #cf222e
-	ghStrBlue := colors.New(10, 48, 105)   // #0a3069
-	ghBrown := colors.New(149, 56, 0)      // #953800
-	ghComment := colors.New(110, 119, 129) // #6e7781
-
-	r.Codeblock = map[string]colors.Color{
-		"default":              ghText,
-		"statement":            ghPurple,
-		"green":                ghPurple,
-		"identifier":           ghDkBlue,
-		"blue":                 ghDkBlue,
-		"preproc":              ghRed,
-		"special":              ghRed,
-		"type.keyword":         ghRed,
-		"red":                  ghRed,
-		"constant":             ghDkBlue,
-		"constant.number":      ghDkBlue,
-		"constant.bool":        ghDkBlue,
-		"symbol.brackets":      ghText,
-		"identifier.var":       ghDkBlue,
-		"cyan":                 ghDkBlue,
-		"constant.specialChar": ghStrBlue,
-		"constant.string.url":  ghStrBlue,
-		"constant.string":      ghStrBlue,
-		"magenta":              ghStrBlue,
-		"type":                 ghBrown,
-		"symbol":               ghBrown,
-		"symbol.operator":      ghText,
-		"symbol.tag.extended":  ghDkBlue,
-		"yellow":               ghBrown,
-		"comment":              ghComment,
-		"high.green":           ghComment,
 	}
 
 	return &r
@@ -208,11 +211,48 @@ func DarkTheme() *Theme {
 	}
 
 	// Code text
-	r.Code = Styler{
-		Font: "LiberationMono", Style: "", Size: 12, Spacing: 2,
-		TextColor: ghText, FillColor: ghCodeBg,
+	// Codeblock syntax highlight colors (GitHub Dark)
+	ghRedSyn := colors.New(255, 123, 114)  // #ff7b72
+	ghBlueSyn := colors.New(121, 192, 255) // #79c0ff
+	ghStrCyan := colors.New(165, 214, 255) // #a5d6ff
+	ghOrange := colors.New(255, 166, 87)   // #ffa657
+	ghGray := colors.New(139, 148, 158)    // #8b949e
+
+	r.Code = Code{
+		Text: Styler{
+			Font: "LiberationMono", Style: "", Size: 12, Spacing: 2,
+			TextColor: ghText, FillColor: ghCodeBg,
+		},
+		TabWidth: 4,
+		Colors: map[string]colors.Color{
+			"default":              ghText,
+			"statement":            ghRedSyn,
+			"green":                ghRedSyn,
+			"identifier":           ghBlueSyn,
+			"blue":                 ghBlueSyn,
+			"preproc":              ghRedSyn,
+			"special":              ghRedSyn,
+			"type.keyword":         ghRedSyn,
+			"red":                  ghRedSyn,
+			"constant":             ghBlueSyn,
+			"constant.number":      ghBlueSyn,
+			"constant.bool":        ghBlueSyn,
+			"symbol.brackets":      ghText,
+			"identifier.var":       ghBlueSyn,
+			"cyan":                 ghBlueSyn,
+			"constant.specialChar": ghStrCyan,
+			"constant.string.url":  ghStrCyan,
+			"constant.string":      ghStrCyan,
+			"magenta":              ghStrCyan,
+			"type":                 ghOrange,
+			"symbol":               ghOrange,
+			"symbol.operator":      ghText,
+			"symbol.tag.extended":  ghOrange,
+			"yellow":               ghOrange,
+			"comment":              ghGray,
+			"high.green":           ghGray,
+		},
 	}
-	r.CodeTabWidth = 4
 
 	// Headings
 	r.H1 = Styler{
@@ -255,42 +295,6 @@ func DarkTheme() *Theme {
 	r.TBody = Styler{
 		Font: "LiberationSans", Style: "", Size: 12, Spacing: 2,
 		TextColor: ghText, FillColor: ghBg,
-	}
-
-	// Codeblock syntax highlight colors (GitHub Dark)
-	ghRedSyn := colors.New(255, 123, 114)  // #ff7b72
-	ghBlueSyn := colors.New(121, 192, 255) // #79c0ff
-	ghStrCyan := colors.New(165, 214, 255) // #a5d6ff
-	ghOrange := colors.New(255, 166, 87)   // #ffa657
-	ghGray := colors.New(139, 148, 158)    // #8b949e
-
-	r.Codeblock = map[string]colors.Color{
-		"default":              ghText,
-		"statement":            ghRedSyn,
-		"green":                ghRedSyn,
-		"identifier":           ghBlueSyn,
-		"blue":                 ghBlueSyn,
-		"preproc":              ghRedSyn,
-		"special":              ghRedSyn,
-		"type.keyword":         ghRedSyn,
-		"red":                  ghRedSyn,
-		"constant":             ghBlueSyn,
-		"constant.number":      ghBlueSyn,
-		"constant.bool":        ghBlueSyn,
-		"symbol.brackets":      ghText,
-		"identifier.var":       ghBlueSyn,
-		"cyan":                 ghBlueSyn,
-		"constant.specialChar": ghStrCyan,
-		"constant.string.url":  ghStrCyan,
-		"constant.string":      ghStrCyan,
-		"magenta":              ghStrCyan,
-		"type":                 ghOrange,
-		"symbol":               ghOrange,
-		"symbol.operator":      ghText,
-		"symbol.tag.extended":  ghOrange,
-		"yellow":               ghOrange,
-		"comment":              ghGray,
-		"high.green":           ghGray,
 	}
 
 	return &r

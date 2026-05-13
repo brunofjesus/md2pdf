@@ -1,141 +1,139 @@
 {
-  "BackgroundColor": {
-    "Red": 13,
-    "Green": 17,
-    "Blue": 23
-  },
-  "Normal": {
+  "background_color": "#0d1117",
+  "normal": {
     "Font": "LiberationSans",
     "Style": "",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
-    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
+    "TextColor": "#e6edf3",
+    "FillColor": "#0d1117"
   },
-  "Link": {
+  "link": {
     "Font": "LiberationSans",
     "Style": "",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": { "Red": 74, "Green": 158, "Blue": 255 },
-    "FillColor": { "Red": 0, "Green": 0, "Blue": 0 }
+    "TextColor": "#4a9eff",
+    "FillColor": "#000000"
   },
-  "Backtick": {
+  "backtick": {
     "Font": "LiberationMono",
     "Style": "",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
-    "FillColor": { "Red": 52, "Green": 59, "Blue": 66 }
+    "TextColor": "#e6edf3",
+    "FillColor": "#343b42"
   },
-  "Blockquote": {
+  "blockquote": {
     "Font": "LiberationSans",
     "Style": "i",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": { "Red": 125, "Green": 133, "Blue": 144 },
-    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
+    "TextColor": "#7d8590",
+    "FillColor": "#0d1117"
   },
-  "IndentValue": 0,
-  "H1": {
+  "indent_value": 0,
+  "h1": {
     "Font": "LiberationSans",
     "Style": "b",
     "Size": 32,
     "Spacing": 5,
-    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
-    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
+    "TextColor": "#e6edf3",
+    "FillColor": "#0d1117"
   },
-  "H2": {
+  "h2": {
     "Font": "LiberationSans",
     "Style": "b",
     "Size": 24,
     "Spacing": 5,
-    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
-    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
+    "TextColor": "#e6edf3",
+    "FillColor": "#0d1117"
   },
-  "H3": {
+  "h3": {
     "Font": "LiberationSans",
     "Style": "b",
     "Size": 20,
     "Spacing": 5,
-    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
-    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
+    "TextColor": "#e6edf3",
+    "FillColor": "#0d1117"
   },
-  "H4": {
+  "h4": {
     "Font": "LiberationSans",
     "Style": "b",
     "Size": 16,
     "Spacing": 5,
-    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
-    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
+    "TextColor": "#e6edf3",
+    "FillColor": "#0d1117"
   },
-  "H5": {
+  "h5": {
     "Font": "LiberationSans",
     "Style": "b",
     "Size": 14,
     "Spacing": 5,
-    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
-    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
+    "TextColor": "#e6edf3",
+    "FillColor": "#0d1117"
   },
-  "H6": {
+  "h6": {
     "Font": "LiberationSans",
     "Style": "b",
     "Size": 13.6,
     "Spacing": 5,
-    "TextColor": { "Red": 125, "Green": 133, "Blue": 144 },
-    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
+    "TextColor": "#7d8590",
+    "FillColor": "#0d1117"
   },
-  "THeader": {
+  "table_header": {
     "Font": "LiberationSans",
     "Style": "b",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
-    "FillColor": { "Red": 22, "Green": 27, "Blue": 34 }
+    "TextColor": "#e6edf3",
+    "FillColor": "#161b22"
   },
-  "TBody": {
+  "table_body": {
     "Font": "LiberationSans",
     "Style": "",
     "Size": 12,
     "Spacing": 2,
-    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
-    "FillColor": { "Red": 13, "Green": 17, "Blue": 23 }
+    "TextColor": "#e6edf3",
+    "FillColor": "#0d1117"
   },
-  "Code": {
-    "Font": "LiberationMono",
-    "Style": "",
-    "Size": 12,
-    "Spacing": 2,
-    "TextColor": { "Red": 230, "Green": 237, "Blue": 243 },
-    "FillColor": { "Red": 22, "Green": 27, "Blue": 34 }
-  },
-  "CodeTabWidth": 4,
-  "Codeblock": {
-    "default":              { "Red": 230, "Green": 237, "Blue": 243 },
-    "statement":            { "Red": 255, "Green": 123, "Blue": 114 },
-    "green":                { "Red": 255, "Green": 123, "Blue": 114 },
-    "identifier":           { "Red": 121, "Green": 192, "Blue": 255 },
-    "blue":                 { "Red": 121, "Green": 192, "Blue": 255 },
-    "preproc":              { "Red": 255, "Green": 123, "Blue": 114 },
-    "special":              { "Red": 255, "Green": 123, "Blue": 114 },
-    "type.keyword":         { "Red": 255, "Green": 123, "Blue": 114 },
-    "red":                  { "Red": 255, "Green": 123, "Blue": 114 },
-    "constant":             { "Red": 121, "Green": 192, "Blue": 255 },
-    "constant.number":      { "Red": 121, "Green": 192, "Blue": 255 },
-    "constant.bool":        { "Red": 121, "Green": 192, "Blue": 255 },
-    "symbol.brackets":      { "Red": 230, "Green": 237, "Blue": 243 },
-    "identifier.var":       { "Red": 121, "Green": 192, "Blue": 255 },
-    "cyan":                 { "Red": 121, "Green": 192, "Blue": 255 },
-    "constant.specialChar": { "Red": 165, "Green": 214, "Blue": 255 },
-    "constant.string.url":  { "Red": 165, "Green": 214, "Blue": 255 },
-    "constant.string":      { "Red": 165, "Green": 214, "Blue": 255 },
-    "magenta":              { "Red": 165, "Green": 214, "Blue": 255 },
-    "type":                 { "Red": 255, "Green": 166, "Blue": 87 },
-    "symbol":               { "Red": 255, "Green": 166, "Blue": 87 },
-    "symbol.operator":      { "Red": 230, "Green": 237, "Blue": 243 },
-    "symbol.tag.extended":  { "Red": 255, "Green": 166, "Blue": 87 },
-    "yellow":               { "Red": 255, "Green": 166, "Blue": 87 },
-    "comment":              { "Red": 139, "Green": 148, "Blue": 158 },
-    "high.green":           { "Red": 139, "Green": 148, "Blue": 158 }
+  "code": {
+    "text": {
+      "Font": "LiberationMono",
+      "Style": "",
+      "Size": 12,
+      "Spacing": 2,
+      "TextColor": "#e6edf3",
+      "FillColor": "#161b22"
+    },
+    "tab_width": 4,
+    "colors": {
+      "default": "#e6edf3",
+      "statement": "#ff7b72",
+      "green": "#ff7b72",
+      "identifier": "#79c0ff",
+      "blue": "#79c0ff",
+      "preproc": "#ff7b72",
+      "special": "#ff7b72",
+      "type.keyword": "#ff7b72",
+      "red": "#ff7b72",
+      "constant": "#79c0ff",
+      "constant.number": "#79c0ff",
+      "constant.bool": "#79c0ff",
+      "symbol.brackets": "#e6edf3",
+      "identifier.var": "#79c0ff",
+      "cyan": "#79c0ff",
+      "constant.specialChar": "#a5d6ff",
+      "constant.string.url": "#a5d6ff",
+      "constant.string": "#a5d6ff",
+      "magenta": "#a5d6ff",
+      "type": "#ffa657",
+      "symbol": "#ffa657",
+      "symbol.operator": "#e6edf3",
+      "symbol.tag.extended": "#ffa657",
+      "yellow": "#ffa657",
+      "comment": "#8b949e",
+      "high.green": "#8b949e"
+    }
   }
 }
