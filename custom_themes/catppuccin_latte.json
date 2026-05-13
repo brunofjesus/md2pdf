@@ -1,0 +1,141 @@
+{
+  "BackgroundColor": {
+    "Red": 239,
+    "Green": 241,
+    "Blue": 245
+  },
+  "Normal": {
+    "Font": "LiberationSans",
+    "Style": "",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": { "Red": 76, "Green": 79, "Blue": 105 },
+    "FillColor": { "Red": 239, "Green": 241, "Blue": 245 }
+  },
+  "Link": {
+    "Font": "LiberationSans",
+    "Style": "",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": { "Red": 30, "Green": 102, "Blue": 245 },
+    "FillColor": { "Red": 0, "Green": 0, "Blue": 0 }
+  },
+  "Backtick": {
+    "Font": "LiberationMono",
+    "Style": "",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": { "Red": 76, "Green": 79, "Blue": 105 },
+    "FillColor": { "Red": 220, "Green": 224, "Blue": 232 }
+  },
+  "Blockquote": {
+    "Font": "LiberationSans",
+    "Style": "i",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": { "Red": 108, "Green": 111, "Blue": 133 },
+    "FillColor": { "Red": 239, "Green": 241, "Blue": 245 }
+  },
+  "IndentValue": 0,
+  "H1": {
+    "Font": "LiberationSans",
+    "Style": "b",
+    "Size": 32,
+    "Spacing": 5,
+    "TextColor": { "Red": 76, "Green": 79, "Blue": 105 },
+    "FillColor": { "Red": 239, "Green": 241, "Blue": 245 }
+  },
+  "H2": {
+    "Font": "LiberationSans",
+    "Style": "b",
+    "Size": 24,
+    "Spacing": 5,
+    "TextColor": { "Red": 76, "Green": 79, "Blue": 105 },
+    "FillColor": { "Red": 239, "Green": 241, "Blue": 245 }
+  },
+  "H3": {
+    "Font": "LiberationSans",
+    "Style": "b",
+    "Size": 20,
+    "Spacing": 5,
+    "TextColor": { "Red": 76, "Green": 79, "Blue": 105 },
+    "FillColor": { "Red": 239, "Green": 241, "Blue": 245 }
+  },
+  "H4": {
+    "Font": "LiberationSans",
+    "Style": "b",
+    "Size": 16,
+    "Spacing": 5,
+    "TextColor": { "Red": 76, "Green": 79, "Blue": 105 },
+    "FillColor": { "Red": 239, "Green": 241, "Blue": 245 }
+  },
+  "H5": {
+    "Font": "LiberationSans",
+    "Style": "b",
+    "Size": 14,
+    "Spacing": 5,
+    "TextColor": { "Red": 76, "Green": 79, "Blue": 105 },
+    "FillColor": { "Red": 239, "Green": 241, "Blue": 245 }
+  },
+  "H6": {
+    "Font": "LiberationSans",
+    "Style": "b",
+    "Size": 13.6,
+    "Spacing": 5,
+    "TextColor": { "Red": 108, "Green": 111, "Blue": 133 },
+    "FillColor": { "Red": 239, "Green": 241, "Blue": 245 }
+  },
+  "THeader": {
+    "Font": "LiberationSans",
+    "Style": "b",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": { "Red": 76, "Green": 79, "Blue": 105 },
+    "FillColor": { "Red": 230, "Green": 233, "Blue": 239 }
+  },
+  "TBody": {
+    "Font": "LiberationSans",
+    "Style": "",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": { "Red": 76, "Green": 79, "Blue": 105 },
+    "FillColor": { "Red": 239, "Green": 241, "Blue": 245 }
+  },
+  "Code": {
+    "Font": "LiberationMono",
+    "Style": "",
+    "Size": 12,
+    "Spacing": 2,
+    "TextColor": { "Red": 76, "Green": 79, "Blue": 105 },
+    "FillColor": { "Red": 230, "Green": 233, "Blue": 239 }
+  },
+  "CodeTabWidth": 4,
+  "Codeblock": {
+    "default":              { "Red": 76, "Green": 79, "Blue": 105 },
+    "statement":            { "Red": 210, "Green": 15, "Blue": 57 },
+    "green":                { "Red": 210, "Green": 15, "Blue": 57 },
+    "identifier":           { "Red": 30, "Green": 102, "Blue": 245 },
+    "blue":                 { "Red": 30, "Green": 102, "Blue": 245 },
+    "preproc":              { "Red": 210, "Green": 15, "Blue": 57 },
+    "special":              { "Red": 210, "Green": 15, "Blue": 57 },
+    "type.keyword":         { "Red": 210, "Green": 15, "Blue": 57 },
+    "red":                  { "Red": 210, "Green": 15, "Blue": 57 },
+    "constant":             { "Red": 30, "Green": 102, "Blue": 245 },
+    "constant.number":      { "Red": 30, "Green": 102, "Blue": 245 },
+    "constant.bool":        { "Red": 30, "Green": 102, "Blue": 245 },
+    "symbol.brackets":      { "Red": 76, "Green": 79, "Blue": 105 },
+    "identifier.var":       { "Red": 30, "Green": 102, "Blue": 245 },
+    "cyan":                 { "Red": 30, "Green": 102, "Blue": 245 },
+    "constant.specialChar": { "Red": 64, "Green": 160, "Blue": 43 },
+    "constant.string.url":  { "Red": 64, "Green": 160, "Blue": 43 },
+    "constant.string":      { "Red": 64, "Green": 160, "Blue": 43 },
+    "magenta":              { "Red": 64, "Green": 160, "Blue": 43 },
+    "type":                 { "Red": 254, "Green": 100, "Blue": 11 },
+    "symbol":               { "Red": 254, "Green": 100, "Blue": 11 },
+    "symbol.operator":      { "Red": 76, "Green": 79, "Blue": 105 },
+    "symbol.tag.extended":  { "Red": 30, "Green": 102, "Blue": 245 },
+    "yellow":               { "Red": 254, "Green": 100, "Blue": 11 },
+    "comment":              { "Red": 156, "Green": 160, "Blue": 176 },
+    "high.green":           { "Red": 156, "Green": 160, "Blue": 176 }
+  }
+}
