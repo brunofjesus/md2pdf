@@ -55,6 +55,10 @@ func main() {
 				opts = append(opts, renderer.WithDefaultFooter(flagOrientation, flagAuthor, flagTitle))
 			}
 
+			if flagTOC {
+				opts = append(opts, renderer.WithTableOfContents())
+			}
+
 			params := renderer.PdfRendererParams{
 				Title:           flagTitle,
 				Orientation:     flagOrientation,
@@ -78,12 +82,7 @@ func main() {
 
 			pf := renderer.NewPdfRenderer(params)
 
-			var p renderer.Processor = pf
-			if flagTOC {
-				p = renderer.NewTOCDecorator(pf)
-			}
-
-			err = p.Process(content)
+			err = pf.Process(content)
 			if err != nil {
 				log.Fatal(err)
 			}

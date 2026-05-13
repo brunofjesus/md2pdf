@@ -37,9 +37,6 @@ import (
 	"github.com/gomarkdown/markdown/parser"
 )
 
-// Ensure PdfRenderer satisfies the Processor interface.
-var _ Processor = (*PdfRenderer)(nil)
-
 // Ensure PdfRenderer satisfies node.PdfContext.
 var _ node.PdfContext = (*PdfRenderer)(nil)
 
@@ -97,6 +94,9 @@ type PdfRenderer struct {
 
 	// nodeProcessors maps AST node type names to their processor functions.
 	nodeProcessors map[string]node.NodeProcessor
+
+	// preProcessors are functions that run before the main rendering pass.
+	preProcessors []func(content []byte) error
 }
 
 // ---------------------------------------------------------------------------
@@ -329,6 +329,12 @@ func (r *PdfRenderer) Process(content []byte) error {
 		defer f.Close()
 		r.w = bufio.NewWriter(f)
 		defer r.w.Flush()
+	}
+
+	for _, pp := range r.preProcessors {
+		if err = pp(content); err != nil {
+			return fmt.Errorf("pre-processor error: %w", err)
+		}
 	}
 
 	err = r.Run(content)

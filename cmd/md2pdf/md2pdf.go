@@ -192,11 +192,10 @@ func main() {
 		})
 	}
 
-	var p renderer.Processor = pf
 	if *generateTOC {
-		p = renderer.NewTOCDecorator(pf)
+		renderer.WithTableOfContents()(pf)
 	}
-	err = p.Process(content)
+	err = pf.Process(content)
 	if err != nil {
 		fmt.Printf("error: %v\n", err)
 	}

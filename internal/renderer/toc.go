@@ -9,11 +9,6 @@ import (
 	"github.com/gomarkdown/markdown/parser"
 )
 
-// Processor is satisfied by PdfRenderer and by any decorator that wraps it.
-type Processor interface {
-	Process(content []byte) error
-}
-
 // tocEntry represents a table of contents entry.
 type tocEntry struct {
 	Level int
@@ -83,50 +78,42 @@ func getTOCEntries(content []byte) ([]tocEntry, error) {
 	return visitor.Entries, nil
 }
 
-// TOCDecorator wraps a PdfRenderer and prepends a table of contents page
-// before delegating rendering to the underlying renderer.
-type TOCDecorator struct {
-	renderer *PdfRenderer
-}
+// WithTableOfContents registers a pre-processor that generates a table of
+// contents page before the main document content is rendered.
+func WithTableOfContents() RenderOption {
+	return func(r *PdfRenderer) {
+		r.preProcessors = append(r.preProcessors, func(content []byte) error {
+			entries, err := getTOCEntries(content)
+			if err != nil {
+				return fmt.Errorf("failed to collect TOC entries: %w", err)
+			}
 
-// NewTOCDecorator creates a TOCDecorator wrapping r.
-func NewTOCDecorator(r *PdfRenderer) *TOCDecorator {
-	return &TOCDecorator{renderer: r}
-}
+			headerLinks := make(map[string]*int, len(entries))
+			for _, entry := range entries {
+				linkID := r.Pdf.AddLink()
+				id := linkID // copy so each pointer is distinct
+				headerLinks[entry.Title] = &id
+			}
 
-// Process generates the TOC page then delegates document rendering to the
-// wrapped PdfRenderer.
-func (d *TOCDecorator) Process(content []byte) error {
-	entries, err := getTOCEntries(content)
-	if err != nil {
-		return fmt.Errorf("TOCDecorator: failed to collect TOC entries: %w", err)
+			r.SetTOCLinks(headerLinks)
+
+			// Render the TOC page.
+			r.Pdf.SetFont(r.Theme.Normal.Font, "B", 24)
+			r.Pdf.Cell(40, 10, "Table of Contents")
+			r.Pdf.Ln(30)
+
+			for _, entry := range entries {
+				if linkPtr, exists := headerLinks[entry.Title]; exists {
+					r.Pdf.SetFont(r.Theme.Normal.Font, "", 12)
+					r.Pdf.SetTextColor(100, 149, 237)
+					indent := strings.Repeat("  ", entry.Level-1)
+					r.Pdf.WriteLinkID(8, fmt.Sprintf("%s • %s", indent, entry.Title), *linkPtr)
+					r.Pdf.Ln(15)
+				}
+			}
+			r.Pdf.AddPage()
+
+			return nil
+		})
 	}
-
-	headerLinks := make(map[string]*int, len(entries))
-	for _, entry := range entries {
-		linkID := d.renderer.Pdf.AddLink()
-		id := linkID // copy so each pointer is distinct
-		headerLinks[entry.Title] = &id
-	}
-
-	d.renderer.SetTOCLinks(headerLinks)
-
-	// Render the TOC page.
-	r := d.renderer
-	r.Pdf.SetFont(r.Theme.Normal.Font, "B", 24)
-	r.Pdf.Cell(40, 10, "Table of Contents")
-	r.Pdf.Ln(30)
-
-	for _, entry := range entries {
-		if linkPtr, exists := headerLinks[entry.Title]; exists {
-			r.Pdf.SetFont(r.Theme.Normal.Font, "", 12)
-			r.Pdf.SetTextColor(100, 149, 237)
-			indent := strings.Repeat("  ", entry.Level-1)
-			r.Pdf.WriteLinkID(8, fmt.Sprintf("%s • %s", indent, entry.Title), *linkPtr)
-			r.Pdf.Ln(15)
-		}
-	}
-	r.Pdf.AddPage()
-
-	return d.renderer.Process(content)
 }
