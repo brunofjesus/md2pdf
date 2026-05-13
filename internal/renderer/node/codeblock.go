@@ -5,7 +5,7 @@ import (
 	"math"
 	"strings"
 
-	syntaxhighlight "github.com/brunofjesus/md2pdf/internal/highlight"
+	syntaxhighlight "github.com/brunofjesus/md2pdf/v3/internal/highlight"
 	"github.com/gomarkdown/markdown/ast"
 	highlight "github.com/jessp01/gohighlight"
 	"github.com/mitchellh/go-wordwrap"

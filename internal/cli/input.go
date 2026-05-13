@@ -11,7 +11,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/brunofjesus/md2pdf/internal/renderer"
+	"github.com/brunofjesus/md2pdf/v3/internal/renderer"
 )
 
 type InputProcessor func(input string) ([]renderer.RenderOption, []byte, error)

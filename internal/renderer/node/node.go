@@ -2,7 +2,7 @@ package node
 
 import (
 	"codeberg.org/go-pdf/fpdf"
-	"github.com/brunofjesus/md2pdf/internal/theme"
+	"github.com/brunofjesus/md2pdf/v3/internal/theme"
 	"github.com/gomarkdown/markdown/ast"
 )
 

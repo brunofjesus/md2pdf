@@ -9,8 +9,8 @@ import (
 	"slices"
 	"strings"
 
-	cliutil "github.com/brunofjesus/md2pdf/internal/cli"
-	"github.com/brunofjesus/md2pdf/internal/renderer"
+	cliutil "github.com/brunofjesus/md2pdf/v3/internal/cli"
+	"github.com/brunofjesus/md2pdf/v3/internal/renderer"
 	"github.com/urfave/cli/v3"
 )
 
@@ -188,7 +188,7 @@ func version() string {
 		return "unknown"
 	}
 
-	if len(info.Main.Version) > 0 {
+	if len(info.Main.Version) > 0 && info.Main.Version != "(devel)" {
 		return info.Main.Version
 	}
 
@@ -198,5 +198,5 @@ func version() string {
 		}
 	}
 
-	return "dev"
+	return "development"
 }

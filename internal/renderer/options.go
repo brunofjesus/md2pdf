@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/brunofjesus/md2pdf/internal/renderer/node"
+	"github.com/brunofjesus/md2pdf/v3/internal/renderer/node"
 	"github.com/gomarkdown/markdown/parser"
 )
 

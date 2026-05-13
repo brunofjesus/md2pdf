@@ -1,6 +1,6 @@
 package renderer
 
-import "github.com/brunofjesus/md2pdf/internal/renderer/node"
+import "github.com/brunofjesus/md2pdf/v3/internal/renderer/node"
 
 // states wraps a stack of node.ContainerState pointers.
 type states struct {
