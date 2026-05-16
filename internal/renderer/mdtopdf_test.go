@@ -39,10 +39,11 @@ func testit(inputf string, gohighlight bool, t *testing.T) {
 	pdffile := path.Join(inputd, strings.TrimSuffix(path.Base(input), path.Ext(input)))
 	pdffile += ".pdf"
 
-	content, err := os.ReadFile(input)
+	file, err := os.Open(input)
 	if err != nil {
 		t.Errorf("%v:%v", input, err)
 	}
+	defer file.Close()
 
 	var opts []RenderOption
 	if gohighlight {
@@ -51,7 +52,6 @@ func testit(inputf string, gohighlight bool, t *testing.T) {
 	params := PdfRendererParams{
 		Orientation:     "",
 		PageSize:        "",
-		PdfFile:         pdffile,
 		TracerFile:      tracerfile,
 		Opts:            opts,
 		Theme:           LIGHT,
@@ -62,7 +62,7 @@ func testit(inputf string, gohighlight bool, t *testing.T) {
 		r.InputBaseURL = filepath.Dir(absInput)
 	}
 	r.Extensions = parser.NoIntraEmphasis | parser.Tables | parser.FencedCode | parser.Autolink | parser.Strikethrough | parser.SpaceHeadings | parser.HeadingIDs | parser.BackslashLineBreak | parser.DefinitionLists
-	err = r.Process(content)
+	err = r.Process(file)
 	if err != nil {
 		t.Error(err)
 	}

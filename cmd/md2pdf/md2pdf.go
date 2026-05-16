@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"runtime/debug"
@@ -21,7 +22,7 @@ func main() {
 		Version: version(),
 		Action: func(_ context.Context, cmd *cli.Command) error {
 			flagInput := cmd.String("input")
-			flatOutput := cmd.String("output")
+			flagOutput := cmd.String("output")
 			flagTitle := cmd.String("title")
 			flagTOC := cmd.Bool("table-of-contents")
 			flagHRNewPage := cmd.Bool("horizontal-rule-new-page")
@@ -34,12 +35,12 @@ func main() {
 			flagLogFile := cmd.String("log-file")
 
 			if !flagForceOverwrite {
-				outFile, err := os.Stat(flatOutput)
+				outFile, err := os.Stat(flagOutput)
 				if err != nil && !errors.Is(err, os.ErrNotExist) {
 					log.Fatalf("error: failed to check output file: %v\n", err)
 				}
 				if outFile != nil {
-					log.Fatalf("error: output file already exists: %s; use -f to overwrite.\n", flatOutput)
+					log.Fatalf("error: output file already exists: %s; use -f to overwrite.\n", flagOutput)
 				}
 			}
 
@@ -48,10 +49,15 @@ func main() {
 				return err
 			}
 
-			opts, content, err := inputProcessor(flagInput)
+			opts, reader, err := inputProcessor(flagInput)
 			if err != nil {
 				return err
 			}
+			defer func() {
+				if err := reader.Close(); err != nil {
+					fmt.Fprintf(os.Stderr, "warning: failed to close input reader: %v\n", err)
+				}
+			}()
 
 			if flagHRNewPage {
 				opts = append(opts, renderer.WithHorizontalRuleAsNewPage())
@@ -69,7 +75,6 @@ func main() {
 				Title:           flagTitle,
 				Orientation:     flagOrientation,
 				PageSize:        flagPageSize,
-				PdfFile:         flatOutput,
 				TracerFile:      flagLogFile,
 				Opts:            opts,
 				Theme:           renderer.LIGHT,
@@ -88,7 +93,12 @@ func main() {
 
 			pf := renderer.NewPdfRenderer(params)
 
-			err = pf.Process(content)
+			err = pf.Process(reader)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			err = pf.OutputFileAndClose(flagOutput)
 			if err != nil {
 				log.Fatal(err)
 			}
