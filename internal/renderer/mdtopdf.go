@@ -72,8 +72,8 @@ type PdfRenderer struct {
 	papersize, fontdir string
 
 	// trace/log file if present
-	pdfFile, tracerFile string
-	w                   *bufio.Writer
+	tracerFile string
+	w          *bufio.Writer
 
 	// default margins for safe keeping
 	mleft, mtop, mright, mbottom float64
@@ -170,11 +170,11 @@ func (r *PdfRenderer) SetTOCLinks(tocHeaders map[string]*int) {
 
 // PdfRendererParams struct to hold params passed to NewPdfRenderer
 type PdfRendererParams struct {
-	Title                                      string
-	Orientation, PageSize, PdfFile, TracerFile string
-	Opts                                       []RenderOption
-	Theme                                      Theme
-	CustomThemeFile                            string
+	Title                             string
+	Orientation, PageSize, TracerFile string
+	Opts                              []RenderOption
+	Theme                             Theme
+	CustomThemeFile                   string
 }
 
 // NewPdfRenderer creates and configures an PdfRenderer object,
@@ -183,7 +183,6 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 	r := new(PdfRenderer)
 
 	// set filenames
-	r.pdfFile = params.PdfFile
 	r.tracerFile = params.TracerFile
 
 	// Global things
@@ -293,31 +292,12 @@ func (r *PdfRenderer) SetNodeProcessor(nodeType string, processor node.NodeProce
 	return fmt.Errorf("node type %s not found in nodeProcessors", nodeType)
 }
 
-// NewPdfRendererWithDefaultStyler creates and configures an PdfRenderer object,
-// which satisfies the Renderer interface.
-// update default styler for normal
-func NewPdfRendererWithDefaultStyler(orient, papersz, pdfFile, tracerFile string, defaultStyler theme.Styler, opts []RenderOption, theme Theme) *PdfRenderer {
-	opts = append(opts, func(r *PdfRenderer) {
-		r.Theme.Normal = defaultStyler
-	})
-	params := PdfRendererParams{
-		Orientation: orient,
-		PageSize:    papersz,
-		PdfFile:     pdfFile,
-		TracerFile:  tracerFile,
-		Opts:        opts,
-		Theme:       theme,
-	}
-
-	return NewPdfRenderer(params)
-}
-
 // ---------------------------------------------------------------------------
 // Processing
 // ---------------------------------------------------------------------------
 
 // Process takes the markdown content, parses it to generate the PDF
-func (r *PdfRenderer) Process(content []byte) error {
+func (r *PdfRenderer) Process(reader io.Reader) error {
 	// try to open tracer
 	var f *os.File
 	var err error
@@ -331,6 +311,11 @@ func (r *PdfRenderer) Process(content []byte) error {
 		defer r.w.Flush()
 	}
 
+	content, err := io.ReadAll(reader)
+	if err != nil {
+		return fmt.Errorf("io.ReadAll() error: %v", err)
+	}
+
 	for _, pp := range r.preProcessors {
 		if err = pp(content); err != nil {
 			return fmt.Errorf("pre-processor error: %w", err)
@@ -339,15 +324,26 @@ func (r *PdfRenderer) Process(content []byte) error {
 
 	err = r.Run(content)
 	if err != nil {
-		return fmt.Errorf("error on %v:%v", r.pdfFile, err)
-	}
-
-	err = r.Pdf.OutputFileAndClose(r.pdfFile)
-	if err != nil {
-		return fmt.Errorf("error on %v:%v", r.pdfFile, err)
+		return err
 	}
 
 	return nil
+}
+
+// Output writes the generated PDF to the provided io.Writer.
+func (r *PdfRenderer) Output(w io.Writer) error {
+	return r.Pdf.Output(w)
+}
+
+// OutputAndClose writes the generated PDF to the provided io.WriteCloser
+// and closes it.
+func (r *PdfRenderer) OutputAndClose(w io.WriteCloser) error {
+	return r.Pdf.OutputAndClose(w)
+}
+
+// OutputFileAndClose writes the generated PDF to a file and closes it.
+func (r *PdfRenderer) OutputFileAndClose(filename string) error {
+	return r.Pdf.OutputFileAndClose(filename)
 }
 
 func (r *PdfRenderer) Run(content []byte) error {

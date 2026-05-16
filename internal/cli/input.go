@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -14,7 +15,7 @@ import (
 	"github.com/brunofjesus/md2pdf/v3/internal/renderer"
 )
 
-type InputProcessor func(input string) ([]renderer.RenderOption, []byte, error)
+type InputProcessor func(input string) ([]renderer.RenderOption, io.ReadCloser, error)
 
 func GetInputProcessor(input string) (InputProcessor, error) {
 	if input == "" {
@@ -33,7 +34,7 @@ func GetInputProcessor(input string) (InputProcessor, error) {
 	}
 }
 
-func processDirInput(input string) ([]renderer.RenderOption, []byte, error) {
+func processDirInput(input string) ([]renderer.RenderOption, io.ReadCloser, error) {
 	var content []byte
 
 	files, err := glob(input, []string{".md", ".markdown"})
@@ -57,51 +58,43 @@ func processDirInput(input string) ([]renderer.RenderOption, []byte, error) {
 		return nil, nil, fmt.Errorf("failed to get absolute path: %w", err)
 	}
 
-	return []renderer.RenderOption{renderer.WithBaseURL(abs)}, content, nil
+	reader := io.NopCloser(bytes.NewReader(content))
+	return []renderer.RenderOption{renderer.WithBaseURL(abs)}, reader, nil
 }
 
-func processFileInput(input string) ([]renderer.RenderOption, []byte, error) {
-	content, err := os.ReadFile(input)
+func processFileInput(input string) ([]renderer.RenderOption, io.ReadCloser, error) {
+	file, err := os.Open(input)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to read file: %w", err)
+		return nil, nil, fmt.Errorf("failed to open file: %w", err)
 	}
 
 	abs, err := filepath.Abs(input)
 	if err != nil {
+		defer file.Close()
 		return nil, nil, fmt.Errorf("failed to get absolute path: %w", err)
 	}
 
-	return []renderer.RenderOption{renderer.WithBaseURL(abs)}, content, nil
+	return []renderer.RenderOption{renderer.WithBaseURL(abs)}, file, nil
 }
 
-func processStdinInput(input string) ([]renderer.RenderOption, []byte, error) {
-	content, err := io.ReadAll(os.Stdin)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to read from stdin: %w", err)
-	}
-
+func processStdinInput(input string) ([]renderer.RenderOption, io.ReadCloser, error) {
 	abs, err := os.Getwd()
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get current working directory: %w", err)
 	}
 
-	return []renderer.RenderOption{renderer.WithBaseURL(abs)}, content, err
+	return []renderer.RenderOption{renderer.WithBaseURL(abs)}, io.NopCloser(os.Stdin), nil
 }
 
-func processHTTPInput(input string) ([]renderer.RenderOption, []byte, error) {
+func processHTTPInput(input string) ([]renderer.RenderOption, io.ReadCloser, error) {
 	resp, err := http.Get(input)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to fetch URL: %w", err)
 	}
-	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != 200 {
-		return nil, nil, errors.New("Received non 200 response code: " + fmt.Sprintf("HTTP %d", resp.StatusCode))
-	}
-
-	content, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to read response body: %w", err)
+		defer resp.Body.Close()
+		return nil, nil, errors.New("received non 200 response code: " + fmt.Sprintf("HTTP %d", resp.StatusCode))
 	}
 
 	// get the base URL so we can adjust relative links and images
@@ -109,7 +102,7 @@ func processHTTPInput(input string) ([]renderer.RenderOption, []byte, error) {
 		strings.Replace(filepath.Dir(input), ":/", "://", 1),
 	)}
 
-	return opts, content, err
+	return opts, resp.Body, nil
 }
 
 // glob recursively walks the given directory and returns a
