@@ -306,9 +306,9 @@ func (r *PdfRenderer) Process(reader io.Reader) error {
 		if err != nil {
 			return fmt.Errorf("os.Create() on tracefile error:%v", err)
 		}
-		defer f.Close()
+		defer func() { _ = f.Close() }()
 		r.w = bufio.NewWriter(f)
-		defer r.w.Flush()
+		defer func() { _ = r.w.Flush() }()
 	}
 
 	content, err := io.ReadAll(reader)

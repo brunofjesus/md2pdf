@@ -37,13 +37,16 @@ func ProcessImage(ctx PdfContext, n ast.Node, entering bool) {
 			}
 		}
 		if errors.Is(err, os.ErrNotExist) {
-			var source string = destination
+			var source = destination
 			if !strings.HasPrefix(destination, "http") {
 				if ctx.GetInputBaseURL() != "" {
 					source = ctx.GetInputBaseURL() + "/" + destination
 				}
 			}
-			os.MkdirAll(tempDir, 755)
+			if mkErr := os.MkdirAll(tempDir, 0o755); mkErr != nil {
+				fmt.Println(mkErr.Error())
+				return
+			}
 			err := downloadFile(source, tempDir+"/"+filepath.Base(destination))
 			if err != nil {
 				fmt.Println(err.Error())
@@ -52,7 +55,7 @@ func ProcessImage(ctx PdfContext, n ast.Node, entering bool) {
 				fmt.Println("Downloaded image to: " + destination)
 			}
 		}
-		mtype, err := mimetype.DetectFile(destination)
+		mtype, _ := mimetype.DetectFile(destination)
 		if mtype.Is("image/svg+xml") {
 			re := regexp.MustCompile(`<svg\s*.*\s*width="([0-9\.]+)"\sheight="([0-9\.]+)".*>`)
 			contents, _ := os.ReadFile(destination)
@@ -64,7 +67,7 @@ func ProcessImage(ctx PdfContext, n ast.Node, entering bool) {
 			}
 
 			if _, err := tf.Write(contents); err != nil {
-				tf.Close()
+				_ = tf.Close()
 				log.Println(err)
 				return
 			}
@@ -72,7 +75,10 @@ func ProcessImage(ctx PdfContext, n ast.Node, entering bool) {
 				log.Println(err)
 				return
 			}
-			os.Rename(destination, tf.Name())
+			if renameErr := os.Rename(destination, tf.Name()); renameErr != nil {
+				log.Println(renameErr)
+				return
+			}
 			destination = tf.Name()
 			width, _ := strconv.ParseFloat(matches[1], 64)
 			height, _ := strconv.ParseFloat(matches[2], 64)
@@ -119,7 +125,7 @@ func downloadFile(url, fileName string) error {
 	if err != nil {
 		return err
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 
 	if response.StatusCode != 200 {
 		return errors.New("Received non 200 response code: " + fmt.Sprintf("HTTP %d", response.StatusCode))
@@ -128,7 +134,7 @@ func downloadFile(url, fileName string) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	_, err = io.Copy(file, response.Body)
 	if err != nil {

@@ -36,14 +36,11 @@ func testit(inputf string, gohighlight bool, t *testing.T) {
 	tracerfile := path.Join(inputd, strings.TrimSuffix(path.Base(input), path.Ext(input)))
 	tracerfile += ".log"
 
-	pdffile := path.Join(inputd, strings.TrimSuffix(path.Base(input), path.Ext(input)))
-	pdffile += ".pdf"
-
 	file, err := os.Open(input)
 	if err != nil {
 		t.Errorf("%v:%v", input, err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	var opts []RenderOption
 	if gohighlight {

@@ -70,7 +70,7 @@ func processFileInput(input string) ([]renderer.RenderOption, io.ReadCloser, err
 
 	abs, err := filepath.Abs(input)
 	if err != nil {
-		defer file.Close()
+		_ = file.Close()
 		return nil, nil, fmt.Errorf("failed to get absolute path: %w", err)
 	}
 
@@ -93,7 +93,7 @@ func processHTTPInput(input string) ([]renderer.RenderOption, io.ReadCloser, err
 	}
 
 	if resp.StatusCode != 200 {
-		defer resp.Body.Close()
+		_ = resp.Body.Close()
 		return nil, nil, errors.New("received non 200 response code: " + fmt.Sprintf("HTTP %d", resp.StatusCode))
 	}
 
