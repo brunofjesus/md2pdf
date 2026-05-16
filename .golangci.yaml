@@ -23,3 +23,6 @@ linters:
     exhaustruct:
       exclude:
         - '.+/node\.ContainerState$'
+        - '.+/urfave/cli/v3\.Command$'
+        - '.+/urfave/cli/v3\.FlagBase$'
+
