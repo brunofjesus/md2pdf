@@ -50,9 +50,9 @@ type ContainerState struct {
 	CellInnerStringStyle *theme.Styler
 }
 
-// NodeProcessor is a function that handles rendering of a particular AST node
+// Processor is a function that handles rendering of a particular AST node
 // type. entering is true when the walker enters the node, false when leaving.
-type NodeProcessor func(ctx PdfContext, node ast.Node, entering bool)
+type Processor func(ctx PdfContext, node ast.Node, entering bool)
 
 // PdfContext is the interface that node processors use to interact with the
 // PDF renderer. It abstracts PdfRenderer so the node/ package has no import

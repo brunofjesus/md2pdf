@@ -1,0 +1,25 @@
+version: "2"
+
+run:
+  go: "1.26"
+
+linters:
+  default: all
+  disable:
+    - varnamelen
+    - funlen
+    - err113
+    - wsl
+    - noinlineerr
+    # check those later
+    - wrapcheck
+    - forbidigo
+    - depguard
+    - cyclop 
+  settings:
+    wsl_v5:
+      disable:
+        - decl
+    exhaustruct:
+      exclude:
+        - '.+/node\.ContainerState$'
