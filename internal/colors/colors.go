@@ -14,12 +14,28 @@ type Color struct {
 	Blue  int `json:"blue"`
 }
 
-func New(red, green, blue int) Color {
+// FromRGB creates a new Color with the given RGB values.
+func FromRGB(red, green, blue int) Color {
 	return Color{
 		Red:   red,
 		Green: green,
 		Blue:  blue,
 	}
+}
+
+// FromHex creates a new Color from a hex string like "#rrggbb".
+func FromHex(hex string) (*Color, error) {
+	c := new(Color)
+
+	hex = strings.TrimPrefix(hex, "#")
+
+	if len(hex) != 6 {
+		return c, fmt.Errorf("invalid hex color length: %q", hex)
+	}
+
+	_, err := fmt.Sscanf(hex, "%02x%02x%02x", &c.Red, &c.Green, &c.Blue)
+
+	return c, err
 }
 
 // MarshalJSON outputs the color as a hex string like "#rrggbb".
@@ -28,18 +44,18 @@ func (c Color) MarshalJSON() ([]byte, error) {
 	return []byte(hex), nil
 }
 
-// UnmarshalJSON accepts both a hex string ("#rrggbb") and the legacy
-// object format ({"Red":0,"Green":0,"Blue":0}).
+// UnmarshalJSON accepts a hex string ("#rrggbb").
 func (c *Color) UnmarshalJSON(data []byte) error {
-	// Try string first
 	var hex string
 	if err := json.Unmarshal(data, &hex); err == nil {
-		hex = strings.TrimPrefix(hex, "#")
-		if len(hex) != 6 {
-			return fmt.Errorf("invalid hex color length: %q", hex)
+		newColor, err := FromHex(hex)
+		if err != nil {
+			return err
 		}
-		_, err := fmt.Sscanf(hex, "%02x%02x%02x", &c.Red, &c.Green, &c.Blue)
-		return err
+
+		c.Red = newColor.Red
+		c.Green = newColor.Green
+		c.Blue = newColor.Blue
 	}
 
 	return nil

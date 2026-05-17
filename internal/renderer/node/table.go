@@ -20,7 +20,7 @@ func ProcessTable(ctx PdfContext, n ast.Node, entering bool) {
 	if entering {
 		ctx.Tracer("Table (entering)", "")
 		x := &ContainerState{
-			TextStyle:  ctx.GetTheme().THeader,
+			TextStyle:  ctx.GetTheme().Table.Header,
 			ListKind:   NotList,
 			LeftMargin: ctx.PeekState().LeftMargin,
 		}
@@ -46,7 +46,7 @@ func ProcessTableHead(ctx PdfContext, _ ast.Node, entering bool) {
 	if entering {
 		ctx.Tracer("TableHead (entering)", "")
 		x := &ContainerState{
-			TextStyle:  ctx.GetTheme().THeader,
+			TextStyle:  ctx.GetTheme().Table.Header,
 			ListKind:   NotList,
 			LeftMargin: ctx.PeekState().LeftMargin,
 		}
@@ -62,7 +62,7 @@ func ProcessTableBody(ctx PdfContext, _ ast.Node, entering bool) {
 	if entering {
 		ctx.Tracer("TableBody (entering)", "")
 		x := &ContainerState{
-			TextStyle:  ctx.GetTheme().TBody,
+			TextStyle:  ctx.GetTheme().Table.Body,
 			ListKind:   NotList,
 			LeftMargin: ctx.PeekState().LeftMargin,
 		}
@@ -79,12 +79,12 @@ func ProcessTableRow(ctx PdfContext, _ ast.Node, entering bool) {
 	if entering {
 		ctx.Tracer("TableRow (entering)", "")
 		x := &ContainerState{
-			TextStyle:  ctx.GetTheme().TBody,
+			TextStyle:  ctx.GetTheme().Table.Body,
 			ListKind:   NotList,
 			LeftMargin: ctx.PeekState().LeftMargin,
 		}
 		if ctx.PeekState().IsHeader {
-			x.TextStyle = ctx.GetTheme().THeader
+			x.TextStyle = ctx.GetTheme().Table.Header
 		}
 		ctx.GetPdf().Ln(-1)
 
@@ -109,11 +109,11 @@ func ProcessTableCell(ctx PdfContext, n ast.Node, entering bool) {
 		}
 		if node.IsHeader {
 			x.IsHeader = true
-			x.TextStyle = ctx.GetTheme().THeader
-			ctx.SetStyler(ctx.GetTheme().THeader)
+			x.TextStyle = ctx.GetTheme().Table.Header
+			ctx.SetStyler(ctx.GetTheme().Table.Header)
 		} else {
-			x.TextStyle = ctx.GetTheme().TBody
-			ctx.SetStyler(ctx.GetTheme().TBody)
+			x.TextStyle = ctx.GetTheme().Table.Body
+			ctx.SetStyler(ctx.GetTheme().Table.Body)
 			x.IsHeader = false
 		}
 		ctx.PushState(x)
