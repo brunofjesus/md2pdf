@@ -8,10 +8,16 @@ import (
 
 // ProcessHeading handles *ast.Heading entering/leaving.
 func ProcessHeading(ctx PdfContext, n ast.Node, entering bool) {
-	node := n.(*ast.Heading)
+	node, ok := n.(*ast.Heading)
+	if !ok {
+		ctx.Tracer("Heading: not a Heading", "")
+		return
+	}
+
 	if entering {
 		ctx.Cr()
 		style := ctx.GetTheme().Normal
+
 		switch node.Level {
 		case 1:
 			style = ctx.GetTheme().Heading.H1
@@ -27,8 +33,11 @@ func ProcessHeading(ctx PdfContext, n ast.Node, entering bool) {
 			style = ctx.GetTheme().Heading.H6
 		}
 
-		ctx.Tracer(fmt.Sprintf("Heading (%d, entering)", node.Level),
-			fmt.Sprintf("%v", ast.ToString(node.AsContainer())))
+		ctx.Tracer(
+			fmt.Sprintf("Heading (%d, entering)", node.Level),
+			ast.ToString(node.AsContainer()),
+		)
+
 		x := &ContainerState{
 			TextStyle:  style,
 			ListKind:   NotList,
@@ -47,6 +56,7 @@ func ProcessHeading(ctx PdfContext, n ast.Node, entering bool) {
 			lm, _, _, _ := pdf.GetMargins()
 			w, _ := pdf.GetPageSize()
 			newx := w - lm
+
 			ctx.Tracer("... Drawing underline from X,Y", fmt.Sprintf("%v,%v", x, y))
 			pdf.MoveTo(x, y)
 			ctx.Tracer("...   To X,Y", fmt.Sprintf("%v,%v", newx, y))

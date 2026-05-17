@@ -1,6 +1,7 @@
 package node
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -11,6 +12,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"codeberg.org/go-pdf/fpdf"
 	"github.com/canhlinh/svg2png"
@@ -19,12 +21,22 @@ import (
 )
 
 // ProcessImage handles *ast.Image entering/leaving.
+//
+//nolint:gocognit
 func ProcessImage(ctx PdfContext, n ast.Node, entering bool) {
-	node := n.(*ast.Image)
+	node, ok := n.(*ast.Image)
+	if !ok {
+		ctx.Tracer("Image: not an Image", "")
+		return
+	}
+
+	//nolint:nestif
 	if entering {
 		ctx.Cr()
+
 		destination := string(node.Destination)
 		tempDir := os.TempDir() + "/" + filepath.Base(os.Args[0])
+
 		_, err := os.Stat(destination)
 		if errors.Is(err, os.ErrNotExist) &&
 			!strings.HasPrefix(destination, "http") &&
@@ -36,17 +48,21 @@ func ProcessImage(ctx PdfContext, n ast.Node, entering bool) {
 				err = nil
 			}
 		}
+
 		if errors.Is(err, os.ErrNotExist) {
-			var source = destination
+			source := destination
 			if !strings.HasPrefix(destination, "http") {
 				if ctx.GetInputBaseURL() != "" {
 					source = ctx.GetInputBaseURL() + "/" + destination
 				}
 			}
-			if mkErr := os.MkdirAll(tempDir, 0o755); mkErr != nil {
+
+			if mkErr := os.MkdirAll(tempDir, 0o750); mkErr != nil {
 				fmt.Println(mkErr.Error())
+
 				return
 			}
+
 			err := downloadFile(source, tempDir+"/"+filepath.Base(destination))
 			if err != nil {
 				fmt.Println(err.Error())
@@ -55,11 +71,13 @@ func ProcessImage(ctx PdfContext, n ast.Node, entering bool) {
 				fmt.Println("Downloaded image to: " + destination)
 			}
 		}
+
 		mtype, _ := mimetype.DetectFile(destination)
 		if mtype.Is("image/svg+xml") {
 			re := regexp.MustCompile(`<svg\s*.*\s*width="([0-9\.]+)"\sheight="([0-9\.]+)".*>`)
-			contents, _ := os.ReadFile(destination)
+			contents, _ := os.ReadFile(filepath.Clean(destination))
 			matches := re.FindStringSubmatch(string(contents))
+
 			tf, err := os.CreateTemp(tempDir, "*.svg")
 			if err != nil {
 				log.Println(err)
@@ -68,38 +86,47 @@ func ProcessImage(ctx PdfContext, n ast.Node, entering bool) {
 
 			if _, err := tf.Write(contents); err != nil {
 				_ = tf.Close()
-				log.Println(err)
+				log.Println(err) //nolint:wsl_v5
+
 				return
 			}
+
 			if err := tf.Close(); err != nil {
 				log.Println(err)
 				return
 			}
+
 			if renameErr := os.Rename(destination, tf.Name()); renameErr != nil {
 				log.Println(renameErr)
 				return
 			}
+
 			destination = tf.Name()
 			width, _ := strconv.ParseFloat(matches[1], 64)
 			height, _ := strconv.ParseFloat(matches[2], 64)
 			chrome := svg2png.NewChrome().SetHeight(int(height)).SetWith(int(width))
 			outputFileName := destination + ".png"
+
+			//nolint:misspell
 			if err := chrome.Screenshoot(destination, outputFileName); err != nil {
 				log.Println(err)
 				return
 			}
+
 			destination = outputFileName
 		}
+
 		ctx.Tracer("Image (entering)",
 			fmt.Sprintf("Destination[%v] Title[%v]",
 				destination,
 				string(node.Title)))
 		imgPath := destination
+
 		_, err = os.Stat(imgPath)
 		if err == nil {
 			ctx.GetPdf().ImageOptions(destination,
 				-1, 0, 0, 0, true,
-				fpdf.ImageOptions{ImageType: "", ReadDpi: true}, 0, "")
+				fpdf.ImageOptions{ImageType: "", ReadDpi: true, AllowNegativePosition: false}, 0, "")
 		} else {
 			ctx.Tracer("Image (file error)", err.Error())
 		}
@@ -109,28 +136,33 @@ func ProcessImage(ctx PdfContext, n ast.Node, entering bool) {
 }
 
 func downloadFile(url, fileName string) error {
-	client := http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+	//nolint:exhaustruct
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+		CheckRedirect: func(req *http.Request, _ []*http.Request) error {
 			fmt.Println("Redirected to:", req.URL)
 			return nil
 		},
 	}
-	req, err := http.NewRequest("GET", url, nil)
+
+	req, err := http.NewRequestWithContext(context.TODO(), http.MethodGet, url, nil)
 	if err != nil {
 		return err
 	}
 
 	req.Header.Add("User-Agent", "curl/7.84.0")
+
 	response, err := client.Do(req)
 	if err != nil {
 		return err
 	}
 	defer func() { _ = response.Body.Close() }()
 
-	if response.StatusCode != 200 {
+	if response.StatusCode != http.StatusOK {
 		return errors.New("Received non 200 response code: " + fmt.Sprintf("HTTP %d", response.StatusCode))
 	}
-	file, err := os.Create(fileName)
+
+	file, err := os.Create(filepath.Clean(fileName))
 	if err != nil {
 		return err
 	}

@@ -1,3 +1,4 @@
+// Package node provides node processing functions used to render the PDF.
 package node
 
 import (
@@ -10,9 +11,16 @@ import (
 type ListType int
 
 const (
+	// NotList is used for ContainerState when not rendering a list.
 	NotList ListType = iota
+
+	// Unordered is a standard unordered list (bullet points).
 	Unordered
+
+	// Ordered is a standard ordered list (numbered).
 	Ordered
+
+	// Definition is a definition list (term + definition).
 	Definition
 )
 
@@ -27,6 +35,7 @@ func (n ListType) String() string {
 	case Definition:
 		return "Definition"
 	}
+
 	return ""
 }
 
@@ -57,7 +66,7 @@ type Processor func(ctx PdfContext, node ast.Node, entering bool)
 // PdfContext is the interface that node processors use to interact with the
 // PDF renderer. It abstracts PdfRenderer so the node/ package has no import
 // dependency on the renderer package.
-type PdfContext interface {
+type PdfContext interface { //nolint:interfacebloat
 	// Tracing / logging
 	Tracer(source, msg string)
 

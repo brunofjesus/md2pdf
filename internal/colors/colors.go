@@ -1,3 +1,4 @@
+// Package colors provides a simple Color struct with JSON (un)marshalling to hex strings.
 package colors
 
 import (
@@ -41,6 +42,7 @@ func FromHex(hex string) (*Color, error) {
 // MarshalJSON outputs the color as a hex string like "#rrggbb".
 func (c Color) MarshalJSON() ([]byte, error) {
 	hex := fmt.Sprintf("\"#%02x%02x%02x\"", c.Red, c.Green, c.Blue)
+
 	return []byte(hex), nil
 }
 

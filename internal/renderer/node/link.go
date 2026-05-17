@@ -9,12 +9,18 @@ import (
 
 // ProcessLink handles *ast.Link entering/leaving.
 func ProcessLink(ctx PdfContext, n ast.Node, entering bool) {
-	node := n.(*ast.Link)
+	node, ok := n.(*ast.Link)
+	if !ok {
+		ctx.Tracer("Link: not a Link", "")
+		return
+	}
+
 	destination := string(node.Destination)
 	if entering {
 		if ctx.GetInputBaseURL() != "" && !strings.HasPrefix(destination, "http") {
 			destination = ctx.GetInputBaseURL() + "/" + strings.Replace(destination, "./", "", 1)
 		}
+
 		x := &ContainerState{
 			TextStyle:   ctx.GetTheme().Link,
 			ListKind:    NotList,
