@@ -9,9 +9,15 @@ import (
 
 // ProcessText handles *ast.Text nodes.
 func ProcessText(ctx PdfContext, n ast.Node, _ bool) {
-	node := n.(*ast.Text)
+	node, ok := n.(*ast.Text)
+	if !ok {
+		ctx.Tracer("Text: not a Text", "")
+		return
+	}
+
 	currentStyle := ctx.PeekState().TextStyle
 	ctx.SetStyler(currentStyle)
+
 	s := string(node.Literal)
 	s = strings.ReplaceAll(s, "\n", " ")
 	ctx.Tracer("Text", s)
@@ -19,8 +25,10 @@ func ProcessText(ctx PdfContext, n ast.Node, _ bool) {
 	if tableState.inCell {
 		ctx.PeekState().CellInnerString += s
 		ctx.PeekState().CellInnerStringStyle = &currentStyle
+
 		return
 	}
+
 	switch node.Parent.(type) {
 	case *ast.Link:
 		ctx.WriteLink(currentStyle, s, ctx.PeekState().Destination)
@@ -35,6 +43,7 @@ func ProcessText(ctx PdfContext, n ast.Node, _ bool) {
 				ctx.Tracer("Text Heading", fmt.Sprintf("Header '%s' not found in links map\n", s))
 			}
 		}
+
 		ctx.Write(currentStyle, s)
 	case *ast.BlockQuote:
 		ctx.Tracer("Text BlockQuote", s)

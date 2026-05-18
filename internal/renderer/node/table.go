@@ -8,6 +8,8 @@ import (
 
 // tableState holds package-level table rendering state.
 // TODO: move these into ContainerState to support concurrent rendering.
+//
+//nolint:gochecknoglobals
 var tableState struct {
 	cellWidths  []float64
 	curDataCell int
@@ -20,12 +22,13 @@ func ProcessTable(ctx PdfContext, n ast.Node, entering bool) {
 	if entering {
 		ctx.Tracer("Table (entering)", "")
 		x := &ContainerState{
-			TextStyle:  ctx.GetTheme().THeader,
+			TextStyle:  ctx.GetTheme().Table.Header,
 			ListKind:   NotList,
 			LeftMargin: ctx.PeekState().LeftMargin,
 		}
 		ctx.Cr()
 		ctx.PushState(x)
+
 		tableState.fill = false
 		tableState.cellWidths = ctx.GetColumnWidths(n)
 	} else {
@@ -33,6 +36,7 @@ func ProcessTable(ctx PdfContext, n ast.Node, entering bool) {
 		for _, w := range tableState.cellWidths {
 			wSum += w
 		}
+
 		ctx.GetPdf().CellFormat(wSum, 0, "", "T", 0, "", false, 0, "")
 
 		ctx.PopState()
@@ -46,7 +50,7 @@ func ProcessTableHead(ctx PdfContext, _ ast.Node, entering bool) {
 	if entering {
 		ctx.Tracer("TableHead (entering)", "")
 		x := &ContainerState{
-			TextStyle:  ctx.GetTheme().THeader,
+			TextStyle:  ctx.GetTheme().Table.Header,
 			ListKind:   NotList,
 			LeftMargin: ctx.PeekState().LeftMargin,
 		}
@@ -62,7 +66,7 @@ func ProcessTableBody(ctx PdfContext, _ ast.Node, entering bool) {
 	if entering {
 		ctx.Tracer("TableBody (entering)", "")
 		x := &ContainerState{
-			TextStyle:  ctx.GetTheme().TBody,
+			TextStyle:  ctx.GetTheme().Table.Body,
 			ListKind:   NotList,
 			LeftMargin: ctx.PeekState().LeftMargin,
 		}
@@ -78,30 +82,38 @@ func ProcessTableBody(ctx PdfContext, _ ast.Node, entering bool) {
 func ProcessTableRow(ctx PdfContext, _ ast.Node, entering bool) {
 	if entering {
 		ctx.Tracer("TableRow (entering)", "")
+
 		x := &ContainerState{
-			TextStyle:  ctx.GetTheme().TBody,
+			TextStyle:  ctx.GetTheme().Table.Body,
 			ListKind:   NotList,
 			LeftMargin: ctx.PeekState().LeftMargin,
 		}
 		if ctx.PeekState().IsHeader {
-			x.TextStyle = ctx.GetTheme().THeader
+			x.TextStyle = ctx.GetTheme().Table.Header
 		}
-		ctx.GetPdf().Ln(-1)
 
-		tableState.curDataCell = 0
-		ctx.PushState(x)
+		ctx.GetPdf().Ln(-1)
+		tableState.curDataCell = 0 //nolint:wsl_v5
+		ctx.PushState(x)           //nolint:wsl_v5
 	} else {
 		ctx.PopState()
 		ctx.Tracer("TableRow (leaving)", "")
+
 		tableState.fill = !tableState.fill
 	}
 }
 
 // ProcessTableCell handles *ast.TableCell entering/leaving.
 func ProcessTableCell(ctx PdfContext, n ast.Node, entering bool) {
-	node := n.(*ast.TableCell)
-	if entering {
+	node, ok := n.(*ast.TableCell)
+	if !ok {
+		ctx.Tracer("TableCell: not a TableCell", "")
+		return
+	}
+
+	if entering { //nolint:nestif
 		ctx.Tracer("TableCell (entering)", "")
+
 		x := &ContainerState{
 			TextStyle:  ctx.GetTheme().Normal,
 			ListKind:   NotList,
@@ -109,24 +121,28 @@ func ProcessTableCell(ctx PdfContext, n ast.Node, entering bool) {
 		}
 		if node.IsHeader {
 			x.IsHeader = true
-			x.TextStyle = ctx.GetTheme().THeader
-			ctx.SetStyler(ctx.GetTheme().THeader)
+			x.TextStyle = ctx.GetTheme().Table.Header
+			ctx.SetStyler(ctx.GetTheme().Table.Header)
 		} else {
-			x.TextStyle = ctx.GetTheme().TBody
-			ctx.SetStyler(ctx.GetTheme().TBody)
-			x.IsHeader = false
+			x.TextStyle = ctx.GetTheme().Table.Body
+			ctx.SetStyler(ctx.GetTheme().Table.Body)
+			x.IsHeader = false //nolint:wsl_v5
 		}
+
 		ctx.PushState(x)
-		tableState.inCell = true
+		tableState.inCell = true //nolint:wsl_v5
 	} else {
 		tableState.inCell = false
 		cs := ctx.PopState()
+
 		currentStyle := cs.TextStyle
 		if cs.CellInnerStringStyle != nil {
 			currentStyle = *cs.CellInnerStringStyle
 		}
+
 		s := cs.CellInnerString
 		w := tableState.cellWidths[tableState.curDataCell]
+
 		if cs.IsHeader {
 			h, _ := ctx.GetPdf().GetFontSize()
 			h += currentStyle.Spacing
@@ -138,7 +154,9 @@ func ProcessTableCell(ctx PdfContext, n ast.Node, entering bool) {
 			h := currentStyle.Size + currentStyle.Spacing
 			ctx.GetPdf().CellFormat(w, h, s, "LR", 0, "", tableState.fill, 0, "")
 		}
+
 		ctx.Tracer("TableCell (leaving)", "")
+
 		tableState.curDataCell++
 	}
 }

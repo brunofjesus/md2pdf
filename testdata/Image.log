@@ -59,7 +59,7 @@
       Code 'title'
       Text 'attribute enclosed in double\nor sin…'
 
-[... List Left Margin] set to 58.338
+[... List Left Margin] set to 48.342
 -[Unordered Item (entering) #1] Container
   Paragraph
     Text 'An exclamation mark:'
@@ -68,14 +68,14 @@
 
 -[cr()] LH=14
 --[Paragraph (entering)] 
---[... Margins (left, top, right, bottom:] 98.322 28.35 28.35 56.7
+--[... Margins (left, top, right, bottom:] 88.326 28.35 28.35 56.7
 --[First Para within a list] breaking
 --[Text] An exclamation mark: 
 --[processCode] !
---[Backtick (entering)] 
+--[Code (entering)] 
 --[Text] ;
 --[Paragraph (leaving)] 
---[... Margins (left, top, right, bottom:] 98.322 28.35 28.35 56.7
+--[... Margins (left, top, right, bottom:] 88.326 28.35 28.35 56.7
 --[Unordered Item (leaving)] Container
   Paragraph
     Text 'An exclamation mark:'
@@ -90,14 +90,14 @@
 
 -[cr()] LH=14
 --[Paragraph (entering)] 
---[... Margins (left, top, right, bottom:] 98.322 28.35 28.35 56.7
+--[... Margins (left, top, right, bottom:] 88.326 28.35 28.35 56.7
 --[First Para within a list] breaking
 --[Text] followed by a set of square brackets, containing the 
 --[processCode] alt
---[Backtick (entering)] 
+--[Code (entering)] 
 --[Text]  attribute text for the image;
 --[Paragraph (leaving)] 
---[... Margins (left, top, right, bottom:] 98.322 28.35 28.35 56.7
+--[... Margins (left, top, right, bottom:] 88.326 28.35 28.35 56.7
 --[Unordered Item (leaving)] Container
   Paragraph
     Text 'followed by a set of square brackets,…'
@@ -112,14 +112,14 @@
 
 -[cr()] LH=14
 --[Paragraph (entering)] 
---[... Margins (left, top, right, bottom:] 98.322 28.35 28.35 56.7
+--[... Margins (left, top, right, bottom:] 88.326 28.35 28.35 56.7
 --[First Para within a list] breaking
 --[Text] followed by a set of parentheses, containing the URL or path to the image, and an optional 
 --[processCode] title
---[Backtick (entering)] 
+--[Code (entering)] 
 --[Text]  attribute enclosed in double or single quotes.
 --[Paragraph (leaving)] 
---[... Margins (left, top, right, bottom:] 98.322 28.35 28.35 56.7
+--[... Margins (left, top, right, bottom:] 88.326 28.35 28.35 56.7
 --[Unordered Item (leaving)] Container
   Paragraph
     Text 'followed by a set of parentheses, con…'
@@ -143,32 +143,32 @@
       Code 'title'
       Text 'attribute enclosed in double\nor sin…'
 
--[... Reset List Left Margin] re-set to 28.35
+-[... Reset List Left Margin] re-set to 28.349999999999998
 [cr()] LH=14
 [Paragraph (entering)] 
-[... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
+[... Margins (left, top, right, bottom:] 28.349999999999998 28.35 28.35 56.7
 [cr()] LH=14
 [Text] Here is the first picture: 
 [cr()] LH=14
-[Image (entering)] Destination[./image/fpdf.png] Title[]
+[Image (entering)] Destination[/home/bruno/Development/third-party/md2pdf/testdata/image/fpdf.png] Title[]
 [Text] from https://codeberg.org/go-pdf/fpdf/src/branch/main/image
 [Image (leaving)] 
 [Paragraph (leaving)] 
-[... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
+[... Margins (left, top, right, bottom:] 28.349999999999998 28.35 28.35 56.7
 [cr()] LH=14
 [Paragraph (entering)] 
-[... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
+[... Margins (left, top, right, bottom:] 28.349999999999998 28.35 28.35 56.7
 [cr()] LH=14
 [Text] Here is the second picture: 
 [cr()] LH=14
-[Image (entering)] Destination[./image/hiking.png] Title[Optional title]
+[Image (entering)] Destination[/home/bruno/Development/third-party/md2pdf/testdata/image/hiking.png] Title[Optional title]
 [Text] from https://github.com/egonelbre/gophers
 [Image (leaving)] 
 [Paragraph (leaving)] 
-[... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
+[... Margins (left, top, right, bottom:] 28.349999999999998 28.35 28.35 56.7
 [cr()] LH=14
 [Paragraph (entering)] 
-[... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
+[... Margins (left, top, right, bottom:] 28.349999999999998 28.35 28.35 56.7
 [cr()] LH=14
 [Text] The Go gopher was designed by Renee French. The Gopher character design is licensed under the Creative Commons 3.0 Attributions license. Read 
 -[Link (entering)] Destination[http://blog.golang.org/gopher] Title[]
@@ -176,20 +176,20 @@
 -[Link (leaving)] 
 [Text]  for more details.
 [Paragraph (leaving)] 
-[... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
+[... Margins (left, top, right, bottom:] 28.349999999999998 28.35 28.35 56.7
 [cr()] LH=14
 [Paragraph (entering)] 
-[... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
+[... Margins (left, top, right, bottom:] 28.349999999999998 28.35 28.35 56.7
 [cr()] LH=14
 [Text] Note: this snippet was adapted from the testdata folder file named:
 [Text]  
 [processCode] Markdown Documentation - Syntax.text
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
-[... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
+[... Margins (left, top, right, bottom:] 28.349999999999998 28.35 28.35 56.7
 [cr()] LH=14
 [Paragraph (entering)] 
-[... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
+[... Margins (left, top, right, bottom:] 28.349999999999998 28.35 28.35 56.7
 [cr()] LH=14
 [Text] Here is a non-existent image... should generate a message in trace file. 
 [cr()] LH=14
@@ -198,17 +198,18 @@
 [Text] Not from https://jpeg.org/images/jpeg-home.jpg
 [Image (leaving)] 
 [Paragraph (leaving)] 
-[... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
+[... Margins (left, top, right, bottom:] 28.349999999999998 28.35 28.35 56.7
 [cr()] LH=14
 [Paragraph (entering)] 
-[... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
+[... Margins (left, top, right, bottom:] 28.349999999999998 28.35 28.35 56.7
 [cr()] LH=14
 [Text] Here is a JPEG image... is it auto-detected? 
 [cr()] LH=14
-[Image (entering)] Destination[./image/bay.jpg] Title[Down by the Bay]
+[Image (entering)] Destination[/home/bruno/Development/third-party/md2pdf/testdata/image/bay.jpg] Title[Down by the Bay]
 [Text] from https://jpeg.org/images/jpeg-home.jpg
 [Image (leaving)] 
 [Paragraph (leaving)] 
-[... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
+[... Margins (left, top, right, bottom:] 28.349999999999998 28.35 28.35 56.7
 [cr()] LH=14
 [Document] Not Handled
+[RenderFooter] Not handled

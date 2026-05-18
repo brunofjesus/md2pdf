@@ -1,7 +1,6 @@
 package node
 
 import (
-	"fmt"
 	"math"
 	"strings"
 
@@ -13,8 +12,13 @@ import (
 
 // ProcessCodeBlock handles *ast.CodeBlock nodes.
 func ProcessCodeBlock(ctx PdfContext, n ast.Node, _ bool) {
-	node := n.(*ast.CodeBlock)
-	ctx.Tracer("Codeblock", fmt.Sprintf("%v", ast.ToString(node.AsLeaf())))
+	ctx.Tracer("Codeblock", ast.ToString(n.AsLeaf()))
+
+	node, ok := n.(*ast.CodeBlock)
+	if !ok {
+		ctx.Tracer("CodeBlock: not a CodeBlock", "")
+		return
+	}
 
 	currentStyle := ctx.PeekState().TextStyle
 	ctx.SetStyler(currentStyle)
@@ -27,17 +31,22 @@ func ProcessCodeBlock(ctx PdfContext, n ast.Node, _ bool) {
 	if strings.HasPrefix(string(node.Literal), "<script") && string(node.Info) == "html" {
 		node.Info = []byte("javascript")
 	}
+
 	syntaxFile, lerr := syntaxhighlight.Files.ReadFile(string(node.Info) + ".yaml")
 	if lerr != nil {
 		outputUnhighlightedCodeBlock(ctx, string(node.Literal))
 		return
 	}
+
 	syntaxDef, _ := highlight.ParseDef(syntaxFile)
+
 	h := highlight.NewHighlighter(syntaxDef)
+
 	linesWrapped := wordwrap.WrapString(string(node.Literal), 90)
 	if ctx.GetTheme().Code.TabWidth > 0 {
 		linesWrapped = strings.ReplaceAll(linesWrapped, "\t", strings.Repeat(" ", ctx.GetTheme().Code.TabWidth))
 	}
+
 	matches := h.HighlightString(linesWrapped)
 
 	ctx.SetStyler(ctx.GetTheme().Code.Text)
@@ -82,7 +91,9 @@ func ProcessCodeBlock(ctx PdfContext, n ast.Node, _ bool) {
 					ctx.SetStyler(codeTheme.Text)
 				}
 			}
+
 			ctx.GetPdf().Write(lineH, string(c))
+
 			colN++
 		}
 	})
@@ -93,9 +104,11 @@ func ProcessCodeBlock(ctx PdfContext, n ast.Node, _ bool) {
 func outputUnhighlightedCodeBlock(ctx PdfContext, codeBlock string) {
 	ctx.Cr()
 	ctx.SetStyler(ctx.GetTheme().Backtick)
+
 	if ctx.GetTheme().Code.TabWidth > 0 {
 		codeBlock = strings.ReplaceAll(codeBlock, "\t", strings.Repeat(" ", ctx.GetTheme().Code.TabWidth))
 	}
+
 	ctx.MultiCell(ctx.GetTheme().Code.Text, codeBlock)
 }
 
@@ -121,12 +134,15 @@ func drawCodeFill(ctx PdfContext, lines []string, lineHeights []float64, renderL
 			if pageTopY+h+lineHeights[i] > usableH {
 				break
 			}
+
 			h += lineHeights[i]
 		}
+
 		return h
 	}
 
 	autoBreak, pbMargin := pdf.GetAutoPageBreak()
+
 	pdf.SetAutoPageBreak(false, pbMargin)
 	defer pdf.SetAutoPageBreak(autoBreak, pbMargin)
 
@@ -141,12 +157,14 @@ func drawCodeFill(ctx PdfContext, lines []string, lineHeights []float64, renderL
 	for lineN, l := range lines {
 		if pdf.GetY()+lineHeights[lineN] > usableH {
 			pdf.AddPage()
+
 			newY := pdf.GetY()
 			if codeTheme.Text.FillColor != bgColor {
 				if h := rectHeightFrom(lineN, newY); h > 0 {
 					drawBg(newY, h)
 				}
 			}
+
 			pdf.SetX(lm)
 		}
 
@@ -162,6 +180,7 @@ func ProcessCode(ctx PdfContext, n ast.Node, _ bool) {
 	ctx.Tracer("Code (entering)", "")
 	codeTheme := ctx.GetTheme().Code
 	ctx.SetStyler(codeTheme.Text)
+
 	s := string(n.AsLeaf().Literal)
 	hw := ctx.GetPdf().GetStringWidth(s)
 	h := codeTheme.Text.Size

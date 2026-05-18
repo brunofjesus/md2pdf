@@ -14,6 +14,7 @@ func (s *states) push(c *node.ContainerState) {
 func (s *states) pop() *node.ContainerState {
 	var x *node.ContainerState
 	x, s.stack = s.stack[len(s.stack)-1], s.stack[:len(s.stack)-1]
+
 	return x
 }
 

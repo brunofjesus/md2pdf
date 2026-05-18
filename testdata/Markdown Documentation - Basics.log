@@ -5,8 +5,10 @@
   Text 'Markdown: Basics'
 
 -[Text] Markdown: Basics
--[Heading (leaving)] 
--[cr()] LH=29
+-[cr()] LH=37
+-[... Drawing underline from X,Y] 28.35,79.35
+-[...   To X,Y] 566.93,79.35
+[Heading (leaving)] 
 [HTMLBlock] <ul id="ProjectSubmenu">
     <li><a href="/projects/markdown/" title="Markdown Project Page">Main</a></li>
     <li><a class="selected" title="Markdown Basics">Basics</a></li>
@@ -21,8 +23,10 @@
   Text 'Getting the Gist of Markdown's Format…'
 
 -[Text] Getting the Gist of Markdown's Formatting Syntax
--[Heading (leaving)] 
--[cr()] LH=27
+-[cr()] LH=29
+-[... Drawing underline from X,Y] 28.35,191.35
+-[...   To X,Y] 566.93,191.35
+[Heading (leaving)] 
 [Paragraph (entering)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -65,8 +69,10 @@
   Text 'Paragraphs, Headers, Blockquotes'
 
 -[Text] Paragraphs, Headers, Blockquotes
--[Heading (leaving)] 
--[cr()] LH=27
+-[cr()] LH=29
+-[... Drawing underline from X,Y] 28.35,388.35
+-[...   To X,Y] 566.93,388.35
+[Heading (leaving)] 
 [Paragraph (entering)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -87,19 +93,19 @@
 [Emph (leaving)] 
 [Text] . Setext-style headers for 
 [processCode] <h1>
-[Backtick (entering)] 
+[Code (entering)] 
 [Text]  and 
 [processCode] <h2>
-[Backtick (entering)] 
+[Code (entering)] 
 [Text]  are created by "underlining" with equal signs (
 [processCode] =
-[Backtick (entering)] 
+[Code (entering)] 
 [Text] ) and hyphens (
 [processCode] -
-[Backtick (entering)] 
+[Code (entering)] 
 [Text] ), respectively. To create an atx-style header, you put 1-6 hash marks (
 [processCode] #
-[Backtick (entering)] 
+[Code (entering)] 
 [Text] ) at the beginning of the line -- the number of hashes equals the resulting HTML header level.
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
@@ -109,7 +115,7 @@
 [cr()] LH=14
 [Text] Blockquotes are indicated using email-style '
 [processCode] >
-[Backtick (entering)] 
+[Code (entering)] 
 [Text] ' angle brackets.
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
@@ -139,8 +145,10 @@
   Text 'Phrase Emphasis'
 
 -[Text] Phrase Emphasis
--[Heading (leaving)] 
 -[cr()] LH=25
+-[... Drawing underline from X,Y] 28.35,473.35
+-[...   To X,Y] 566.93,473.35
+[Heading (leaving)] 
 [Paragraph (entering)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -173,20 +181,22 @@
   Text 'Lists'
 
 -[Text] Lists
--[Heading (leaving)] 
--[cr()] LH=27
+-[cr()] LH=29
+-[... Drawing underline from X,Y] 28.35,768.35
+-[...   To X,Y] 566.93,768.35
+[Heading (leaving)] 
 [Paragraph (entering)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
 [Text] Unordered (bulleted) lists use asterisks, pluses, and hyphens (
 [processCode] *
-[Backtick (entering)] 
+[Code (entering)] 
 [Text] , 
 [processCode] +
-[Backtick (entering)] 
+[Code (entering)] 
 [Text] , and 
 [processCode] -
-[Backtick (entering)] 
+[Code (entering)] 
 [Text] ) as list markers. These three markers are interchangable; this:
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
@@ -249,7 +259,7 @@
 [cr()] LH=14
 [Text] If you put blank lines between items, you'll get 
 [processCode] <p>
-[Backtick (entering)] 
+[Code (entering)] 
 [Text]  tags for the list item text. You can create multi-paragraph list items by indenting the paragraphs by 4 spaces or 1 tab:
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
@@ -272,8 +282,10 @@
   Text 'Links'
 
 -[Text] Links
--[Heading (leaving)] 
 -[cr()] LH=25
+-[... Drawing underline from X,Y] 28.35,109.35
+-[...   To X,Y] 566.93,109.35
+[Heading (leaving)] 
 [Paragraph (entering)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -378,8 +390,10 @@
   Text 'Images'
 
 -[Text] Images
--[Heading (leaving)] 
 -[cr()] LH=25
+-[... Drawing underline from X,Y] 28.35,109.35
+-[...   To X,Y] 566.93,109.35
+[Heading (leaving)] 
 [Paragraph (entering)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -422,20 +436,22 @@
   Text 'Code'
 
 -[Text] Code
--[Heading (leaving)] 
 -[cr()] LH=25
+-[... Drawing underline from X,Y] 28.35,372.35
+-[...   To X,Y] 566.93,372.35
+[Heading (leaving)] 
 [Paragraph (entering)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
 [Text] In a regular paragraph, you can create code span by wrapping text in backtick quotes. Any ampersands (
 [processCode] &
-[Backtick (entering)] 
+[Code (entering)] 
 [Text] ) and angle brackets (
 [processCode] <
-[Backtick (entering)] 
+[Code (entering)] 
 [Text]  or 
 [processCode] >
-[Backtick (entering)] 
+[Code (entering)] 
 [Text] ) will automatically be translated into HTML entities. This makes it easy to use Markdown to write about HTML example code:
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
@@ -458,13 +474,13 @@
 [cr()] LH=14
 [Text] To specify an entire block of pre-formatted code, indent every line of the block by 4 spaces or 1 tab. Just like with code spans, 
 [processCode] &
-[Backtick (entering)] 
+[Code (entering)] 
 [Text] , 
 [processCode] <
-[Backtick (entering)] 
+[Code (entering)] 
 [Text] , and 
 [processCode] >
-[Backtick (entering)] 
+[Code (entering)] 
 [Text]  characters will be escaped automatically.
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
@@ -490,3 +506,4 @@
 
 [cr()] LH=14
 [Document] Not Handled
+[RenderFooter] Not handled

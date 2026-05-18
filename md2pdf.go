@@ -7,7 +7,7 @@
 // [Md2Pdf.OutputFileAndClose]).
 //
 // Functional options such as [WithTableOfContents], [WithHorizontalRuleAsNewPage],
-// [WithBaseURL], and [WithDefaultFooter] can be passed via [Md2PdfParams.Options]
+// [WithBaseURL], and [WithDefaultFooter] can be passed via [Params.Options]
 // to customize the conversion.
 package md2pdf
 
@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/brunofjesus/md2pdf/v3/internal/renderer"
 )
@@ -25,18 +26,21 @@ import (
 // the Output methods.
 type Md2Pdf struct {
 	pdfRenderer *renderer.PdfRenderer
-	params      Md2PdfParams
+	params      Params
 }
 
+// Orientation represents the page orientation for the generated PDF.
 type Orientation string
 
 const (
-	OrientationPortrait  Orientation = "portrait"
+	// OrientationPortrait represents portrait page orientation.
+	OrientationPortrait Orientation = "portrait"
+	// OrientationLandscape represents landscape page orientation.
 	OrientationLandscape Orientation = "landscape"
 )
 
-// Md2PdfParams holds the configuration for creating a new [Md2Pdf] instance.
-type Md2PdfParams struct {
+// Params holds the configuration for creating a new [Md2Pdf] instance.
+type Params struct {
 	// Title is the PDF document title stored in the file metadata.
 	Title string
 	// Orientation is the page orientation: "portrait" (default) or "landscape".
@@ -54,7 +58,7 @@ type Md2PdfParams struct {
 type Option func(r *Md2Pdf)
 
 // New creates a new [Md2Pdf] converter with the given parameters.
-func New(p Md2PdfParams) (*Md2Pdf, error) {
+func New(p Params) (*Md2Pdf, error) {
 	switch p.Orientation {
 	case "":
 		p.Orientation = OrientationPortrait
@@ -65,6 +69,7 @@ func New(p Md2PdfParams) (*Md2Pdf, error) {
 
 	var theme renderer.Theme
 	var customThemeFile string
+
 	switch p.Theme {
 	case "light":
 		theme = renderer.LIGHT
@@ -81,10 +86,13 @@ func New(p Md2PdfParams) (*Md2Pdf, error) {
 		PageSize:        p.PageSize,
 		Theme:           theme,
 		CustomThemeFile: customThemeFile,
+		TracerFile:      "",
+		Opts:            nil,
 	})
 
 	md2pdf := &Md2Pdf{
 		pdfRenderer: rend,
+		params:      p,
 	}
 
 	for _, opt := range p.Options {
@@ -121,7 +129,7 @@ func (m *Md2Pdf) ProcessAndClose(reader io.ReadCloser) error {
 // in-memory PDF, and closes the file. Call one of the Output methods afterwards
 // to retrieve the result.
 func (m *Md2Pdf) ProcessFileAndClose(filename string) error {
-	file, err := os.Open(filename)
+	file, err := os.Open(filepath.Clean(filename))
 	if err != nil {
 		return fmt.Errorf("failed to open file: %w", err)
 	}
@@ -163,7 +171,7 @@ func WithTableOfContents() Option {
 }
 
 // WithHorizontalRuleAsNewPage configures the renderer to interpret horizontal
-// rules (---) as page breaks,
+// rules (---) as page breaks.
 func WithHorizontalRuleAsNewPage() Option {
 	return func(m *Md2Pdf) {
 		renderer.WithHorizontalRuleAsNewPage()(m.pdfRenderer)

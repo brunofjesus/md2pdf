@@ -1,0 +1,33 @@
+version: "2"
+
+run:
+  go: "1.26"
+
+linters:
+  default: all
+  disable:
+    - varnamelen
+    - funlen
+    - err113
+    - wsl
+    - noinlineerr
+    - mnd
+    - nlreturn
+    - testpackage
+    - gomodguard
+    # check those later
+    - wrapcheck
+    - forbidigo
+    - depguard
+    - cyclop 
+    - godox
+  settings:
+    wsl_v5:
+      disable:
+        - decl
+    exhaustruct:
+      exclude:
+        - '.+/node\.ContainerState$'
+        - '.+/urfave/cli/v3\.Command$'
+        - '.+/urfave/cli/v3\.FlagBase$'
+

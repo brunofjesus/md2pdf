@@ -1,3 +1,4 @@
+// Command-line tool for converting Markdown files to PDF using the md2pdf library.
 package main
 
 import (
@@ -39,6 +40,7 @@ func main() {
 				if err != nil && !errors.Is(err, os.ErrNotExist) {
 					log.Fatalf("error: failed to check output file: %v\n", err)
 				}
+
 				if outFile != nil {
 					log.Fatalf("error: output file already exists: %s; use -f to overwrite.\n", flagOutput)
 				}
@@ -106,89 +108,96 @@ func main() {
 			return nil
 		},
 		UseShortOptionHandling: true,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "input",
-				Aliases: []string{"i"},
-				Usage:   "Input filename, dir consisting of .md|.markdown files or HTTP(s) URL; default is os.Stdin",
-			},
-			&cli.StringFlag{
-				Name:    "output",
-				Aliases: []string{"o"},
-				Usage:   "Output PDF filename; required",
-				Value:   "out.pdf",
-			},
-			&cli.StringFlag{
-				Name:    "title",
-				Aliases: []string{"t"},
-				Usage:   "PDF title",
-			},
-			&cli.StringFlag{
-				Name:  "theme",
-				Usage: "Theme to use for the PDF; Can be 'light', 'dark' or the path for a custom theme file",
-				Value: "light",
-			},
-			&cli.BoolFlag{
-				Name:    "table-of-contents",
-				Aliases: []string{"toc"},
-				Usage:   "Generate a table of contents page based on the headings in the input markdown",
-				Value:   false,
-			},
-			&cli.BoolFlag{
-				Name:    "horizontal-rule-new-page",
-				Aliases: []string{"hr-new-page"},
-				Usage:   "Start a new page on horizontal rules (---); useful for presentations",
-				Value:   false,
-			},
-			&cli.BoolFlag{
-				Name:    "force-overwrite",
-				Aliases: []string{"f"},
-				Usage:   "Force overwrite of output file if it already exists",
-				Value:   false,
-			},
-			&cli.BoolFlag{
-				Name:  "footer",
-				Usage: "Print doc footer (<author>  <title>  <page number>)",
-				Value: false,
-			},
-			&cli.StringFlag{
-				Name:        "page-size",
-				Usage:       "Page size for the PDF; can be 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'Letter', 'Legal' or 'Tabloid'",
-				DefaultText: "A4",
-				Value:       "A4",
-				Validator: func(value string) error {
-					acceptedSizes := []string{"A1", "A2", "A3", "A4", "A5", "A6", "A7", "Letter", "Legal", "Tabloid"}
-					if !slices.Contains(acceptedSizes, value) {
-						return errors.New("page-size must be one of: " + strings.Join(acceptedSizes, ", "))
-					}
-					return nil
-				},
-			},
-			&cli.StringFlag{
-				Name:  "orientation",
-				Usage: "Page orientation for the PDF; can be 'portrait' or 'landscape'; default is 'portrait'",
-				Value: "portrait",
-				Validator: func(value string) error {
-					if value != "portrait" && value != "landscape" {
-						return errors.New("orientation must be either 'portrait' or 'landscape'")
-					}
-					return nil
-				},
-			},
-			&cli.StringFlag{
-				Name:  "author",
-				Usage: "Author's name",
-				Value: "",
-			},
-			&cli.StringFlag{
-				Name:  "log-file",
-				Usage: "Path to log file",
-			},
-		},
+		Flags:                  flags(),
 	}
 
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
 		log.Fatal(err)
+	}
+}
+
+func flags() []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:    "input",
+			Aliases: []string{"i"},
+			Usage:   "Input filename, dir consisting of .md|.markdown files or HTTP(s) URL; default is os.Stdin",
+		},
+		&cli.StringFlag{
+			Name:    "output",
+			Aliases: []string{"o"},
+			Usage:   "Output PDF filename; required",
+			Value:   "out.pdf",
+		},
+		&cli.StringFlag{
+			Name:    "title",
+			Aliases: []string{"t"},
+			Usage:   "PDF title",
+		},
+		&cli.StringFlag{
+			Name:  "theme",
+			Usage: "Theme to use for the PDF; Can be 'light', 'dark' or the path for a custom theme file",
+			Value: "light",
+		},
+		&cli.BoolFlag{
+			Name:    "table-of-contents",
+			Aliases: []string{"toc"},
+			Usage:   "Generate a table of contents page based on the headings in the input markdown",
+			Value:   false,
+		},
+		&cli.BoolFlag{
+			Name:    "horizontal-rule-new-page",
+			Aliases: []string{"hr-new-page"},
+			Usage:   "Start a new page on horizontal rules (---); useful for presentations",
+			Value:   false,
+		},
+		&cli.BoolFlag{
+			Name:    "force-overwrite",
+			Aliases: []string{"f"},
+			Usage:   "Force overwrite of output file if it already exists",
+			Value:   false,
+		},
+		&cli.BoolFlag{
+			Name:  "footer",
+			Usage: "Print doc footer (<author>  <title>  <page number>)",
+			Value: false,
+		},
+		&cli.StringFlag{
+			Name: "page-size",
+			Usage: "Page size for the PDF;" +
+				" can be 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'Letter', 'Legal' or 'Tabloid'",
+			DefaultText: "A4",
+			Value:       "A4",
+			Validator: func(value string) error {
+				acceptedSizes := []string{"A1", "A2", "A3", "A4", "A5", "A6", "A7", "Letter", "Legal", "Tabloid"}
+				if !slices.Contains(acceptedSizes, value) {
+					return errors.New("page-size must be one of: " + strings.Join(acceptedSizes, ", "))
+				}
+
+				return nil
+			},
+		},
+		&cli.StringFlag{
+			Name:  "orientation",
+			Usage: "Page orientation for the PDF; can be 'portrait' or 'landscape'; default is 'portrait'",
+			Value: "portrait",
+			Validator: func(value string) error {
+				if value != "portrait" && value != "landscape" {
+					return errors.New("orientation must be either 'portrait' or 'landscape'")
+				}
+
+				return nil
+			},
+		},
+		&cli.StringFlag{
+			Name:  "author",
+			Usage: "Author's name",
+			Value: "",
+		},
+		&cli.StringFlag{
+			Name:  "log-file",
+			Usage: "Path to log file",
+		},
 	}
 }
 

@@ -1,23 +1,3 @@
-/*
- * Markdown to PDF Converter
- * Available at http://github.com/brunofjesus/md2pdf
- *
- * Copyright © Cecil New <cecil.new@gmail.com>, Jesse Portnoy <jesse@packman.io>.
- * Distributed under the MIT License.
- * See README.md for details.
- *
- * Dependencies
- * This package depends on two other packages:
- *
- * Go Markdown processor
- *   Available at https://github.com/gomarkdown/markdown
- *
- * fpdf - a PDF document generator with high level support for
- *   text, drawing and images.
- *   Available at https://codeberg.org/go-pdf/fpdf
- */
-
-// Package renderer converts markdown to PDF.
 package renderer
 
 import (
@@ -40,7 +20,7 @@ import (
 // Ensure PdfRenderer satisfies node.PdfContext.
 var _ node.PdfContext = (*PdfRenderer)(nil)
 
-// RenderOption allows to define functions to configure the renderer
+// RenderOption allows to define functions to configure the renderer.
 type RenderOption func(r *PdfRenderer)
 
 // NodeProcessor is a function type that takes a PdfRenderer, an AST node and a
@@ -50,17 +30,20 @@ type RenderOption func(r *PdfRenderer)
 // during PDF generation.
 type NodeProcessor func(r *PdfRenderer, node ast.Node, entering bool)
 
-// Theme [light|dark]
+// Theme [light|dark].
 type Theme int
 
 const (
-	// DARK theme const
+	// DARK theme const.
 	DARK Theme = 1
-	// LIGHT theme const
+	// LIGHT theme const.
 	LIGHT Theme = 2
-	// CUSTOM theme const
+	// CUSTOM theme const.
 	CUSTOM Theme = 3
 )
+
+// identCharLen is the number of characters to per identation level.
+const identCharLen float64 = 2
 
 // PdfRenderer is the struct to manage conversion of a markdown object
 // to PDF format.
@@ -93,82 +76,13 @@ type PdfRenderer struct {
 	tocLinks map[string]*int
 
 	// nodeProcessors maps AST node type names to their processor functions.
-	nodeProcessors map[string]node.NodeProcessor
+	nodeProcessors map[string]node.Processor
 
 	// preProcessors are functions that run before the main rendering pass.
 	preProcessors []func(content []byte) error
 }
 
-// ---------------------------------------------------------------------------
-// node.PdfContext implementation
-// ---------------------------------------------------------------------------
-
-func (r *PdfRenderer) Tracer(source, msg string) {
-	if r.tracerFile != "" {
-		indent := strings.Repeat("-", len(r.cs.stack)-1)
-		_, _ = fmt.Fprintf(r.w, "%v[%v] %v\n", indent, source, msg)
-	}
-}
-
-func (r *PdfRenderer) Cr() {
-	LH := r.cs.peek().TextStyle.Size + r.cs.peek().TextStyle.Spacing
-	r.Tracer("cr()", fmt.Sprintf("LH=%v", LH))
-	r.Write(r.cs.peek().TextStyle, "\n")
-}
-
-func (r *PdfRenderer) Write(s theme.Styler, t string) {
-	r.Pdf.Write(s.Size+s.Spacing, t)
-}
-
-func (r *PdfRenderer) MultiCell(s theme.Styler, t string) {
-	r.Pdf.MultiCell(0, s.Size+s.Spacing, t, "", "", true)
-}
-
-func (r *PdfRenderer) WriteLink(s theme.Styler, display, url string) {
-	r.Pdf.WriteLinkString(s.Size+s.Spacing, display, url)
-}
-
-func (r *PdfRenderer) SetStyler(s theme.Styler) {
-	if s.Style == "bb" {
-		s.Style = "b"
-	}
-	r.Pdf.SetFont(s.Font, s.Style, s.Size)
-	r.Pdf.SetTextColor(s.TextColor.Red, s.TextColor.Green, s.TextColor.Blue)
-	r.Pdf.SetFillColor(s.FillColor.Red, s.FillColor.Green, s.FillColor.Blue)
-}
-
-func (r *PdfRenderer) PushState(s *node.ContainerState)  { r.cs.push(s) }
-func (r *PdfRenderer) PopState() *node.ContainerState    { return r.cs.pop() }
-func (r *PdfRenderer) PeekState() *node.ContainerState   { return r.cs.peek() }
-func (r *PdfRenderer) ParentState() *node.ContainerState { return r.cs.parent() }
-func (r *PdfRenderer) StackDepth() int                   { return len(r.cs.stack) }
-
-func (r *PdfRenderer) SetLeftMargin(margin float64) {
-	r.Pdf.SetLeftMargin(margin)
-}
-
-func (r *PdfRenderer) GetTheme() *theme.Theme       { return r.Theme }
-func (r *PdfRenderer) GetIndentValue() float64      { return r.IndentValue }
-func (r *PdfRenderer) GetNormalEm() float64         { return r.NormalEm }
-func (r *PdfRenderer) GetInputBaseURL() string      { return r.InputBaseURL }
-func (r *PdfRenderer) GetTOCLinks() map[string]*int { return r.tocLinks }
-func (r *PdfRenderer) GetPdf() *fpdf.Fpdf           { return r.Pdf }
-
-func (r *PdfRenderer) GetColumnWidths(n ast.Node) []float64 {
-	return r.ColumnWidths[n]
-}
-
-// SetTOCLinks stores the heading→linkID map used by processText to place
-// link anchors when each heading is rendered. Called by TOCDecorator.
-func (r *PdfRenderer) SetTOCLinks(tocHeaders map[string]*int) {
-	r.tocLinks = tocHeaders
-}
-
-// ---------------------------------------------------------------------------
-// Constructor
-// ---------------------------------------------------------------------------
-
-// PdfRendererParams struct to hold params passed to NewPdfRenderer
+// PdfRendererParams struct to hold params passed to NewPdfRenderer.
 type PdfRendererParams struct {
 	Title                             string
 	Orientation, PageSize, TracerFile string
@@ -193,6 +107,7 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 
 	r.units = "pt"
 	r.papersize = "A4"
+
 	if params.PageSize != "" {
 		r.papersize = params.PageSize
 	}
@@ -236,7 +151,7 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 	r.SetStyler(r.Theme.Normal)
 	r.mleft, r.mtop, r.mright, r.mbottom = r.Pdf.GetMargins()
 	r.NormalEm = r.Pdf.GetStringWidth("m")
-	r.IndentValue = 3 * r.NormalEm
+	r.IndentValue = identCharLen * r.NormalEm
 
 	r.cs = states{stack: make([]*node.ContainerState, 0)}
 	initcurrent := &node.ContainerState{
@@ -249,7 +164,7 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 	r.Pdf.SetTitle(params.Title, true)
 
 	// Register default node processors.
-	r.nodeProcessors = map[string]node.NodeProcessor{
+	r.nodeProcessors = map[string]node.Processor{
 		"Text":           node.ProcessText,
 		"Emph":           node.ProcessEmph,
 		"Strong":         node.ProcessStrong,
@@ -282,10 +197,117 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 	return r
 }
 
+// ---------------------------------------------------------------------------
+// node.PdfContext implementation
+// ---------------------------------------------------------------------------
+
+// Tracer writes trace messages to the tracer file if it is set. The message is
+// indented according to the current depth of the container state stack.
+func (r *PdfRenderer) Tracer(source, msg string) {
+	if r.tracerFile != "" {
+		indent := strings.Repeat("-", len(r.cs.stack)-1)
+		_, _ = fmt.Fprintf(r.w, "%v[%v] %v\n", indent, source, msg)
+	}
+}
+
+// Cr writes a newline to the PDF document. The line height is determined by the
+// current text style's size and spacing.
+func (r *PdfRenderer) Cr() {
+	LH := r.cs.peek().TextStyle.Size + r.cs.peek().TextStyle.Spacing
+	r.Tracer("cr()", fmt.Sprintf("LH=%v", LH))
+	r.Write(r.cs.peek().TextStyle, "\n")
+}
+
+// Write writes text to the PDF document using the provided styler for font size
+// and spacing.
+func (r *PdfRenderer) Write(s theme.Styler, t string) {
+	r.Pdf.Write(s.Size+s.Spacing, t)
+}
+
+// MultiCell writes text to the PDF document in a multi-cell format, allowing for
+// line breaks. The cell width is set to 0 (full width), and the line height is
+// determined by the provided styler's size and spacing.
+func (r *PdfRenderer) MultiCell(s theme.Styler, t string) {
+	r.Pdf.MultiCell(0, s.Size+s.Spacing, t, "", "", true)
+}
+
+// WriteLink writes a hyperlink to the PDF document using the provided styler for
+// font size and spacing. The display text and URL are specified as parameters.
+func (r *PdfRenderer) WriteLink(s theme.Styler, display, url string) {
+	r.Pdf.WriteLinkString(s.Size+s.Spacing, display, url)
+}
+
+// SetStyler sets the font and colors in the PDF document according to the provided
+// styler. If the styler's style is "bb", it is treated as "b" (bold) for compatibility.
+func (r *PdfRenderer) SetStyler(styler theme.Styler) {
+	if styler.Style == "bb" {
+		styler.Style = "b"
+	}
+
+	r.Pdf.SetFont(styler.Font, styler.Style, styler.Size)
+	r.Pdf.SetTextColor(styler.TextColor.Red, styler.TextColor.Green, styler.TextColor.Blue)
+	r.Pdf.SetFillColor(styler.FillColor.Red, styler.FillColor.Green, styler.FillColor.Blue)
+}
+
+// PushState pushes a new container state onto the stack.
+func (r *PdfRenderer) PushState(s *node.ContainerState) { r.cs.push(s) }
+
+// PopState pops the current container state from the stack and returns it.
+func (r *PdfRenderer) PopState() *node.ContainerState { return r.cs.pop() }
+
+// PeekState returns the current container state without modifying the stack.
+func (r *PdfRenderer) PeekState() *node.ContainerState { return r.cs.peek() }
+
+// ParentState returns the parent container state, which is the second-to-last.
+func (r *PdfRenderer) ParentState() *node.ContainerState { return r.cs.parent() }
+
+// StackDepth returns the current depth of the container state stack.
+func (r *PdfRenderer) StackDepth() int { return len(r.cs.stack) }
+
+// SetLeftMargin sets the left margin of the PDF document to the specified value.
+func (r *PdfRenderer) SetLeftMargin(margin float64) {
+	r.Pdf.SetLeftMargin(margin)
+}
+
+// GetTheme returns the current theme being used by the renderer.
+func (r *PdfRenderer) GetTheme() *theme.Theme { return r.Theme }
+
+// GetIndentValue returns the current indent value used for lists and
+// blockquotes.
+func (r *PdfRenderer) GetIndentValue() float64 { return r.IndentValue }
+
+// GetNormalEm returns the width of the character "m" in the current font.
+func (r *PdfRenderer) GetNormalEm() float64 { return r.NormalEm }
+
+// GetInputBaseURL returns the base URL for resolving relative links in the
+// markdown document.
+func (r *PdfRenderer) GetInputBaseURL() string { return r.InputBaseURL }
+
+// GetTOCLinks returns the map of heading text to link IDs used for generating
+// the Table of Contents.
+func (r *PdfRenderer) GetTOCLinks() map[string]*int { return r.tocLinks }
+
+// GetPdf returns the underlying fpdf.Fpdf object, allowing direct access to
+// its methods and properties.
+func (r *PdfRenderer) GetPdf() *fpdf.Fpdf { return r.Pdf }
+
+// GetColumnWidths returns the map of AST nodes to their corresponding column
+// widths, which is used for table rendering.
+func (r *PdfRenderer) GetColumnWidths(n ast.Node) []float64 {
+	return r.ColumnWidths[n]
+}
+
+// SetTOCLinks stores the heading→linkID map used by processText to place
+// link anchors when each heading is rendered. Called by TOCDecorator.
+func (r *PdfRenderer) SetTOCLinks(tocHeaders map[string]*int) {
+	r.tocLinks = tocHeaders
+}
+
 // SetNodeProcessor allows users to set a custom node processor for a given node type.
-func (r *PdfRenderer) SetNodeProcessor(nodeType string, processor node.NodeProcessor) error {
+func (r *PdfRenderer) SetNodeProcessor(nodeType string, processor node.Processor) error {
 	if _, ok := r.nodeProcessors[nodeType]; ok {
 		r.nodeProcessors[nodeType] = processor
+
 		return nil
 	}
 
@@ -296,28 +318,30 @@ func (r *PdfRenderer) SetNodeProcessor(nodeType string, processor node.NodeProce
 // Processing
 // ---------------------------------------------------------------------------
 
-// Process takes the markdown content, parses it to generate the PDF
+// Process takes the markdown content, parses it to generate the PDF.
 func (r *PdfRenderer) Process(reader io.Reader) error {
 	// try to open tracer
 	var f *os.File
 	var err error
+
 	if r.tracerFile != "" {
 		f, err = os.Create(r.tracerFile)
 		if err != nil {
-			return fmt.Errorf("os.Create() on tracefile error:%v", err)
+			return fmt.Errorf("os.Create() on tracefile error: %w", err)
 		}
-		defer f.Close()
+		defer func() { _ = f.Close() }()
+
 		r.w = bufio.NewWriter(f)
-		defer r.w.Flush()
+		defer func() { _ = r.w.Flush() }()
 	}
 
 	content, err := io.ReadAll(reader)
 	if err != nil {
-		return fmt.Errorf("io.ReadAll() error: %v", err)
+		return fmt.Errorf("io.ReadAll() error: %w", err)
 	}
 
 	for _, pp := range r.preProcessors {
-		if err = pp(content); err != nil {
+		if err := pp(content); err != nil {
 			return fmt.Errorf("pre-processor error: %w", err)
 		}
 	}
@@ -346,6 +370,8 @@ func (r *PdfRenderer) OutputFileAndClose(filename string) error {
 	return r.Pdf.OutputFileAndClose(filename)
 }
 
+// Run takes the markdown content as a byte slice, preprocesses it, parses it into an AST,
+// and renders it to PDF using the registered node processors.
 func (r *PdfRenderer) Run(content []byte) error {
 	// Preprocess content by changing all CRLF to LF
 	s := content
@@ -360,14 +386,17 @@ func (r *PdfRenderer) Run(content []byte) error {
 	return nil
 }
 
-// Parses all tables and sets the column width to the longest string in that column
+// Parses all tables and sets the column width to the longest string in that column.
 func setColumnWidths(doc ast.Node, r *PdfRenderer) {
+	const cellPaddingPct = 0.2
+
 	columnWidths := map[ast.Node][]float64{}
 	intable := false
 	inheader := true
 	cellnum := 0
 	lengths := []float64{}
 	textlength := float64(0)
+
 	ast.WalkFunc(doc, func(node ast.Node, entering bool) ast.WalkStatus {
 		switch n := node.(type) {
 		case *ast.Table:
@@ -393,12 +422,13 @@ func setColumnWidths(doc ast.Node, r *PdfRenderer) {
 					lengths = append(lengths, 0)
 				}
 			} else {
-				textlength += textlength * 0.2
+				textlength += textlength * cellPaddingPct
 
 				currentMax := lengths[cellnum]
 				if textlength > currentMax {
 					lengths[cellnum] = textlength
 				}
+
 				textlength = 0
 				cellnum++
 			}
@@ -408,12 +438,14 @@ func setColumnWidths(doc ast.Node, r *PdfRenderer) {
 				textlength += l
 			}
 		}
+
 		return ast.GoToNext
 	})
+
 	r.ColumnWidths = columnWidths
 }
 
-// UpdateParagraphStyler - update with default styler
+// UpdateParagraphStyler - update with default styler.
 func (r *PdfRenderer) UpdateParagraphStyler(defaultStyler theme.Styler) {
 	initcurrent := &node.ContainerState{
 		ListKind:  node.NotList,
@@ -427,18 +459,21 @@ func (r *PdfRenderer) UpdateParagraphStyler(defaultStyler theme.Styler) {
 // ---------------------------------------------------------------------------
 
 // RenderNode dispatches each AST node to the registered NodeProcessor.
-func (r *PdfRenderer) RenderNode(w io.Writer, n ast.Node, entering bool) ast.WalkStatus {
+func (r *PdfRenderer) RenderNode(_ io.Writer, n ast.Node, entering bool) ast.WalkStatus {
 	var key string
+
 	switch n.(type) {
 	case *ast.Text:
 		key = "Text"
 	case *ast.Softbreak:
 		r.Tracer("Softbreak", "Output newline")
 		r.Cr()
+
 		return ast.GoToNext
 	case *ast.Hardbreak:
 		r.Tracer("Hardbreak", "Output newline")
 		r.Cr()
+
 		return ast.GoToNext
 	case *ast.Emph:
 		key = "Emph"
@@ -450,9 +485,11 @@ func (r *PdfRenderer) RenderNode(w io.Writer, n ast.Node, entering bool) ast.Wal
 		} else {
 			r.Tracer("DEL (leaving)", "Not handled")
 		}
+
 		return ast.GoToNext
 	case *ast.HTMLSpan:
 		r.Tracer("HTMLSpan", "Not handled")
+
 		return ast.GoToNext
 	case *ast.Link:
 		key = "Link"
@@ -462,6 +499,7 @@ func (r *PdfRenderer) RenderNode(w io.Writer, n ast.Node, entering bool) ast.Wal
 		key = "Code"
 	case *ast.Document:
 		r.Tracer("Document", "Not Handled")
+
 		return ast.GoToNext
 	case *ast.Paragraph:
 		key = "Paragraph"
@@ -491,22 +529,25 @@ func (r *PdfRenderer) RenderNode(w io.Writer, n ast.Node, entering bool) ast.Wal
 		key = "TableCell"
 	default:
 		fmt.Printf("Unknown node type: %T. Skipping\n", n)
+
 		return ast.GoToNext
 	}
 
 	if proc, ok := r.nodeProcessors[key]; ok {
 		proc(r, n, entering)
 	}
+
 	return ast.GoToNext
 }
 
 // RenderHeader is not supported.
-func (r *PdfRenderer) RenderHeader(w io.Writer, ast ast.Node) {
+func (r *PdfRenderer) RenderHeader(_ io.Writer, _ ast.Node) {
 	r.Tracer("RenderHeader", "Not handled")
 }
 
 // RenderFooter is not supported.
-func (r *PdfRenderer) RenderFooter(w io.Writer, _ ast.Node) {
+func (r *PdfRenderer) RenderFooter(_ io.Writer, _ ast.Node) {
+	r.Tracer("RenderFooter", "Not handled")
 }
 
 func dorect(doc *fpdf.Fpdf, x, y, w, h float64, color colors.Color) {

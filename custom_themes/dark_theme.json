@@ -1,118 +1,120 @@
 {
-  "background_color": "#0d1117",
+  "backgroundColor": "#0d1117",
   "normal": {
-    "Font": "LiberationSans",
-    "Style": "",
-    "Size": 12,
-    "Spacing": 2,
-    "TextColor": "#e6edf3",
-    "FillColor": "#0d1117"
+    "font": "LiberationSans",
+    "style": "",
+    "size": 12,
+    "spacing": 2,
+    "textColor": "#e6edf3",
+    "fillColor": "#0d1117"
   },
   "link": {
-    "Font": "LiberationSans",
-    "Style": "",
-    "Size": 12,
-    "Spacing": 2,
-    "TextColor": "#4a9eff",
-    "FillColor": "#000000"
+    "font": "LiberationSans",
+    "style": "",
+    "size": 12,
+    "spacing": 2,
+    "textColor": "#4a9eff",
+    "fillColor": "#000000"
   },
   "backtick": {
-    "Font": "LiberationMono",
-    "Style": "",
-    "Size": 12,
-    "Spacing": 2,
-    "TextColor": "#e6edf3",
-    "FillColor": "#343b42"
+    "font": "LiberationMono",
+    "style": "",
+    "size": 12,
+    "spacing": 2,
+    "textColor": "#e6edf3",
+    "fillColor": "#343b42"
   },
   "blockquote": {
-    "Font": "LiberationSans",
-    "Style": "i",
-    "Size": 12,
-    "Spacing": 2,
-    "TextColor": "#7d8590",
-    "FillColor": "#0d1117"
+    "font": "LiberationSans",
+    "style": "i",
+    "size": 12,
+    "spacing": 2,
+    "textColor": "#7d8590",
+    "fillColor": "#0d1117"
   },
-  "indent_value": 0,
+  "indentValue": 0,
   "heading": {
     "h1": {
-      "Font": "LiberationSans",
-      "Style": "b",
-      "Size": 32,
-      "Spacing": 5,
-      "TextColor": "#e6edf3",
-      "FillColor": "#0d1117"
+      "font": "LiberationSans",
+      "style": "b",
+      "size": 32,
+      "spacing": 5,
+      "textColor": "#e6edf3",
+      "fillColor": "#0d1117"
     },
     "h2": {
-      "Font": "LiberationSans",
-      "Style": "b",
-      "Size": 24,
-      "Spacing": 5,
-      "TextColor": "#e6edf3",
-      "FillColor": "#0d1117"
+      "font": "LiberationSans",
+      "style": "b",
+      "size": 24,
+      "spacing": 5,
+      "textColor": "#e6edf3",
+      "fillColor": "#0d1117"
     },
     "h3": {
-      "Font": "LiberationSans",
-      "Style": "b",
-      "Size": 20,
-      "Spacing": 5,
-      "TextColor": "#e6edf3",
-      "FillColor": "#0d1117"
+      "font": "LiberationSans",
+      "style": "b",
+      "size": 20,
+      "spacing": 5,
+      "textColor": "#e6edf3",
+      "fillColor": "#0d1117"
     },
     "h4": {
-      "Font": "LiberationSans",
-      "Style": "b",
-      "Size": 16,
-      "Spacing": 5,
-      "TextColor": "#e6edf3",
-      "FillColor": "#0d1117"
+      "font": "LiberationSans",
+      "style": "b",
+      "size": 16,
+      "spacing": 5,
+      "textColor": "#e6edf3",
+      "fillColor": "#0d1117"
     },
     "h5": {
-      "Font": "LiberationSans",
-      "Style": "b",
-      "Size": 14,
-      "Spacing": 5,
-      "TextColor": "#e6edf3",
-      "FillColor": "#0d1117"
+      "font": "LiberationSans",
+      "style": "b",
+      "size": 14,
+      "spacing": 5,
+      "textColor": "#e6edf3",
+      "fillColor": "#0d1117"
     },
     "h6": {
-      "Font": "LiberationSans",
-      "Style": "b",
-      "Size": 13.6,
-      "Spacing": 5,
-      "TextColor": "#7d8590",
-      "FillColor": "#0d1117"
+      "font": "LiberationSans",
+      "style": "b",
+      "size": 13.6,
+      "spacing": 5,
+      "textColor": "#7d8590",
+      "fillColor": "#0d1117"
     },
     "line": {
       "height": 0.75,
       "color": "#3d444d"
     }
   },
-  "table_header": {
-    "Font": "LiberationSans",
-    "Style": "b",
-    "Size": 12,
-    "Spacing": 2,
-    "TextColor": "#e6edf3",
-    "FillColor": "#161b22"
-  },
-  "table_body": {
-    "Font": "LiberationSans",
-    "Style": "",
-    "Size": 12,
-    "Spacing": 2,
-    "TextColor": "#e6edf3",
-    "FillColor": "#0d1117"
+  "table": {
+    "header": {
+      "font": "LiberationSans",
+      "style": "b",
+      "size": 12,
+      "spacing": 2,
+      "textColor": "#e6edf3",
+      "fillColor": "#161b22"
+    },
+    "body": {
+      "font": "LiberationSans",
+      "style": "",
+      "size": 12,
+      "spacing": 2,
+      "textColor": "#e6edf3",
+      "fillColor": "#0d1117"
+    }
   },
   "code": {
     "text": {
-      "Font": "LiberationMono",
-      "Style": "",
-      "Size": 12,
-      "Spacing": 2,
-      "TextColor": "#e6edf3",
-      "FillColor": "#161b22"
+      "font": "LiberationMono",
+      "style": "",
+      "size": 12,
+      "spacing": 2,
+      "textColor": "#e6edf3",
+      "fillColor": "#161b22"
     },
-    "tab_width": 4,
+    "tabWidth": 4,
     "colors": {
       "default": "#e6edf3",
       "statement": "#ff7b72",
@@ -142,7 +144,7 @@
       "high.green": "#8b949e"
     }
   },
-  "horizontal_rule": {
+  "horizontalRule": {
     "height": 3,
     "color": "#3d444d"
   }
