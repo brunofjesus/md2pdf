@@ -13,6 +13,8 @@ linters:
     - noinlineerr
     - mnd
     - nlreturn
+    - testpackage
+    - gomodguard
     # check those later
     - wrapcheck
     - forbidigo

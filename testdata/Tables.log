@@ -5,8 +5,10 @@
   Text 'Table Tests'
 
 -[Text] Table Tests
--[Heading (leaving)] 
--[cr()] LH=29
+-[cr()] LH=37
+-[... Drawing underline from X,Y] 28.35,79.35
+-[...   To X,Y] 566.93,79.35
+[Heading (leaving)] 
 [Paragraph (entering)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -157,3 +159,4 @@
 [Table (leaving)] 
 [cr()] LH=14
 [Document] Not Handled
+[RenderFooter] Not handled

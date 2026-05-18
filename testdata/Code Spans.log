@@ -5,10 +5,10 @@
 [cr()] LH=14
 [Text] 
 [processCode] <test a="
-[Backtick (entering)] 
+[Code (entering)] 
 [Text]  content of attribute 
 [processCode] ">
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -27,9 +27,10 @@
 [cr()] LH=14
 [Text] Here's how you put 
 [processCode] `backticks`
-[Backtick (entering)] 
+[Code (entering)] 
 [Text]  in a code span.
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
 [Document] Not Handled
+[RenderFooter] Not handled

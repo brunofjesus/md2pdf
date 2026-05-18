@@ -29,12 +29,14 @@ func WithBaseURL(baseURL string) RenderOption {
 	}
 }
 
+// WithMarkdownParsingExtensions configures the markdown parser with the specified extensions.
 func WithMarkdownParsingExtensions(exts parser.Extensions) RenderOption {
 	return func(r *PdfRenderer) {
-		r.Extensions = r.Extensions | exts
+		r.Extensions = r.Extensions | exts //nolint:gocritic
 	}
 }
 
+// WithDefaultMarkdownParsingExtensions configures the markdown parser with a set of commonly used extensions.
 func WithDefaultMarkdownParsingExtensions() RenderOption {
 	return func(r *PdfRenderer) {
 		r.Extensions = r.Extensions | parser.NoIntraEmphasis | parser.Tables | parser.FencedCode |
@@ -43,6 +45,7 @@ func WithDefaultMarkdownParsingExtensions() RenderOption {
 	}
 }
 
+// WithDefaultFooter configures the PDF renderer to include a default footer on each page.
 func WithDefaultFooter(orientation, author, title string) RenderOption {
 	return func(r *PdfRenderer) {
 		r.Pdf.SetFooterFunc(func() {
@@ -56,10 +59,12 @@ func WithDefaultFooter(orientation, author, title string) RenderOption {
 			w, h, _ := r.Pdf.PageSize(r.Pdf.PageNo())
 			r.Pdf.SetX(4)
 			r.Pdf.CellFormat(0, 10, author, "", 0, "", true, 0, "")
+
 			middle := w / 2
 			if orientation == "landscape" {
 				middle = h / 2
 			}
+
 			r.Pdf.SetX(middle - float64(len(title)))
 			r.Pdf.CellFormat(0, 10, title, "", 0, "", true, 0, "")
 			r.Pdf.SetX(-40)
