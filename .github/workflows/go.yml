@@ -21,7 +21,7 @@ jobs:
         uses: golangci/golangci-lint-action@v9
         with:
           version: v2.12
-          args: --config .golangci-lint.yaml
+          args: --config .golangci.yml
       - name: Build
         run: go build -v
       - name: Test
