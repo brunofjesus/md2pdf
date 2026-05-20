@@ -9,18 +9,28 @@ import (
 
 // ProcessList handles *ast.List entering/leaving.
 func ProcessList(ctx PdfContext, n ast.Node, entering bool) {
-	node := n.(*ast.List)
+	node, ok := n.(*ast.List)
+	if !ok {
+		ctx.Tracer("List: not a List", "")
+		return
+	}
+
 	kind := Unordered
 	if node.ListFlags&ast.ListTypeOrdered != 0 {
 		kind = Ordered
 	}
+
 	if node.ListFlags&ast.ListTypeDefinition != 0 {
 		kind = Definition
 	}
+
 	ctx.SetStyler(ctx.GetTheme().Normal)
+
 	if entering {
-		ctx.Tracer(fmt.Sprintf("%v List (entering)", kind),
-			fmt.Sprintf("%v", ast.ToString(node.AsContainer())))
+		ctx.Tracer(
+			fmt.Sprintf("%v List (entering)", kind),
+			ast.ToString(node.AsContainer()),
+		)
 		ctx.SetLeftMargin(ctx.PeekState().LeftMargin + ctx.GetIndentValue())
 		ctx.Tracer("... List Left Margin",
 			fmt.Sprintf("set to %v", ctx.PeekState().LeftMargin+ctx.GetIndentValue()))
@@ -32,12 +42,15 @@ func ProcessList(ctx PdfContext, n ast.Node, entering bool) {
 		}
 		ctx.PushState(x)
 	} else {
-		ctx.Tracer(fmt.Sprintf("%v List (leaving)", kind),
-			fmt.Sprintf("%v", ast.ToString(node.AsContainer())))
+		ctx.Tracer(
+			fmt.Sprintf("%v List (leaving)", kind),
+			ast.ToString(node.AsContainer()),
+		)
 		ctx.SetLeftMargin(ctx.PeekState().LeftMargin - ctx.GetIndentValue())
 		ctx.Tracer("... Reset List Left Margin",
 			fmt.Sprintf("re-set to %v", ctx.PeekState().LeftMargin-ctx.GetIndentValue()))
 		ctx.PopState()
+
 		if ctx.StackDepth() < 2 {
 			ctx.Cr()
 		}
@@ -46,11 +59,20 @@ func ProcessList(ctx PdfContext, n ast.Node, entering bool) {
 
 // ProcessItem handles *ast.ListItem entering/leaving.
 func ProcessItem(ctx PdfContext, n ast.Node, entering bool) {
-	node := n.(*ast.ListItem)
-	if entering {
-		ctx.Tracer(fmt.Sprintf("%v Item (entering) #%v",
-			ctx.PeekState().ListKind, ctx.PeekState().ItemNumber+1),
-			fmt.Sprintf("%v", ast.ToString(node.AsContainer())))
+	node, ok := n.(*ast.ListItem)
+	if !ok {
+		ctx.Tracer("Item: not a ListItem", "")
+		return
+	}
+
+	if entering { //nolint:nestif
+		ctx.Tracer(
+			fmt.Sprintf(
+				"%v Item (entering) #%v",
+				ctx.PeekState().ListKind, ctx.PeekState().ItemNumber+1,
+			),
+			ast.ToString(node.AsContainer()),
+		)
 		ctx.Cr()
 		x := &ContainerState{
 			TextStyle:      ctx.GetTheme().Normal,
@@ -60,14 +82,18 @@ func ProcessItem(ctx PdfContext, n ast.Node, entering bool) {
 			LeftMargin:     ctx.PeekState().LeftMargin,
 		}
 		ctx.PushState(x)
+
 		normalEm := ctx.GetNormalEm()
 		if ctx.PeekState().ListKind == Unordered {
 			bulletChar := "•"
 			currFontSize, _ := ctx.GetPdf().GetFontSize()
+
 			if node.BulletChar != 45 {
 				bulletChar = "▪"
+
 				ctx.GetPdf().SetFont("", "", 25)
 			}
+
 			ctx.GetPdf().CellFormat(4*normalEm, ctx.GetTheme().Normal.Size+ctx.GetTheme().Normal.Spacing,
 				bulletChar,
 				"", 0, "RB", false, 0, "")
@@ -77,12 +103,17 @@ func ProcessItem(ctx PdfContext, n ast.Node, entering bool) {
 				fmt.Sprintf("%v.", ctx.PeekState().ItemNumber),
 				"", 0, "RB", false, 0, "")
 		}
+
 		ctx.SetLeftMargin(ctx.PeekState().LeftMargin + (4 * normalEm))
 		ctx.GetPdf().SetX(ctx.PeekState().LeftMargin + (4 * normalEm))
 	} else {
-		ctx.Tracer(fmt.Sprintf("%v Item (leaving)",
-			ctx.PeekState().ListKind),
-			fmt.Sprintf("%v", ast.ToString(node.AsContainer())))
+		ctx.Tracer(
+			fmt.Sprintf(
+				"%v Item (leaving)",
+				ctx.PeekState().ListKind,
+			),
+			ast.ToString(node.AsContainer()),
+		)
 		ctx.SetLeftMargin(ctx.PeekState().LeftMargin)
 		ctx.ParentState().ItemNumber++
 		ctx.PopState()

@@ -8,13 +8,20 @@ import (
 
 // ProcessParagraph handles *ast.Paragraph entering/leaving.
 func ProcessParagraph(ctx PdfContext, n ast.Node, entering bool) {
-	node := n.(*ast.Paragraph)
+	node, ok := n.(*ast.Paragraph)
+	if !ok {
+		ctx.Tracer("Paragraph: not a Paragraph", "")
+		return
+	}
+
 	ctx.SetStyler(ctx.GetTheme().Normal)
-	if entering {
+
+	if entering { //nolint:nestif
 		ctx.Tracer("Paragraph (entering)", "")
 		lm, tm, rm, bm := ctx.GetPdf().GetMargins()
 		ctx.Tracer("... Margins (left, top, right, bottom:",
 			fmt.Sprintf("%v %v %v %v", lm, tm, rm, bm))
+
 		if IsListItem(node.Parent) {
 			t := ctx.PeekState().ListKind
 			if t == Unordered || t == Ordered || t == Definition {
@@ -25,14 +32,17 @@ func ProcessParagraph(ctx PdfContext, n ast.Node, entering bool) {
 					ctx.Cr()
 				}
 			}
+
 			return
 		}
+
 		ctx.Cr()
 	} else {
 		ctx.Tracer("Paragraph (leaving)", "")
 		lm, tm, rm, bm := ctx.GetPdf().GetMargins()
 		ctx.Tracer("... Margins (left, top, right, bottom:",
 			fmt.Sprintf("%v %v %v %v", lm, tm, rm, bm))
+
 		if IsListItem(node.Parent) {
 			t := ctx.PeekState().ListKind
 			if t == Unordered || t == Ordered || t == Definition {
@@ -43,8 +53,10 @@ func ProcessParagraph(ctx PdfContext, n ast.Node, entering bool) {
 					ctx.Cr()
 				}
 			}
+
 			return
 		}
+
 		ctx.Cr()
 	}
 }

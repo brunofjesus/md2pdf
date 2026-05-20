@@ -165,7 +165,7 @@
 [cr()] LH=14
 [Text] Backslash: 
 [processCode] \\
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -174,7 +174,7 @@
 [cr()] LH=14
 [Text] Backtick: 
 [processCode] \`
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -183,7 +183,7 @@
 [cr()] LH=14
 [Text] Asterisk: 
 [processCode] \*
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -192,7 +192,7 @@
 [cr()] LH=14
 [Text] Underscore: 
 [processCode] \_
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -201,7 +201,7 @@
 [cr()] LH=14
 [Text] Left brace: 
 [processCode] \{
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -210,7 +210,7 @@
 [cr()] LH=14
 [Text] Right brace: 
 [processCode] \}
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -219,7 +219,7 @@
 [cr()] LH=14
 [Text] Left bracket: 
 [processCode] \[
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -228,7 +228,7 @@
 [cr()] LH=14
 [Text] Right bracket: 
 [processCode] \]
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -237,7 +237,7 @@
 [cr()] LH=14
 [Text] Left paren: 
 [processCode] \(
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -246,7 +246,7 @@
 [cr()] LH=14
 [Text] Right paren: 
 [processCode] \)
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -255,7 +255,7 @@
 [cr()] LH=14
 [Text] Greater-than: 
 [processCode] \>
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -264,7 +264,7 @@
 [cr()] LH=14
 [Text] Hash: 
 [processCode] \#
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -273,7 +273,7 @@
 [cr()] LH=14
 [Text] Period: 
 [processCode] \.
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -282,7 +282,7 @@
 [cr()] LH=14
 [Text] Bang: 
 [processCode] \!
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -291,7 +291,7 @@
 [cr()] LH=14
 [Text] Plus: 
 [processCode] \+
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -300,7 +300,7 @@
 [cr()] LH=14
 [Text] Minus: 
 [processCode] \-
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -309,7 +309,7 @@
 [cr()] LH=14
 [Text] Tilde: 
 [processCode] \~
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -355,7 +355,7 @@
 [cr()] LH=14
 [Text] This is a code span with a literal backslash-backtick sequence: 
 [processCode] \`
-[Backtick (entering)] 
+[Code (entering)] 
 [Paragraph (leaving)] 
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
@@ -382,3 +382,4 @@
 [... Margins (left, top, right, bottom:] 28.35 28.35 28.35 56.7
 [cr()] LH=14
 [Document] Not Handled
+[RenderFooter] Not handled

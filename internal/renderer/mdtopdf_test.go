@@ -1,22 +1,3 @@
-/*
- * Markdown to PDF Converter
- * Available at http://github.com/brunofjesus/md2pdf
- *
- * Copyright © 2018 Cecil New <cecil.new@gmail.com>.
- * Distributed under the MIT License.
- * See README.md for details.
- *
- * Dependencies
- * This package depends on two other packages:
- *
- * Go Markdown processor
- *   Available at https://github.com/gomarkdown/markdown
- *
- * fpdf - a PDF document generator with high level support for
- *   text, drawing and images.
- *   Available at https://codeberg.org/go-pdf/fpdf
- */
-
 package renderer
 
 import (
@@ -29,27 +10,28 @@ import (
 	"github.com/gomarkdown/markdown/parser"
 )
 
-func testit(inputf string, gohighlight bool, t *testing.T) {
+func testit(t *testing.T, inputf string, gohighlight bool) {
+	t.Helper()
+
 	inputd := "../../testdata/"
 	input := path.Join(inputd, inputf)
 
 	tracerfile := path.Join(inputd, strings.TrimSuffix(path.Base(input), path.Ext(input)))
 	tracerfile += ".log"
 
-	pdffile := path.Join(inputd, strings.TrimSuffix(path.Base(input), path.Ext(input)))
-	pdffile += ".pdf"
-
-	file, err := os.Open(input)
+	file, err := os.Open(input) //nolint:gosec
 	if err != nil {
 		t.Errorf("%v:%v", input, err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	var opts []RenderOption
 	if gohighlight {
 		opts = []RenderOption{WithHorizontalRuleAsNewPage()}
 	}
+
 	params := PdfRendererParams{
+		Title:           "",
 		Orientation:     "",
 		PageSize:        "",
 		TracerFile:      tracerfile,
@@ -57,11 +39,16 @@ func testit(inputf string, gohighlight bool, t *testing.T) {
 		Theme:           LIGHT,
 		CustomThemeFile: "",
 	}
+
 	r := NewPdfRenderer(params)
 	if absInput, err := filepath.Abs(input); err == nil {
 		r.InputBaseURL = filepath.Dir(absInput)
 	}
-	r.Extensions = parser.NoIntraEmphasis | parser.Tables | parser.FencedCode | parser.Autolink | parser.Strikethrough | parser.SpaceHeadings | parser.HeadingIDs | parser.BackslashLineBreak | parser.DefinitionLists
+
+	r.Extensions = parser.NoIntraEmphasis | parser.Tables | parser.FencedCode |
+		parser.Autolink | parser.Strikethrough | parser.SpaceHeadings |
+		parser.HeadingIDs | parser.BackslashLineBreak | parser.DefinitionLists
+
 	err = r.Process(file)
 	if err != nil {
 		t.Error(err)
@@ -69,105 +56,131 @@ func testit(inputf string, gohighlight bool, t *testing.T) {
 }
 
 func TestTables(t *testing.T) {
-	testit("Tables.text", false, t)
+	t.Parallel()
+	testit(t, "Tables.text", false)
 }
 
 func TestMarkdownDocumenationBasic(t *testing.T) {
-	testit("Markdown Documentation - Basics.text", false, t)
+	t.Parallel()
+	testit(t, "Markdown Documentation - Basics.text", false)
 }
 
 func TestMarkdownDocumenationSyntax(t *testing.T) {
-	testit("syntax.md", false, t)
+	t.Parallel()
+	testit(t, "syntax.md", false)
 }
 
 func TestMarkdownDocumenationColourSyntax(t *testing.T) {
-	testit("syntax_highlighting.md", true, t)
+	t.Parallel()
+	testit(t, "syntax_highlighting.md", true)
 }
 
 func TestImage(t *testing.T) {
-	testit("Image.text", false, t)
+	t.Parallel()
+	testit(t, "Image.text", false)
 }
 
 func TestAutoLinks(t *testing.T) {
-	testit("Auto links.text", false, t)
+	t.Parallel()
+	testit(t, "Auto links.text", false)
 }
 
 func TestAmpersandEncoding(t *testing.T) {
-	testit("Amps and angle encoding.text", false, t)
+	t.Parallel()
+	testit(t, "Amps and angle encoding.text", false)
 }
 
 func TestInlineLinks(t *testing.T) {
-	testit("Links, inline style.text", false, t)
+	t.Parallel()
+	testit(t, "Links, inline style.text", false)
 }
 
 func TestLists(t *testing.T) {
-	testit("Ordered and unordered lists.md", false, t)
+	t.Parallel()
+	testit(t, "Ordered and unordered lists.md", false)
 }
 
 func TestStringEmph(t *testing.T) {
-	testit("Strong and em together.text", false, t)
+	t.Parallel()
+	testit(t, "Strong and em together.text", false)
 }
 
 func TestTabs(t *testing.T) {
-	testit("Tabs.text", false, t)
+	t.Parallel()
+	testit(t, "Tabs.text", false)
 }
 
 func TestBackslashEscapes(t *testing.T) {
-	testit("Backslash escapes.text", false, t)
+	t.Parallel()
+	testit(t, "Backslash escapes.text", false)
 }
 
 func TestBackquotes(t *testing.T) {
-	testit("Blockquotes with code blocks.text", false, t)
+	t.Parallel()
+	testit(t, "Blockquotes with code blocks.text", false)
 }
 
 func TestCodeBlocks(t *testing.T) {
-	testit("Code Blocks.text", false, t)
+	t.Parallel()
+	testit(t, "Code Blocks.text", false)
 }
 
 func TestCodeSpans(t *testing.T) {
-	testit("Code Spans.text", false, t)
+	t.Parallel()
+	testit(t, "Code Spans.text", false)
 }
 
 func TestHardWrappedPara(t *testing.T) {
-	testit("Hard-wrapped paragraphs with list-like lines no empty line before block.text", false, t)
+	t.Parallel()
+	testit(t, "Hard-wrapped paragraphs with list-like lines no empty line before block.text", false)
 }
 
 func TestHardWrappedPara2(t *testing.T) {
-	testit("Hard-wrapped paragraphs with list-like lines.text", false, t)
+	t.Parallel()
+	testit(t, "Hard-wrapped paragraphs with list-like lines.text", false)
 }
 
 func TestHorizontalRules(t *testing.T) {
-	testit("Horizontal rules.text", false, t)
+	t.Parallel()
+	testit(t, "Horizontal rules.text", false)
 }
 
 func TestInlineHtmlSimple(t *testing.T) {
-	testit("Inline HTML (Simple).text", false, t)
+	t.Parallel()
+	testit(t, "Inline HTML (Simple).text", false)
 }
 
 func TestInlineHtmlAdvanced(t *testing.T) {
-	testit("Inline HTML (Advanced).text", false, t)
+	t.Parallel()
+	testit(t, "Inline HTML (Advanced).text", false)
 }
 
 func TestInlineHtmlComments(t *testing.T) {
-	testit("Inline HTML comments.text", false, t)
+	t.Parallel()
+	testit(t, "Inline HTML comments.text", false)
 }
 
 func TestTitleWithQuotes(t *testing.T) {
-	testit("Literal quotes in titles.text", false, t)
+	t.Parallel()
+	testit(t, "Literal quotes in titles.text", false)
 }
 
 func TestNestedBlockquotes(t *testing.T) {
-	testit("Nested blockquotes.text", false, t)
+	t.Parallel()
+	testit(t, "Nested blockquotes.text", false)
 }
 
 func TestLinksReference(t *testing.T) {
-	testit("Links, reference style.text", false, t)
+	t.Parallel()
+	testit(t, "Links, reference style.text", false)
 }
 
 func TestLinksShortcut(t *testing.T) {
-	testit("Links, shortcut references.text", false, t)
+	t.Parallel()
+	testit(t, "Links, shortcut references.text", false)
 }
 
 func TestTidyness(t *testing.T) {
-	testit("Tidyness.text", false, t)
+	t.Parallel()
+	testit(t, "Tidyness.text", false)
 }

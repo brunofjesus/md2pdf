@@ -60,6 +60,7 @@ func extractTextFromNode(node ast.Node) string {
 				text.Write(n.Literal)
 			}
 		}
+
 		return ast.GoToNext
 	})
 
@@ -67,15 +68,17 @@ func extractTextFromNode(node ast.Node) string {
 }
 
 // getTOCEntries parses content and returns all heading entries for the TOC.
-func getTOCEntries(content []byte) ([]tocEntry, error) {
+func getTOCEntries(content []byte) []tocEntry {
 	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
 	p := parser.NewWithExtensions(extensions)
 	doc := markdown.Parse(content, p)
 
-	visitor := &tocVisitor{}
+	visitor := &tocVisitor{
+		Entries: make([]tocEntry, 0),
+	}
 	ast.Walk(doc, visitor)
 
-	return visitor.Entries, nil
+	return visitor.Entries
 }
 
 // WithTableOfContents registers a pre-processor that generates a table of
@@ -83,10 +86,7 @@ func getTOCEntries(content []byte) ([]tocEntry, error) {
 func WithTableOfContents() RenderOption {
 	return func(r *PdfRenderer) {
 		r.preProcessors = append(r.preProcessors, func(content []byte) error {
-			entries, err := getTOCEntries(content)
-			if err != nil {
-				return fmt.Errorf("failed to collect TOC entries: %w", err)
-			}
+			entries := getTOCEntries(content)
 
 			headerLinks := make(map[string]*int, len(entries))
 			for _, entry := range entries {
@@ -106,11 +106,13 @@ func WithTableOfContents() RenderOption {
 				if linkPtr, exists := headerLinks[entry.Title]; exists {
 					r.Pdf.SetFont(r.Theme.Normal.Font, "", 12)
 					r.Pdf.SetTextColor(100, 149, 237)
+
 					indent := strings.Repeat("  ", entry.Level-1)
 					r.Pdf.WriteLinkID(8, fmt.Sprintf("%s • %s", indent, entry.Title), *linkPtr)
 					r.Pdf.Ln(15)
 				}
 			}
+
 			r.Pdf.AddPage()
 
 			return nil

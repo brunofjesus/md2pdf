@@ -26,6 +26,7 @@ func HorizontalRuleLineProcessor(ctx PdfContext, _ ast.Node, _ bool) {
 		lm, _, _, _ := pdf.GetMargins()
 		w, _ := pdf.GetPageSize()
 		newx := w - lm
+
 		ctx.Tracer("... From X,Y", fmt.Sprintf("%v,%v", x, y))
 		pdf.MoveTo(x, y)
 		ctx.Tracer("...   To X,Y", fmt.Sprintf("%v,%v", newx, y))

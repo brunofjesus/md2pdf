@@ -1,3 +1,5 @@
+// Package highlight provides syntax highlighting for code blocks in markdown
+// documents.
 package highlight
 
 import "embed"
