@@ -6,8 +6,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-
-	"github.com/gomarkdown/markdown/parser"
 )
 
 func testit(t *testing.T, inputf string, gohighlight bool) {
@@ -27,7 +25,10 @@ func testit(t *testing.T, inputf string, gohighlight bool) {
 
 	var opts []RenderOption
 	if gohighlight {
-		opts = []RenderOption{WithHorizontalRuleAsNewPage()}
+		opts = []RenderOption{
+			WithHorizontalRuleAsNewPage(),
+			WithDefaultMarkdownParsingExtensions(),
+		}
 	}
 
 	params := PdfRendererParams{
@@ -45,11 +46,15 @@ func testit(t *testing.T, inputf string, gohighlight bool) {
 		r.InputBaseURL = filepath.Dir(absInput)
 	}
 
-	r.Extensions = parser.NoIntraEmphasis | parser.Tables | parser.FencedCode |
-		parser.Autolink | parser.Strikethrough | parser.SpaceHeadings |
-		parser.HeadingIDs | parser.BackslashLineBreak | parser.DefinitionLists
-
 	err = r.Process(file)
+	if err != nil {
+		t.Error(err)
+	}
+
+	pdffile := path.Join(inputd, strings.TrimSuffix(path.Base(input), path.Ext(input)))
+	pdffile += ".pdf"
+
+	err = r.OutputFileAndClose(pdffile)
 	if err != nil {
 		t.Error(err)
 	}
