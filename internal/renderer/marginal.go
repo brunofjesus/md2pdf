@@ -81,7 +81,6 @@ func resolveTextPlaceholders(r *PdfRenderer, text string) string {
 		"%AUTHOR%", r.metadata[MetadataKeyAuthor],
 		"%TITLE%", r.metadata[MetadataKeyTitle],
 		"%PAGE_NUMBER%", strconv.Itoa(r.Pdf.PageNo()),
-		"%PAGE_TOTAL%", strconv.Itoa(r.Pdf.PageCount()),
 	)
 
 	return replacer.Replace(text)

@@ -185,6 +185,8 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 		WithDefaultMarkdownParsingExtensions()(r)
 	}
 
+	r.Pdf.AliasNbPages("%PAGE_TOTAL%")
+
 	r.Pdf.AddPage()
 	// set default font
 	r.SetStyler(r.Theme.Normal)
