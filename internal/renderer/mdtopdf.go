@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"codeberg.org/go-pdf/fpdf"
-	"github.com/brunofjesus/md2pdf/v3/internal/colors"
 	"github.com/brunofjesus/md2pdf/v3/internal/fonts"
 	"github.com/brunofjesus/md2pdf/v3/internal/renderer/node"
 	"github.com/brunofjesus/md2pdf/v3/internal/theme"
@@ -43,7 +42,9 @@ const (
 )
 
 const (
-	MetadataKeyTitle  = "title"
+	// MetadataKeyTitle is the key for the PDF title in the metadata map.
+	MetadataKeyTitle = "title"
+	// MetadataKeyAuthor is the key for the PDF author in the metadata map.
 	MetadataKeyAuthor = "author"
 )
 
@@ -153,6 +154,7 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 	title := r.metadata[MetadataKeyTitle]
 	r.Pdf.SetSubject(title, true)
 	r.Pdf.SetTitle(title, true)
+	r.Pdf.SetAuthor(r.metadata[MetadataKeyAuthor], true)
 
 	// Register default node processors.
 	r.nodeProcessors = map[string]node.Processor{
@@ -555,9 +557,4 @@ func (r *PdfRenderer) RenderHeader(_ io.Writer, _ ast.Node) {
 // RenderFooter is not supported.
 func (r *PdfRenderer) RenderFooter(_ io.Writer, _ ast.Node) {
 	r.Tracer("RenderFooter", "Not handled")
-}
-
-func dorect(doc *fpdf.Fpdf, x, y, w, h float64, color colors.Color) {
-	doc.SetFillColor(color.Red, color.Green, color.Blue)
-	doc.Rect(x, y, w, h, "F")
 }

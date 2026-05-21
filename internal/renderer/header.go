@@ -4,14 +4,17 @@ import (
 	"github.com/brunofjesus/md2pdf/v3/internal/colors"
 )
 
+// Header defines the configuration for a PDF page header, including its background color,
+// height, and content sections aligned to the left, center, and right.
 type Header struct {
-	BackgroundColor *colors.Color
-	Height          float64
-	Left            []MarginalSection
-	Center          []MarginalSection
-	Right           []MarginalSection
+	BackgroundColor *colors.Color     `json:"backgroundColor,omitempty"`
+	Height          float64           `json:"height"`
+	Left            []MarginalSection `json:"left,omitempty"`
+	Center          []MarginalSection `json:"center,omitempty"`
+	Right           []MarginalSection `json:"right,omitempty"`
 }
 
+// WithHeader configures the PDF renderer to include a custom header on each page.
 func WithHeader(header Header) RenderOption {
 	return func(r *PdfRenderer) {
 		r.Pdf.SetTopMargin(header.Height)
@@ -63,12 +66,15 @@ func WithDefaultHeader() RenderOption {
 	medGray := colors.FromRGB(102, 102, 102)
 
 	return WithHeader(Header{
-		Height: 20,
+		BackgroundColor: nil,
+		Height:          20,
 		Left: []MarginalSection{
 			{
-				Height:    10,
-				RelativeX: 10,
-				RelativeY: 5,
+				Width:           0,
+				Height:          10,
+				RelativeX:       10,
+				RelativeY:       5,
+				BackgroundImage: "",
 				Text: &MarginalSectionTextContent{
 					Text:                "%TITLE%",
 					FontSize:            10,
@@ -79,11 +85,14 @@ func WithDefaultHeader() RenderOption {
 				},
 			},
 		},
+		Center: nil,
 		Right: []MarginalSection{
 			{
-				Height:    10,
-				RelativeX: 10,
-				RelativeY: 5,
+				Width:           0,
+				Height:          10,
+				RelativeX:       10,
+				RelativeY:       5,
+				BackgroundImage: "",
 				Text: &MarginalSectionTextContent{
 					Text:                "%AUTHOR%",
 					FontSize:            9,

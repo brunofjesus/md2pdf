@@ -25,12 +25,8 @@ func main() {
 			flagInput := cmd.String("input")
 			flagOutput := cmd.String("output")
 			flagTitle := cmd.String("title")
-			flagTOC := cmd.Bool("table-of-contents")
-			flagHRNewPage := cmd.Bool("horizontal-rule-new-page")
 			flagTheme := cmd.String("theme")
 			flagForceOverwrite := cmd.Bool("force-overwrite")
-			flagHeader := cmd.Bool("header")
-			flagFooter := cmd.Bool("footer")
 			flagPageSize := cmd.String("page-size")
 			flagOrientation := cmd.String("orientation")
 			flagAuthor := cmd.String("author")
@@ -62,21 +58,7 @@ func main() {
 				}
 			}()
 
-			if flagHRNewPage {
-				opts = append(opts, renderer.WithHorizontalRuleAsNewPage())
-			}
-
-			if flagHeader {
-				opts = append(opts, renderer.WithDefaultHeader())
-			}
-
-			if flagFooter {
-				opts = append(opts, renderer.WithDefaultFooter())
-			}
-
-			if flagTOC {
-				opts = append(opts, renderer.WithTableOfContents())
-			}
+			opts = addNeededOpts(cmd, opts)
 
 			params := renderer.PdfRendererParams{
 				Orientation:     flagOrientation,
@@ -122,6 +104,31 @@ func main() {
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func addNeededOpts(cmd *cli.Command, opts []renderer.RenderOption) []renderer.RenderOption {
+	flagTOC := cmd.Bool("table-of-contents")
+	flagHRNewPage := cmd.Bool("horizontal-rule-new-page")
+	flagHeader := cmd.Bool("header")
+	flagFooter := cmd.Bool("footer")
+
+	if flagHRNewPage {
+		opts = append(opts, renderer.WithHorizontalRuleAsNewPage())
+	}
+
+	if flagHeader {
+		opts = append(opts, renderer.WithDefaultHeader())
+	}
+
+	if flagFooter {
+		opts = append(opts, renderer.WithDefaultFooter())
+	}
+
+	if flagTOC {
+		opts = append(opts, renderer.WithTableOfContents())
+	}
+
+	return opts
 }
 
 func flags() []cli.Flag {

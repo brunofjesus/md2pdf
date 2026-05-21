@@ -8,53 +8,71 @@ import (
 	"github.com/brunofjesus/md2pdf/v3/internal/colors"
 )
 
+// MarginalHorizontalAlignment represents the horizontal text alignment within a marginal section.
 type MarginalHorizontalAlignment rune
 
 const (
-	MarginalHorizontalAlignmentLeft   MarginalHorizontalAlignment = 'L'
+	// MarginalHorizontalAlignmentLeft aligns text to the left edge of the section.
+	MarginalHorizontalAlignmentLeft MarginalHorizontalAlignment = 'L'
+	// MarginalHorizontalAlignmentCenter centers text horizontally within the section.
 	MarginalHorizontalAlignmentCenter MarginalHorizontalAlignment = 'C'
-	MarginalHorizontalAlignmentRight  MarginalHorizontalAlignment = 'R'
+	// MarginalHorizontalAlignmentRight aligns text to the right edge of the section.
+	MarginalHorizontalAlignmentRight MarginalHorizontalAlignment = 'R'
 )
 
+// MarginalVerticalAlignment represents the vertical text alignment within a marginal section.
 type MarginalVerticalAlignment rune
 
 const (
-	MarginalVerticalAlignmentTop      MarginalVerticalAlignment = 'T'
-	MarginalVerticalAlignmentMiddle   MarginalVerticalAlignment = 'M'
-	MarginalVerticalAlignmentBottom   MarginalVerticalAlignment = 'B'
+	// MarginalVerticalAlignmentTop aligns text to the top edge of the section.
+	MarginalVerticalAlignmentTop MarginalVerticalAlignment = 'T'
+	// MarginalVerticalAlignmentMiddle centers text vertically within the section.
+	MarginalVerticalAlignmentMiddle MarginalVerticalAlignment = 'M'
+	// MarginalVerticalAlignmentBottom aligns text to the bottom edge of the section.
+	MarginalVerticalAlignmentBottom MarginalVerticalAlignment = 'B'
+	// MarginalVerticalAlignmentBaseline aligns text to the baseline of the section.
 	MarginalVerticalAlignmentBaseline MarginalVerticalAlignment = 'A'
 )
 
+// MarginalFontStyle represents a font style modifier (bold, italic, underline, strikethrough).
 type MarginalFontStyle rune
 
 const (
-	MarginalFontStyleBold          MarginalFontStyle = 'B'
-	MarginalFontStyleItalic        MarginalFontStyle = 'I'
-	MarginalFontStyleUnderline     MarginalFontStyle = 'U'
+	// MarginalFontStyleBold applies bold styling to the text.
+	MarginalFontStyleBold MarginalFontStyle = 'B'
+	// MarginalFontStyleItalic applies italic styling to the text.
+	MarginalFontStyleItalic MarginalFontStyle = 'I'
+	// MarginalFontStyleUnderline applies underline styling to the text.
+	MarginalFontStyleUnderline MarginalFontStyle = 'U'
+	// MarginalFontStyleStrikethrough applies strikethrough styling to the text.
 	MarginalFontStyleStrikethrough MarginalFontStyle = 'S'
 )
 
+// MarginalSection defines a content block within a header or footer, with positioning,
+// dimensions, and optional text or background image content.
 type MarginalSection struct {
-	Width     float64
-	Height    float64
-	RelativeX float64
-	RelativeY float64
+	Width     float64 `json:"width,omitempty"`
+	Height    float64 `json:"height"`
+	RelativeX float64 `json:"relativeX,omitempty"`
+	RelativeY float64 `json:"relativeY,omitempty"`
 
-	BackgroundImage string
-	Text            *MarginalSectionTextContent
+	BackgroundImage string                      `json:"backgroundImage,omitempty"`
+	Text            *MarginalSectionTextContent `json:"text,omitempty"`
 }
 
+// MarginalSectionTextContent defines the text content and styling for a marginal section,
+// including font size, style, color, and alignment.
 type MarginalSectionTextContent struct {
-	Text      string
-	FontSize  float64
-	FontStyle []MarginalFontStyle
-	Color     *colors.Color
+	Text      string              `json:"text"`
+	FontSize  float64             `json:"fontSize,omitempty"`
+	FontStyle []MarginalFontStyle `json:"fontStyle,omitempty"`
+	Color     *colors.Color       `json:"color,omitempty"`
 
-	HorizontalAlignment []MarginalHorizontalAlignment
-	VerticalAlignment   []MarginalVerticalAlignment
+	HorizontalAlignment []MarginalHorizontalAlignment `json:"horizontalAlignment,omitempty"`
+	VerticalAlignment   []MarginalVerticalAlignment   `json:"verticalAlignment,omitempty"`
 }
 
-func (c MarginalSectionTextContent) GetFontStyleString() string {
+func (c MarginalSectionTextContent) getFontStyleString() string {
 	var result strings.Builder
 	for _, style := range c.FontStyle {
 		result.WriteString(string(style))
@@ -63,7 +81,7 @@ func (c MarginalSectionTextContent) GetFontStyleString() string {
 	return result.String()
 }
 
-func (c MarginalSectionTextContent) GetAlignmentString() string {
+func (c MarginalSectionTextContent) getAlignmentString() string {
 	var result strings.Builder
 	for _, h := range c.HorizontalAlignment {
 		result.WriteRune(rune(h))
@@ -99,7 +117,7 @@ func marginalSectionWidth(r *PdfRenderer, section MarginalSection) float64 {
 
 		r.Pdf.SetFont(
 			r.Theme.Normal.Font,
-			section.Text.GetFontStyleString(),
+			section.Text.getFontStyleString(),
 			fontSize,
 		)
 
@@ -122,7 +140,7 @@ func drawMarginalSection(r *PdfRenderer, section MarginalSection) {
 
 		r.Pdf.SetFont(
 			r.Theme.Normal.Font,
-			section.Text.GetFontStyleString(),
+			section.Text.getFontStyleString(),
 			fontSize,
 		)
 
@@ -153,7 +171,7 @@ func drawMarginalSection(r *PdfRenderer, section MarginalSection) {
 			txtContent,
 			"",
 			1,
-			section.Text.GetAlignmentString(),
+			section.Text.getAlignmentString(),
 			true,
 			0,
 			"",
