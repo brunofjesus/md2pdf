@@ -148,11 +148,6 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 		r.Theme = theme.LightTheme()
 	}
 
-	//r.Pdf.SetHeaderFunc(func() {
-	//	w, h := r.Pdf.GetPageSize()
-	//	dorect(r.Pdf, 0, 0, w, h, r.Theme.BackgroundColor)
-	//})
-
 	r.metadata = params.Metadata
 
 	title := r.metadata[MetadataKeyTitle]
