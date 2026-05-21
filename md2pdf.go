@@ -81,7 +81,6 @@ func New(p Params) (*Md2Pdf, error) {
 	}
 
 	rend := renderer.NewPdfRenderer(renderer.PdfRendererParams{
-		Title:           p.Title,
 		Orientation:     string(p.Orientation),
 		PageSize:        p.PageSize,
 		Theme:           theme,
@@ -187,9 +186,9 @@ func WithBaseURL(baseURL string) Option {
 }
 
 // WithDefaultFooter configures the renderer to add a default footer to each page of the PDF,
-// containing the specified orientation, author, and title.
-func WithDefaultFooter(author, title string) Option {
+// containing the author, title and pagination
+func WithDefaultFooter() Option {
 	return func(m *Md2Pdf) {
-		renderer.WithDefaultFooter(string(m.params.Orientation), author, title)(m.pdfRenderer)
+		renderer.WithDefaultFooter()(m.pdfRenderer)
 	}
 }

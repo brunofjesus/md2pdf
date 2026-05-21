@@ -29,6 +29,7 @@ func main() {
 			flagHRNewPage := cmd.Bool("horizontal-rule-new-page")
 			flagTheme := cmd.String("theme")
 			flagForceOverwrite := cmd.Bool("force-overwrite")
+			flagHeader := cmd.Bool("header")
 			flagFooter := cmd.Bool("footer")
 			flagPageSize := cmd.String("page-size")
 			flagOrientation := cmd.String("orientation")
@@ -65,8 +66,12 @@ func main() {
 				opts = append(opts, renderer.WithHorizontalRuleAsNewPage())
 			}
 
+			if flagHeader {
+				opts = append(opts, renderer.WithDefaultHeader())
+			}
+
 			if flagFooter {
-				opts = append(opts, renderer.WithDefaultFooter(flagOrientation, flagAuthor, flagTitle))
+				opts = append(opts, renderer.WithDefaultFooter())
 			}
 
 			if flagTOC {
@@ -74,13 +79,16 @@ func main() {
 			}
 
 			params := renderer.PdfRendererParams{
-				Title:           flagTitle,
 				Orientation:     flagOrientation,
 				PageSize:        flagPageSize,
 				TracerFile:      flagLogFile,
 				Opts:            opts,
 				Theme:           renderer.LIGHT,
 				CustomThemeFile: "",
+				Metadata: map[string]string{
+					renderer.MetadataKeyTitle:  flagTitle,
+					renderer.MetadataKeyAuthor: flagAuthor,
+				},
 			}
 
 			switch flagTheme {
@@ -156,6 +164,11 @@ func flags() []cli.Flag {
 			Aliases: []string{"f"},
 			Usage:   "Force overwrite of output file if it already exists",
 			Value:   false,
+		},
+		&cli.BoolFlag{
+			Name:  "header",
+			Usage: "Print doc header (<author>  <title>  <page number>)",
+			Value: false,
 		},
 		&cli.BoolFlag{
 			Name:  "footer",

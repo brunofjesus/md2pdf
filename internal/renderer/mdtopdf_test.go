@@ -32,7 +32,7 @@ func testit(t *testing.T, inputf string, gohighlight bool) {
 	}
 
 	params := PdfRendererParams{
-		Title:           "",
+		Metadata:        map[string]string{},
 		Orientation:     "",
 		PageSize:        "",
 		TracerFile:      tracerfile,
