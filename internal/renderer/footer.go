@@ -4,26 +4,21 @@ import (
 	"github.com/brunofjesus/md2pdf/v3/internal/colors"
 )
 
-// Footer defines the configuration for a PDF page footer, including its background color,
-// height, and content sections aligned to the left, center, and right.
-type Footer struct {
-	BackgroundColor *colors.Color     `json:"backgroundColor,omitempty"`
-	Height          float64           `json:"height"`
-	Left            []MarginalSection `json:"left,omitempty"`
-	Center          []MarginalSection `json:"center,omitempty"`
-	Right           []MarginalSection `json:"right,omitempty"`
-}
-
 // WithFooter configures the PDF renderer to include a custom footer on each page.
-func WithFooter(footer Footer) RenderOption {
+func WithFooter(footer Marginal) RenderOption {
 	return func(r *PdfRenderer) {
 		r.Pdf.SetFooterFunc(func() {
+			w, h, _ := r.Pdf.PageSize(r.Pdf.PageNo())
+
 			if footer.BackgroundColor != nil {
 				r.Pdf.SetFillColor(
 					footer.BackgroundColor.Red,
 					footer.BackgroundColor.Green,
 					footer.BackgroundColor.Blue,
 				)
+
+				r.Pdf.SetDrawColor(footer.BackgroundColor.Red, footer.BackgroundColor.Green, footer.BackgroundColor.Blue)
+				r.Pdf.Rect(0, h-footer.Height, w, footer.Height, "DF")
 			} else {
 				r.Pdf.SetFillColor(
 					r.Theme.BackgroundColor.Red,
@@ -36,8 +31,6 @@ func WithFooter(footer Footer) RenderOption {
 				r.Pdf.SetXY(section.RelativeX, -footer.Height+section.RelativeY)
 				drawMarginalSection(r, section)
 			}
-
-			w, h, _ := r.Pdf.PageSize(r.Pdf.PageNo())
 
 			centerX := w / 2
 			if r.orientation == "landscape" {
@@ -63,7 +56,7 @@ func WithFooter(footer Footer) RenderOption {
 func WithDefaultFooter() RenderOption {
 	gray := colors.FromRGB(128, 128, 128)
 
-	return WithFooter(Footer{
+	return WithFooter(Marginal{
 		BackgroundColor: nil,
 		Left:            nil,
 		Right:           nil,

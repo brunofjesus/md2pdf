@@ -58,7 +58,10 @@ func main() {
 				}
 			}()
 
-			opts = addNeededOpts(cmd, opts)
+			opts, err = addNeededOpts(cmd, opts)
+			if err != nil {
+				log.Fatal(err)
+			}
 
 			params := renderer.PdfRendererParams{
 				Orientation:     flagOrientation,
@@ -106,21 +109,38 @@ func main() {
 	}
 }
 
-func addNeededOpts(cmd *cli.Command, opts []renderer.RenderOption) []renderer.RenderOption {
+func addNeededOpts(cmd *cli.Command, opts []renderer.RenderOption) ([]renderer.RenderOption, error) {
 	flagTOC := cmd.Bool("table-of-contents")
 	flagHRNewPage := cmd.Bool("horizontal-rule-new-page")
 	flagHeader := cmd.Bool("header")
 	flagFooter := cmd.Bool("footer")
 
+	headerFilePath := cmd.String("header-file")
+	footerFilePath := cmd.String("footer-file")
+
 	if flagHRNewPage {
 		opts = append(opts, renderer.WithHorizontalRuleAsNewPage())
 	}
 
-	if flagHeader {
+	if headerFilePath != "" {
+		var m renderer.Marginal
+		if err := m.FromJSONFile(headerFilePath); err != nil {
+			return nil, fmt.Errorf("failed to load header from file %q: %w", headerFilePath, err)
+		}
+
+		opts = append(opts, renderer.WithHeader(m))
+	} else if flagHeader {
 		opts = append(opts, renderer.WithDefaultHeader())
 	}
 
-	if flagFooter {
+	if footerFilePath != "" {
+		var m renderer.Marginal
+		if err := m.FromJSONFile(footerFilePath); err != nil {
+			return nil, fmt.Errorf("failed to load footer from file %q: %w", footerFilePath, err)
+		}
+
+		opts = append(opts, renderer.WithFooter(m))
+	} else if flagFooter {
 		opts = append(opts, renderer.WithDefaultFooter())
 	}
 
@@ -128,7 +148,7 @@ func addNeededOpts(cmd *cli.Command, opts []renderer.RenderOption) []renderer.Re
 		opts = append(opts, renderer.WithTableOfContents())
 	}
 
-	return opts
+	return opts, nil
 }
 
 func flags() []cli.Flag {
@@ -181,6 +201,16 @@ func flags() []cli.Flag {
 			Name:  "footer",
 			Usage: "Print doc footer (<author>  <title>  <page number>)",
 			Value: false,
+		},
+		&cli.StringFlag{
+			Name:      "header-file",
+			Usage:     "Load a custom header configuration from a JSON file",
+			TakesFile: true,
+		},
+		&cli.StringFlag{
+			Name:      "footer-file",
+			Usage:     "Load a custom footer configuration from a JSON file",
+			TakesFile: true,
 		},
 		&cli.StringFlag{
 			Name: "page-size",

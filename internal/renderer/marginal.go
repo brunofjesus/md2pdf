@@ -1,12 +1,48 @@
 package renderer
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
 	"github.com/brunofjesus/md2pdf/v3/internal/colors"
 )
+
+// Marginal is the struct the defines either an Header or a Footer.
+// Can by passed to a function like [WithHeader] or [WithFooter] in order
+// for it to be included on the document.
+type Marginal struct {
+	BackgroundColor *colors.Color     `json:"backgroundColor,omitempty"`
+	Height          float64           `json:"height"`
+	Left            []MarginalSection `json:"left,omitempty"`
+	Center          []MarginalSection `json:"center,omitempty"`
+	Right           []MarginalSection `json:"right,omitempty"`
+}
+
+// FromJSONFile reads a JSON file and unmarshals its content into the Marginal struct.
+func (m *Marginal) FromJSONFile(file string) error {
+	f, err := os.Open(file) //nolint:gosec // G304: file path is an intentional user-supplied CLI flag
+	if err != nil {
+		return fmt.Errorf("opening marginal file %q: %w", file, err)
+	}
+	defer func() {
+		_ = f.Close()
+	}()
+
+	dec := json.NewDecoder(f)
+	dec.DisallowUnknownFields()
+
+	var parsed Marginal
+	if err := dec.Decode(&parsed); err != nil {
+		return fmt.Errorf("parsing marginal file %q: %w", file, err)
+	}
+
+	*m = parsed
+
+	return nil
+}
 
 // MarginalHorizontalAlignment represents the horizontal text alignment within a marginal section.
 type MarginalHorizontalAlignment rune
@@ -19,6 +55,23 @@ const (
 	// MarginalHorizontalAlignmentRight aligns text to the right edge of the section.
 	MarginalHorizontalAlignmentRight MarginalHorizontalAlignment = 'R'
 )
+
+// MarshalJSON encodes the alignment as a single-character string (e.g. "L").
+func (a MarginalHorizontalAlignment) MarshalJSON() ([]byte, error) {
+	return marshalRuneChar(rune(a))
+}
+
+// UnmarshalJSON decodes a single-character string (e.g. "L") into the alignment.
+func (a *MarginalHorizontalAlignment) UnmarshalJSON(data []byte) error {
+	r, err := unmarshalRuneChar(data)
+	if err != nil {
+		return err
+	}
+
+	*a = MarginalHorizontalAlignment(r)
+
+	return nil
+}
 
 // MarginalVerticalAlignment represents the vertical text alignment within a marginal section.
 type MarginalVerticalAlignment rune
@@ -34,6 +87,23 @@ const (
 	MarginalVerticalAlignmentBaseline MarginalVerticalAlignment = 'A'
 )
 
+// MarshalJSON encodes the alignment as a single-character string (e.g. "M").
+func (a MarginalVerticalAlignment) MarshalJSON() ([]byte, error) {
+	return marshalRuneChar(rune(a))
+}
+
+// UnmarshalJSON decodes a single-character string (e.g. "M") into the alignment.
+func (a *MarginalVerticalAlignment) UnmarshalJSON(data []byte) error {
+	r, err := unmarshalRuneChar(data)
+	if err != nil {
+		return err
+	}
+
+	*a = MarginalVerticalAlignment(r)
+
+	return nil
+}
+
 // MarginalFontStyle represents a font style modifier (bold, italic, underline, strikethrough).
 type MarginalFontStyle rune
 
@@ -47,6 +117,23 @@ const (
 	// MarginalFontStyleStrikethrough applies strikethrough styling to the text.
 	MarginalFontStyleStrikethrough MarginalFontStyle = 'S'
 )
+
+// MarshalJSON encodes the font style as a single-character string (e.g. "B").
+func (s MarginalFontStyle) MarshalJSON() ([]byte, error) {
+	return marshalRuneChar(rune(s))
+}
+
+// UnmarshalJSON decodes a single-character string (e.g. "B") into the font style.
+func (s *MarginalFontStyle) UnmarshalJSON(data []byte) error {
+	r, err := unmarshalRuneChar(data)
+	if err != nil {
+		return err
+	}
+
+	*s = MarginalFontStyle(r)
+
+	return nil
+}
 
 // MarginalSection defines a content block within a header or footer, with positioning,
 // dimensions, and optional text or background image content.

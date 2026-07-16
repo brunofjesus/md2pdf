@@ -4,19 +4,11 @@ import (
 	"github.com/brunofjesus/md2pdf/v3/internal/colors"
 )
 
-// Header defines the configuration for a PDF page header, including its background color,
-// height, and content sections aligned to the left, center, and right.
-type Header struct {
-	BackgroundColor *colors.Color     `json:"backgroundColor,omitempty"`
-	Height          float64           `json:"height"`
-	Left            []MarginalSection `json:"left,omitempty"`
-	Center          []MarginalSection `json:"center,omitempty"`
-	Right           []MarginalSection `json:"right,omitempty"`
-}
-
 // WithHeader configures the PDF renderer to include a custom header on each page.
-func WithHeader(header Header) RenderOption {
+func WithHeader(header Marginal) RenderOption {
 	return func(r *PdfRenderer) {
+		w, h, _ := r.Pdf.PageSize(r.Pdf.PageNo())
+
 		r.Pdf.SetTopMargin(header.Height)
 		r.Pdf.SetHeaderFuncMode(func() {
 			if header.BackgroundColor != nil {
@@ -25,6 +17,9 @@ func WithHeader(header Header) RenderOption {
 					header.BackgroundColor.Green,
 					header.BackgroundColor.Blue,
 				)
+
+				r.Pdf.SetDrawColor(header.BackgroundColor.Red, header.BackgroundColor.Green, header.BackgroundColor.Blue)
+				r.Pdf.Rect(0, 0, w, header.Height, "DF")
 			} else {
 				r.Pdf.SetFillColor(
 					r.Theme.BackgroundColor.Red,
@@ -37,8 +32,6 @@ func WithHeader(header Header) RenderOption {
 				r.Pdf.SetXY(section.RelativeX, section.RelativeY)
 				drawMarginalSection(r, section)
 			}
-
-			w, h, _ := r.Pdf.PageSize(r.Pdf.PageNo())
 
 			centerX := w / 2
 			if r.orientation == "landscape" {
@@ -65,7 +58,7 @@ func WithDefaultHeader() RenderOption {
 	darkGray := colors.FromRGB(51, 51, 51)
 	medGray := colors.FromRGB(102, 102, 102)
 
-	return WithHeader(Header{
+	return WithHeader(Marginal{
 		BackgroundColor: nil,
 		Height:          20,
 		Left: []MarginalSection{
