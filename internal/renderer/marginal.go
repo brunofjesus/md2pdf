@@ -3,11 +3,14 @@ package renderer
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
 
+	"codeberg.org/go-pdf/fpdf"
 	"github.com/brunofjesus/md2pdf/v3/internal/colors"
+	"github.com/brunofjesus/md2pdf/v3/internal/renderer/node"
 )
 
 // Marginal is the struct the defines either an Header or a Footer.
@@ -145,6 +148,26 @@ type MarginalSection struct {
 
 	BackgroundImage string                      `json:"backgroundImage,omitempty"`
 	Text            *MarginalSectionTextContent `json:"text,omitempty"`
+
+	resolvedBackgroundImage string `json:"-"`
+}
+
+// ResolvedBackgroundImage resolves the background image path for the marginal section,
+// downloading it if necessary, and caches the result for future use.
+// It returns the resolved local file path or an error if resolution fails.
+func (c *MarginalSection) ResolvedBackgroundImage(r *PdfRenderer) (string, error) {
+	if c.resolvedBackgroundImage != "" {
+		return c.resolvedBackgroundImage, nil
+	} else if c.BackgroundImage != "" {
+		path, err := node.ResolveImagePath(r, c.BackgroundImage)
+		if err != nil {
+			return "", err
+		}
+
+		c.resolvedBackgroundImage = path
+	}
+
+	return c.resolvedBackgroundImage, nil
 }
 
 // MarginalSectionTextContent defines the text content and styling for a marginal section,
@@ -215,8 +238,18 @@ func marginalSectionWidth(r *PdfRenderer, section MarginalSection) float64 {
 }
 
 func drawMarginalSection(r *PdfRenderer, section MarginalSection) {
-	if section.BackgroundImage != "" {
-		fmt.Println("TODO: add background image to marginal section")
+	backgroundImage, err := section.ResolvedBackgroundImage(r)
+	if err == nil && backgroundImage != "" {
+		x, y := r.Pdf.GetXY()
+		r.Pdf.ImageOptions(
+			backgroundImage, x, y, section.Width, section.Height, false,
+			fpdf.ImageOptions{
+				ImageType: "", ReadDpi: true, AllowNegativePosition: false,
+			},
+			0, "",
+		)
+	} else if err != nil {
+		log.Printf("Error resolving background image for marginal section: %v", err)
 	}
 
 	if section.Text != nil {
@@ -259,7 +292,7 @@ func drawMarginalSection(r *PdfRenderer, section MarginalSection) {
 			"",
 			1,
 			section.Text.getAlignmentString(),
-			true,
+			backgroundImage == "",
 			0,
 			"",
 		)
