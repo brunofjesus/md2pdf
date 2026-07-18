@@ -86,6 +86,7 @@ func New(p Params) (*Md2Pdf, error) {
 		Theme:           theme,
 		CustomThemeFile: customThemeFile,
 		TracerFile:      "",
+		Metadata:        nil,
 		Opts:            nil,
 	})
 
@@ -186,7 +187,7 @@ func WithBaseURL(baseURL string) Option {
 }
 
 // WithDefaultFooter configures the renderer to add a default footer to each page of the PDF,
-// containing the author, title and pagination
+// containing the author, title and pagination.
 func WithDefaultFooter() Option {
 	return func(m *Md2Pdf) {
 		renderer.WithDefaultFooter()(m.pdfRenderer)

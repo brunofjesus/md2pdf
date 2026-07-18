@@ -63,11 +63,12 @@ func WithDefaultFooter() RenderOption {
 		Height:          12,
 		Center: []MarginalSection{
 			{
-				Width:           0,
-				Height:          8,
-				RelativeX:       0,
-				RelativeY:       0,
-				BackgroundImage: "",
+				Width:                   0,
+				Height:                  8,
+				RelativeX:               0,
+				RelativeY:               0,
+				BackgroundImage:         "",
+				resolvedBackgroundImage: "",
 				Text: &MarginalSectionTextContent{
 					Text:                "%PAGE_NUMBER% / %PAGE_TOTAL%",
 					FontSize:            9,

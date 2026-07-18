@@ -63,11 +63,12 @@ func WithDefaultHeader() RenderOption {
 		Height:          20,
 		Left: []MarginalSection{
 			{
-				Width:           0,
-				Height:          10,
-				RelativeX:       10,
-				RelativeY:       5,
-				BackgroundImage: "",
+				Width:                   0,
+				Height:                  10,
+				RelativeX:               10,
+				RelativeY:               5,
+				BackgroundImage:         "",
+				resolvedBackgroundImage: "",
 				Text: &MarginalSectionTextContent{
 					Text:                "%TITLE%",
 					FontSize:            10,
@@ -81,11 +82,12 @@ func WithDefaultHeader() RenderOption {
 		Center: nil,
 		Right: []MarginalSection{
 			{
-				Width:           0,
-				Height:          10,
-				RelativeX:       10,
-				RelativeY:       5,
-				BackgroundImage: "",
+				Width:                   0,
+				Height:                  10,
+				RelativeX:               10,
+				RelativeY:               5,
+				BackgroundImage:         "",
+				resolvedBackgroundImage: "",
 				Text: &MarginalSectionTextContent{
 					Text:                "%AUTHOR%",
 					FontSize:            9,
