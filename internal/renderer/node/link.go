@@ -18,7 +18,7 @@ func ProcessLink(ctx PdfContext, n ast.Node, entering bool) {
 	destination := string(node.Destination)
 	if entering {
 		if ctx.GetInputBaseURL() != "" && !strings.HasPrefix(destination, "http") {
-			destination = ctx.GetInputBaseURL() + "/" + strings.Replace(destination, "./", "", 1)
+			destination = joinBase(ctx.GetInputBaseURL(), destination)
 		}
 
 		x := &ContainerState{

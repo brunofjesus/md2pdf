@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"codeberg.org/go-pdf/fpdf"
-	"github.com/brunofjesus/md2pdf/v3/internal/colors"
 	"github.com/brunofjesus/md2pdf/v3/internal/fonts"
 	"github.com/brunofjesus/md2pdf/v3/internal/renderer/node"
 	"github.com/brunofjesus/md2pdf/v3/internal/theme"
@@ -40,6 +39,13 @@ const (
 	LIGHT Theme = 2
 	// CUSTOM theme const.
 	CUSTOM Theme = 3
+)
+
+const (
+	// MetadataKeyTitle is the key for the PDF title in the metadata map.
+	MetadataKeyTitle = "title"
+	// MetadataKeyAuthor is the key for the PDF author in the metadata map.
+	MetadataKeyAuthor = "author"
 )
 
 // identCharLen is the number of characters to per identation level.
@@ -80,15 +86,17 @@ type PdfRenderer struct {
 
 	// preProcessors are functions that run before the main rendering pass.
 	preProcessors []func(content []byte) error
+
+	metadata map[string]string
 }
 
 // PdfRendererParams struct to hold params passed to NewPdfRenderer.
 type PdfRendererParams struct {
-	Title                             string
 	Orientation, PageSize, TracerFile string
 	Opts                              []RenderOption
 	Theme                             Theme
 	CustomThemeFile                   string
+	Metadata                          map[string]string
 }
 
 // NewPdfRenderer creates and configures an PdfRenderer object,
@@ -141,27 +149,12 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 		r.Theme = theme.LightTheme()
 	}
 
-	r.Pdf.SetHeaderFunc(func() {
-		w, h := r.Pdf.GetPageSize()
-		dorect(r.Pdf, 0, 0, w, h, r.Theme.BackgroundColor)
-	})
+	r.metadata = params.Metadata
 
-	r.Pdf.AddPage()
-	// set default font
-	r.SetStyler(r.Theme.Normal)
-	r.mleft, r.mtop, r.mright, r.mbottom = r.Pdf.GetMargins()
-	r.NormalEm = r.Pdf.GetStringWidth("m")
-	r.IndentValue = identCharLen * r.NormalEm
-
-	r.cs = states{stack: make([]*node.ContainerState, 0)}
-	initcurrent := &node.ContainerState{
-		ListKind:  node.NotList,
-		TextStyle: r.Theme.Normal, LeftMargin: r.mleft,
-	}
-	r.cs.push(initcurrent)
-
-	r.Pdf.SetSubject(params.Title, true)
-	r.Pdf.SetTitle(params.Title, true)
+	title := r.metadata[MetadataKeyTitle]
+	r.Pdf.SetSubject(title, true)
+	r.Pdf.SetTitle(title, true)
+	r.Pdf.SetAuthor(r.metadata[MetadataKeyAuthor], true)
 
 	// Register default node processors.
 	r.nodeProcessors = map[string]node.Processor{
@@ -186,6 +179,9 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 		"HorizontalRule": node.HorizontalRuleLineProcessor,
 	}
 
+	// fill background color before setting custom header so we don't override it
+	r.Pdf.SetHeaderFuncMode(func() { fillBackground(r) }, true)
+
 	for _, o := range params.Opts {
 		o(r)
 	}
@@ -193,6 +189,22 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 	if r.Extensions == 0 {
 		WithDefaultMarkdownParsingExtensions()(r)
 	}
+
+	r.Pdf.AliasNbPages("%PAGE_TOTAL%")
+
+	r.Pdf.AddPage()
+	// set default font
+	r.SetStyler(r.Theme.Normal)
+	r.mleft, r.mtop, r.mright, r.mbottom = r.Pdf.GetMargins()
+	r.NormalEm = r.Pdf.GetStringWidth("m")
+	r.IndentValue = identCharLen * r.NormalEm
+
+	r.cs = states{stack: make([]*node.ContainerState, 0)}
+	initcurrent := &node.ContainerState{
+		ListKind:  node.NotList,
+		TextStyle: r.Theme.Normal, LeftMargin: r.mleft,
+	}
+	r.cs.push(initcurrent)
 
 	return r
 }
@@ -548,9 +560,4 @@ func (r *PdfRenderer) RenderHeader(_ io.Writer, _ ast.Node) {
 // RenderFooter is not supported.
 func (r *PdfRenderer) RenderFooter(_ io.Writer, _ ast.Node) {
 	r.Tracer("RenderFooter", "Not handled")
-}
-
-func dorect(doc *fpdf.Fpdf, x, y, w, h float64, color colors.Color) {
-	doc.SetFillColor(color.Red, color.Green, color.Blue)
-	doc.Rect(x, y, w, h, "F")
 }

@@ -25,11 +25,8 @@ func main() {
 			flagInput := cmd.String("input")
 			flagOutput := cmd.String("output")
 			flagTitle := cmd.String("title")
-			flagTOC := cmd.Bool("table-of-contents")
-			flagHRNewPage := cmd.Bool("horizontal-rule-new-page")
 			flagTheme := cmd.String("theme")
 			flagForceOverwrite := cmd.Bool("force-overwrite")
-			flagFooter := cmd.Bool("footer")
 			flagPageSize := cmd.String("page-size")
 			flagOrientation := cmd.String("orientation")
 			flagAuthor := cmd.String("author")
@@ -61,26 +58,22 @@ func main() {
 				}
 			}()
 
-			if flagHRNewPage {
-				opts = append(opts, renderer.WithHorizontalRuleAsNewPage())
-			}
-
-			if flagFooter {
-				opts = append(opts, renderer.WithDefaultFooter(flagOrientation, flagAuthor, flagTitle))
-			}
-
-			if flagTOC {
-				opts = append(opts, renderer.WithTableOfContents())
+			opts, err = addNeededOpts(cmd, opts)
+			if err != nil {
+				return err
 			}
 
 			params := renderer.PdfRendererParams{
-				Title:           flagTitle,
 				Orientation:     flagOrientation,
 				PageSize:        flagPageSize,
 				TracerFile:      flagLogFile,
 				Opts:            opts,
 				Theme:           renderer.LIGHT,
 				CustomThemeFile: "",
+				Metadata: map[string]string{
+					renderer.MetadataKeyTitle:  flagTitle,
+					renderer.MetadataKeyAuthor: flagAuthor,
+				},
 			}
 
 			switch flagTheme {
@@ -97,12 +90,12 @@ func main() {
 
 			err = pf.Process(reader)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 
 			err = pf.OutputFileAndClose(flagOutput)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 
 			return nil
@@ -114,6 +107,48 @@ func main() {
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func addNeededOpts(cmd *cli.Command, opts []renderer.RenderOption) ([]renderer.RenderOption, error) {
+	flagTOC := cmd.Bool("table-of-contents")
+	flagHRNewPage := cmd.Bool("horizontal-rule-new-page")
+	flagHeader := cmd.Bool("header")
+	flagFooter := cmd.Bool("footer")
+
+	headerFilePath := cmd.String("header-file")
+	footerFilePath := cmd.String("footer-file")
+
+	if flagHRNewPage {
+		opts = append(opts, renderer.WithHorizontalRuleAsNewPage())
+	}
+
+	if headerFilePath != "" {
+		var m renderer.Marginal
+		if err := m.FromJSONFile(headerFilePath); err != nil {
+			return nil, fmt.Errorf("failed to load header from file %q: %w", headerFilePath, err)
+		}
+
+		opts = append(opts, renderer.WithHeader(m))
+	} else if flagHeader {
+		opts = append(opts, renderer.WithDefaultHeader())
+	}
+
+	if footerFilePath != "" {
+		var m renderer.Marginal
+		if err := m.FromJSONFile(footerFilePath); err != nil {
+			return nil, fmt.Errorf("failed to load footer from file %q: %w", footerFilePath, err)
+		}
+
+		opts = append(opts, renderer.WithFooter(m))
+	} else if flagFooter {
+		opts = append(opts, renderer.WithDefaultFooter())
+	}
+
+	if flagTOC {
+		opts = append(opts, renderer.WithTableOfContents())
+	}
+
+	return opts, nil
 }
 
 func flags() []cli.Flag {
@@ -158,9 +193,24 @@ func flags() []cli.Flag {
 			Value:   false,
 		},
 		&cli.BoolFlag{
-			Name:  "footer",
-			Usage: "Print doc footer (<author>  <title>  <page number>)",
+			Name:  "header",
+			Usage: "Print doc header with title on the left and author on the right",
 			Value: false,
+		},
+		&cli.BoolFlag{
+			Name:  "footer",
+			Usage: "Print doc footer with both the page number and total pages",
+			Value: false,
+		},
+		&cli.StringFlag{
+			Name:      "header-file",
+			Usage:     "Load a custom header configuration from a JSON file",
+			TakesFile: true,
+		},
+		&cli.StringFlag{
+			Name:      "footer-file",
+			Usage:     "Load a custom footer configuration from a JSON file",
+			TakesFile: true,
 		},
 		&cli.StringFlag{
 			Name: "page-size",

@@ -43,6 +43,8 @@ const (
 type Params struct {
 	// Title is the PDF document title stored in the file metadata.
 	Title string
+	// Author is the PDF document author stored in the file metadata.
+	Author string
 	// Orientation is the page orientation: "portrait" (default) or "landscape".
 	Orientation Orientation
 	// PageSize is the page size, e.g. "A4", "Letter". Defaults to "A4".
@@ -81,13 +83,16 @@ func New(p Params) (*Md2Pdf, error) {
 	}
 
 	rend := renderer.NewPdfRenderer(renderer.PdfRendererParams{
-		Title:           p.Title,
 		Orientation:     string(p.Orientation),
 		PageSize:        p.PageSize,
 		Theme:           theme,
 		CustomThemeFile: customThemeFile,
 		TracerFile:      "",
-		Opts:            nil,
+		Metadata: map[string]string{
+			renderer.MetadataKeyTitle:  p.Title,
+			renderer.MetadataKeyAuthor: p.Author,
+		},
+		Opts: nil,
 	})
 
 	md2pdf := &Md2Pdf{
@@ -186,10 +191,18 @@ func WithBaseURL(baseURL string) Option {
 	}
 }
 
-// WithDefaultFooter configures the renderer to add a default footer to each page of the PDF,
-// containing the specified orientation, author, and title.
-func WithDefaultFooter(author, title string) Option {
+// WithDefaultHeader configures the renderer to add a default header to each page of the PDF,
+// containing the document title and the author name.
+func WithDefaultHeader() Option {
 	return func(m *Md2Pdf) {
-		renderer.WithDefaultFooter(string(m.params.Orientation), author, title)(m.pdfRenderer)
+		renderer.WithDefaultHeader()(m.pdfRenderer)
+	}
+}
+
+// WithDefaultFooter configures the renderer to add a default footer to each page of the PDF,
+// containing the page number / total pages.
+func WithDefaultFooter() Option {
+	return func(m *Md2Pdf) {
+		renderer.WithDefaultFooter()(m.pdfRenderer)
 	}
 }
