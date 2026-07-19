@@ -13,15 +13,16 @@ import (
 	"github.com/brunofjesus/md2pdf/v3/internal/renderer/node"
 )
 
-// Marginal is the struct the defines either an Header or a Footer.
-// Can by passed to a function like [WithHeader] or [WithFooter] in order
-// for it to be included on the document.
+// Marginal is the struct that defines either a Header or a Footer.
+// It can by passed to a function like [WithHeader] or [WithFooter] to
+// include it in the document.
 type Marginal struct {
 	BackgroundColor *colors.Color     `json:"backgroundColor,omitempty"`
 	Height          float64           `json:"height"`
 	Left            []MarginalSection `json:"left,omitempty"`
 	Center          []MarginalSection `json:"center,omitempty"`
 	Right           []MarginalSection `json:"right,omitempty"`
+	resolvedImages  map[string]string `json:"-"`
 }
 
 // FromJSONFile reads a JSON file and unmarshals its content into the Marginal struct.
@@ -45,6 +46,30 @@ func (m *Marginal) FromJSONFile(file string) error {
 	*m = parsed
 
 	return nil
+}
+
+func (m *Marginal) resolveBackgroundImages(r *PdfRenderer) {
+	m.resolvedImages = make(map[string]string)
+
+	for _, sections := range [][]MarginalSection{m.Left, m.Center, m.Right} {
+		for _, section := range sections {
+			if section.BackgroundImage == "" {
+				continue
+			}
+
+			if _, ok := m.resolvedImages[section.BackgroundImage]; ok {
+				continue // duplicated image path, already resolved
+			}
+
+			path, err := node.ResolveImagePath(r, section.BackgroundImage)
+			if err != nil {
+				log.Printf("Error resolving background image %q: %v", section.BackgroundImage, err)
+				continue // don't cache failed paths
+			}
+
+			m.resolvedImages[section.BackgroundImage] = path
+		}
+	}
 }
 
 // MarginalHorizontalAlignment represents the horizontal text alignment within a marginal section.
@@ -148,26 +173,6 @@ type MarginalSection struct {
 
 	BackgroundImage string                      `json:"backgroundImage,omitempty"`
 	Text            *MarginalSectionTextContent `json:"text,omitempty"`
-
-	resolvedBackgroundImage string `json:"-"`
-}
-
-// ResolvedBackgroundImage resolves the background image path for the marginal section,
-// downloading it if necessary, and caches the result for future use.
-// It returns the resolved local file path or an error if resolution fails.
-func (c *MarginalSection) ResolvedBackgroundImage(r *PdfRenderer) (string, error) {
-	if c.resolvedBackgroundImage != "" {
-		return c.resolvedBackgroundImage, nil
-	} else if c.BackgroundImage != "" {
-		path, err := node.ResolveImagePath(r, c.BackgroundImage)
-		if err != nil {
-			return "", err
-		}
-
-		c.resolvedBackgroundImage = path
-	}
-
-	return c.resolvedBackgroundImage, nil
 }
 
 // MarginalSectionTextContent defines the text content and styling for a marginal section,
@@ -237,9 +242,9 @@ func marginalSectionWidth(r *PdfRenderer, section MarginalSection) float64 {
 	return 0
 }
 
-func drawMarginalSection(r *PdfRenderer, section MarginalSection) {
-	backgroundImage, err := section.ResolvedBackgroundImage(r)
-	if err == nil && backgroundImage != "" {
+func drawMarginalSection(r *PdfRenderer, marginal Marginal, section MarginalSection) {
+	backgroundImage, ok := marginal.resolvedImages[section.BackgroundImage]
+	if ok && backgroundImage != "" {
 		x, y := r.Pdf.GetXY()
 		r.Pdf.ImageOptions(
 			backgroundImage, x, y, section.Width, section.Height, false,
@@ -248,8 +253,6 @@ func drawMarginalSection(r *PdfRenderer, section MarginalSection) {
 			},
 			0, "",
 		)
-	} else if err != nil {
-		log.Printf("Error resolving background image for marginal section: %v", err)
 	}
 
 	if section.Text != nil {

@@ -7,6 +7,8 @@ import (
 // WithHeader configures the PDF renderer to include a custom header on each page.
 func WithHeader(header Marginal) RenderOption {
 	return func(r *PdfRenderer) {
+		header.resolveBackgroundImages(r)
+
 		r.Pdf.SetTopMargin(header.Height)
 		r.Pdf.SetHeaderFuncMode(func() {
 			fillBackground(r) // apply the background color to the entire page before drawing the header
@@ -32,7 +34,7 @@ func WithHeader(header Marginal) RenderOption {
 
 			for _, section := range header.Left {
 				r.Pdf.SetXY(section.RelativeX, section.RelativeY)
-				drawMarginalSection(r, section)
+				drawMarginalSection(r, header, section)
 			}
 
 			centerX := w / 2
@@ -43,13 +45,13 @@ func WithHeader(header Marginal) RenderOption {
 			for _, section := range header.Center {
 				width := marginalSectionWidth(r, section)
 				r.Pdf.SetXY(centerX-width/2+section.RelativeX, section.RelativeY)
-				drawMarginalSection(r, section)
+				drawMarginalSection(r, header, section)
 			}
 
 			for _, section := range header.Right {
 				width := marginalSectionWidth(r, section)
 				r.Pdf.SetXY(w-section.RelativeX-width, section.RelativeY)
-				drawMarginalSection(r, section)
+				drawMarginalSection(r, header, section)
 			}
 		}, true)
 	}
@@ -65,12 +67,11 @@ func WithDefaultHeader() RenderOption {
 		Height:          20,
 		Left: []MarginalSection{
 			{
-				Width:                   0,
-				Height:                  10,
-				RelativeX:               10,
-				RelativeY:               5,
-				BackgroundImage:         "",
-				resolvedBackgroundImage: "",
+				Width:           0,
+				Height:          10,
+				RelativeX:       10,
+				RelativeY:       5,
+				BackgroundImage: "",
 				Text: &MarginalSectionTextContent{
 					Text:                "%TITLE%",
 					FontSize:            10,
@@ -84,12 +85,11 @@ func WithDefaultHeader() RenderOption {
 		Center: nil,
 		Right: []MarginalSection{
 			{
-				Width:                   0,
-				Height:                  10,
-				RelativeX:               10,
-				RelativeY:               5,
-				BackgroundImage:         "",
-				resolvedBackgroundImage: "",
+				Width:           0,
+				Height:          10,
+				RelativeX:       10,
+				RelativeY:       5,
+				BackgroundImage: "",
 				Text: &MarginalSectionTextContent{
 					Text:                "%AUTHOR%",
 					FontSize:            9,
@@ -100,5 +100,6 @@ func WithDefaultHeader() RenderOption {
 				},
 			},
 		},
+		resolvedImages: nil,
 	})
 }

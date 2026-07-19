@@ -7,6 +7,8 @@ import (
 // WithFooter configures the PDF renderer to include a custom footer on each page.
 func WithFooter(footer Marginal) RenderOption {
 	return func(r *PdfRenderer) {
+		footer.resolveBackgroundImages(r)
+
 		r.Pdf.SetFooterFunc(func() {
 			w, h, _ := r.Pdf.PageSize(r.Pdf.PageNo())
 
@@ -29,7 +31,7 @@ func WithFooter(footer Marginal) RenderOption {
 
 			for _, section := range footer.Left {
 				r.Pdf.SetXY(section.RelativeX, -footer.Height+section.RelativeY)
-				drawMarginalSection(r, section)
+				drawMarginalSection(r, footer, section)
 			}
 
 			centerX := w / 2
@@ -40,13 +42,13 @@ func WithFooter(footer Marginal) RenderOption {
 			for _, section := range footer.Center {
 				width := marginalSectionWidth(r, section)
 				r.Pdf.SetXY(centerX-width/2+section.RelativeX, -footer.Height+section.RelativeY)
-				drawMarginalSection(r, section)
+				drawMarginalSection(r, footer, section)
 			}
 
 			for _, section := range footer.Right {
 				width := marginalSectionWidth(r, section)
 				r.Pdf.SetXY(w-section.RelativeX-width, -footer.Height+section.RelativeY)
-				drawMarginalSection(r, section)
+				drawMarginalSection(r, footer, section)
 			}
 		})
 	}
@@ -63,12 +65,11 @@ func WithDefaultFooter() RenderOption {
 		Height:          12,
 		Center: []MarginalSection{
 			{
-				Width:                   0,
-				Height:                  8,
-				RelativeX:               0,
-				RelativeY:               0,
-				BackgroundImage:         "",
-				resolvedBackgroundImage: "",
+				Width:           0,
+				Height:          8,
+				RelativeX:       0,
+				RelativeY:       0,
+				BackgroundImage: "",
 				Text: &MarginalSectionTextContent{
 					Text:                "%PAGE_NUMBER% / %PAGE_TOTAL%",
 					FontSize:            9,
@@ -79,5 +80,6 @@ func WithDefaultFooter() RenderOption {
 				},
 			},
 		},
+		resolvedImages: nil,
 	})
 }

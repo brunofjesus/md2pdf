@@ -43,6 +43,8 @@ const (
 type Params struct {
 	// Title is the PDF document title stored in the file metadata.
 	Title string
+	// Author is the PDF document author stored in the file metadata.
+	Author string
 	// Orientation is the page orientation: "portrait" (default) or "landscape".
 	Orientation Orientation
 	// PageSize is the page size, e.g. "A4", "Letter". Defaults to "A4".
@@ -87,7 +89,8 @@ func New(p Params) (*Md2Pdf, error) {
 		CustomThemeFile: customThemeFile,
 		TracerFile:      "",
 		Metadata: map[string]string{
-			renderer.MetadataKeyTitle: p.Title,
+			renderer.MetadataKeyTitle:  p.Title,
+			renderer.MetadataKeyAuthor: p.Author,
 		},
 		Opts: nil,
 	})
