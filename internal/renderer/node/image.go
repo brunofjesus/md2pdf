@@ -31,7 +31,7 @@ func ProcessImage(ctx PdfContext, n ast.Node, entering bool) {
 	if entering {
 		ctx.Cr()
 
-		destination, err := ResolveImagePath(ctx, string(node.Destination))
+		destination, err := ResolveImagePath(ctx.GetInputBaseURL(), string(node.Destination))
 		if err != nil {
 			ctx.Tracer("Image (resolve error)", err.Error())
 			log.Println(err)
@@ -60,44 +60,30 @@ func ProcessImage(ctx PdfContext, n ast.Node, entering bool) {
 
 // ResolveImagePath resolves a raw image destination (local path, base-URL,
 // relative path, HTTP URL, or SVG) into a local file path ready to draw.
-func ResolveImagePath(ctx PdfContext, destination string) (string, error) {
+// baseURL is the base against which relative destinations are resolved; it may
+// be a local directory or an HTTP base URL (empty when there is none).
+func ResolveImagePath(baseURL, destination string) (string, error) {
 	tempDir := os.TempDir() + "/" + filepath.Base(os.Args[0])
 
-	// TODO: double check this path joining logic, it may not be correct.
-	_, err := os.Stat(destination)
-	if errors.Is(err, os.ErrNotExist) &&
-		!strings.HasPrefix(destination, "http") &&
-		ctx.GetInputBaseURL() != "" &&
-		!strings.HasPrefix(ctx.GetInputBaseURL(), "http") {
-		localPath := filepath.Join(ctx.GetInputBaseURL(), destination)
-		if _, lerr := os.Stat(localPath); lerr == nil {
-			destination = localPath
-			err = nil
-		}
+	source, needsDownload, err := locateImageSource(baseURL, destination)
+	if err != nil {
+		return "", err
 	}
 
-	//nolint:nestif
-	if errors.Is(err, os.ErrNotExist) {
-		source := destination
-		if !strings.HasPrefix(destination, "http") {
-			if ctx.GetInputBaseURL() != "" {
-				source = ctx.GetInputBaseURL() + "/" + destination
-			}
-		}
-
+	if needsDownload {
 		if mkErr := os.MkdirAll(tempDir, 0o750); mkErr != nil {
-			fmt.Println(mkErr.Error())
-
-			return "", mkErr
+			return "", fmt.Errorf("failed to create temp directory %s: %w", tempDir, mkErr)
 		}
 
-		err := downloadFile(source, tempDir+"/"+filepath.Base(destination))
-		if err != nil {
-			fmt.Println(err.Error())
-		} else {
-			destination = tempDir + "/" + filepath.Base(destination)
-			fmt.Println("Downloaded image to: " + destination)
+		localPath := tempDir + "/" + filepath.Base(destination)
+		if dlErr := downloadFile(source, localPath); dlErr != nil {
+			return "", fmt.Errorf("failed to download image from %s: %w", source, dlErr)
 		}
+
+		destination = localPath
+		fmt.Println("Downloaded image to: " + destination)
+	} else {
+		destination = source
 	}
 
 	mtype, _ := mimetype.DetectFile(destination)
@@ -146,6 +132,41 @@ func ResolveImagePath(ctx PdfContext, destination string) (string, error) {
 	}
 
 	return destination, nil
+}
+
+// locateImageSource decides how a raw destination should be obtained. It
+// returns the source to use, whether that source must be downloaded, and an
+// error when a local image cannot be found.
+//
+// Resolution order:
+//   - absolute HTTP destination -> download as-is
+//   - destination existing on disk -> use as-is
+//   - local (non-http) base URL -> join and use if it exists, else "not found"
+//   - HTTP base URL -> join and download
+//   - otherwise -> "not found"
+func locateImageSource(baseURL, destination string) (string, bool, error) {
+	if strings.HasPrefix(destination, "http") {
+		return destination, true, nil
+	}
+
+	if _, statErr := os.Stat(destination); statErr == nil {
+		return destination, false, nil
+	}
+
+	if baseURL != "" && !strings.HasPrefix(baseURL, "http") {
+		localPath := joinBase(baseURL, destination)
+		if _, statErr := os.Stat(localPath); statErr == nil {
+			return localPath, false, nil
+		}
+
+		return "", false, fmt.Errorf("image not found: %s", destination)
+	}
+
+	if strings.HasPrefix(baseURL, "http") {
+		return joinBase(baseURL, destination), true, nil
+	}
+
+	return "", false, fmt.Errorf("image not found: %s", destination)
 }
 
 func downloadFile(url, fileName string) error {

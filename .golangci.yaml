@@ -30,4 +30,10 @@ linters:
         - '.+/node\.ContainerState$'
         - '.+/urfave/cli/v3\.Command$'
         - '.+/urfave/cli/v3\.FlagBase$'
+  exclusions:
+    rules:
+      # Test tables favour explicit literals over shared constants for clarity.
+      - path: _test\.go
+        linters:
+          - goconst
 

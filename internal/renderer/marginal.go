@@ -61,7 +61,7 @@ func (m *Marginal) resolveBackgroundImages(r *PdfRenderer) {
 				continue // duplicated image path, already resolved
 			}
 
-			path, err := node.ResolveImagePath(r, section.BackgroundImage)
+			path, err := node.ResolveImagePath(r.GetInputBaseURL(), section.BackgroundImage)
 			if err != nil {
 				log.Printf("Error resolving background image %q: %v", section.BackgroundImage, err)
 				continue // don't cache failed paths
