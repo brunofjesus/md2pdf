@@ -24,3 +24,14 @@ func unmarshalRuneChar(data []byte) (rune, error) {
 
 	return runes[0], nil
 }
+
+// fillBackground fills the entire page with the background color defined in the theme.
+// should be called at the beginning of each page rendering to ensure the background is set correctly.
+func fillBackground(r *PdfRenderer) {
+	w, h := r.Pdf.GetPageSize()
+	r.Pdf.SetFillColor(
+		r.Theme.BackgroundColor.Red,
+		r.Theme.BackgroundColor.Green,
+		r.Theme.BackgroundColor.Blue)
+	r.Pdf.Rect(0, 0, w, h, "F")
+}

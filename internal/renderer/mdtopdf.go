@@ -179,6 +179,9 @@ func NewPdfRenderer(params PdfRendererParams) *PdfRenderer {
 		"HorizontalRule": node.HorizontalRuleLineProcessor,
 	}
 
+	// fill background color before setting custom header so we don't override it
+	r.Pdf.SetHeaderFuncMode(func() { fillBackground(r) }, true)
+
 	for _, o := range params.Opts {
 		o(r)
 	}

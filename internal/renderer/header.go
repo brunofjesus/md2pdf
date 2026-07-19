@@ -7,10 +7,12 @@ import (
 // WithHeader configures the PDF renderer to include a custom header on each page.
 func WithHeader(header Marginal) RenderOption {
 	return func(r *PdfRenderer) {
-		w, h, _ := r.Pdf.PageSize(r.Pdf.PageNo())
-
 		r.Pdf.SetTopMargin(header.Height)
 		r.Pdf.SetHeaderFuncMode(func() {
+			fillBackground(r) // apply the background color to the entire page before drawing the header
+
+			w, h, _ := r.Pdf.PageSize(r.Pdf.PageNo())
+
 			if header.BackgroundColor != nil {
 				r.Pdf.SetFillColor(
 					header.BackgroundColor.Red,
