@@ -194,12 +194,12 @@ func flags() []cli.Flag {
 		},
 		&cli.BoolFlag{
 			Name:  "header",
-			Usage: "Print doc header (<author>  <title>  <page number>)",
+			Usage: "Print doc header with title on the left and author on the right",
 			Value: false,
 		},
 		&cli.BoolFlag{
 			Name:  "footer",
-			Usage: "Print doc footer (<author>  <title>  <page number>)",
+			Usage: "Print doc footer with both the page number and total pages",
 			Value: false,
 		},
 		&cli.StringFlag{
