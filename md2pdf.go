@@ -188,8 +188,16 @@ func WithBaseURL(baseURL string) Option {
 	}
 }
 
+// WithDefaultHeader configures the renderer to add a default header to each page of the PDF,
+// containing the document title and the author name.
+func WithDefaultHeader() Option {
+	return func(m *Md2Pdf) {
+		renderer.WithDefaultHeader()(m.pdfRenderer)
+	}
+}
+
 // WithDefaultFooter configures the renderer to add a default footer to each page of the PDF,
-// containing the author, title and pagination.
+// containing the page number / total pages.
 func WithDefaultFooter() Option {
 	return func(m *Md2Pdf) {
 		renderer.WithDefaultFooter()(m.pdfRenderer)
