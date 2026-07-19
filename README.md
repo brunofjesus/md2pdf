@@ -10,6 +10,7 @@ This is a fork of [solworktech/md2pdf](https://github.com/solworktech/md2pdf). I
 - **Embedded syntax highlighting** — syntax definition files are bundled into the binary; no git submodule or `-s` flag needed
 - **Code block improvements** — code blocks use Liberation Mono with background highlighting
 - **Restructured internals** — renderer, theme, colors, fonts and highlight logic moved into `internal/` packages
+- **Customisable headers and footers** — configurable page headers and footers (marginals) with left/center/right sections, text placeholders (`%TITLE%`, `%AUTHOR%`, `%PAGE_NUMBER%`, `%PAGE_TOTAL%`) and background images, defined via JSON; includes a built-in default header and footer.
 
 This package depends on two other packages:
 - [gomarkdown](https://github.com/gomarkdown/markdown) parser to read the markdown source
@@ -25,7 +26,8 @@ This package depends on two other packages:
 - [Auto Generation of Table of Contents](#auto-generation-of-table-of-contents)
 - Built-in UTF-8 support (Liberation Sans / Liberation Mono)
 - [Pagination control (using horizontal lines - especially useful for presentations)](#additional-options)
-- [Page Footer (consisting of author, title and page number)](#additional-options)
+- [Page headers and footers with sensible defaults](#headers-and-footers)
+- [Fully customisable headers and footers via JSON (marginals)](#custom-headers-and-footers)
 
 ## Supported Markdown elements
 
@@ -88,7 +90,10 @@ $ go run ./cmd/md2pdf -i /path/to/md/directory -o output.pdf
 --table-of-contents, --toc                 Generate a table of contents page based on the headings in the input markdown
 --horizontal-rule-new-page, --hr-new-page  Start a new page on horizontal rules (---); useful for presentations
 --force-overwrite, -f                      Force overwrite of output file if it already exists
---footer                                   Print doc footer (<author>  <title>  <page number>)
+--header                                    Print doc header with the title on the left and the author on the right
+--footer                                    Print doc footer with the current page number and the total page count
+--header-file string                       Load a custom header configuration from a JSON file (see Custom headers and footers)
+--footer-file string                       Load a custom footer configuration from a JSON file (see Custom headers and footers)
 --page-size string                         Page size for the PDF; can be 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'Letter', 'Legal' or 'Tabloid' (default: A4)
 --orientation string                       Page orientation for the PDF; can be 'portrait' or 'landscape'; default is 'portrait' (default: "portrait")
 --author string                            Author name
@@ -100,15 +105,203 @@ $ go run ./cmd/md2pdf -i /path/to/md/directory -o output.pdf
 For example, the below will:
 
 - Set the title to `My Grand Title`
-- Set `Random Bloke` as the author (used in the footer)
+- Set `Random Bloke` as the author (used in the header/footer)
 - Set the dark theme
 - Start a new page when encountering an HR (`---`); useful for creating presentations
-- Print a footer (`author name, title, page number`)
+- Print the default header (title + author) and the default footer (page number / total pages)
 
 ```sh
 $ go run ./cmd/md2pdf -i /path/to/md \
     -o /path/to/pdf --title "My Grand Title" --author "Random Bloke" \
-    --theme dark --new-page-on-hr --with-footer
+    --theme dark --hr-new-page --header --footer
+```
+
+## Headers and Footers
+
+`md2pdf` can render a header and/or a footer on every page.
+
+For the common case, just pass `--header` and/or `--footer`:
+
+- `--header` prints the document **title** on the left and the **author** on the right.
+- `--footer` prints `page number / total pages`, centered.
+
+```sh
+$ go run ./cmd/md2pdf -i input.md -o out.pdf --header --footer \
+    --title "My Grand Title" --author "Random Bloke"
+```
+
+### Custom headers and footers
+
+For full control over content, positioning and styling, pass a JSON file via
+`--header-file` and/or `--footer-file`. Headers and footers share the same
+schema (a "marginal").
+
+```sh
+$ go run ./cmd/md2pdf -i input.md -o out.pdf \
+    --header-file header.json --footer-file footer.json
+```
+
+A marginal is split into three columns — `left`, `center` and `right` — each
+holding a list of sections. A section renders either a text snippet or a
+background image.
+
+**Marginal**
+
+| Field             | Type     | Description                                              |
+| ----------------- | -------- | -------------------------------------------------------- |
+| `backgroundColor` | hex str  | Optional band background colour, e.g. `"#eba0ac"`        |
+| `height`          | number   | Height of the band in mm                                 |
+| `left`            | array    | Sections aligned to the left edge                        |
+| `center`          | array    | Sections centered horizontally                           |
+| `right`           | array    | Sections aligned to the right edge                       |
+
+**Section**
+
+| Field             | Type     | Description                                              |
+| ----------------- | -------- | -------------------------------------------------------- |
+| `width`           | number   | Optional fixed width in mm (auto-sized from text if 0)   |
+| `height`          | number   | Section height in mm                                     |
+| `relativeX`       | number   | Horizontal offset from the column anchor in mm           |
+| `relativeY`       | number   | Vertical offset from the top of the band in mm           |
+| `backgroundImage` | path     | Optional image drawn in the section (needs `width`/`height`) |
+| `text`            | object   | Optional text content (see below)                        |
+
+**Text**
+
+| Field                 | Type       | Description                                                       |
+| --------------------- | ---------- | ---------------------------------------------------------------- |
+| `text`                | string     | The text to render; supports placeholders (see below)            |
+| `fontSize`            | number     | Font size in points                                              |
+| `fontStyle`           | str array  | Any of `"B"` (bold), `"I"` (italic), `"U"` (underline), `"S"` (strikethrough) |
+| `color`               | hex str    | Text colour, e.g. `"#1a1a1a"`                                    |
+| `horizontalAlignment` | str array  | Any of `"L"` (left), `"C"` (center), `"R"` (right)              |
+| `verticalAlignment`   | str array  | Any of `"T"` (top), `"M"` (middle), `"B"` (bottom), `"A"` (baseline) |
+
+**Placeholders** (substituted at render time):
+
+| Placeholder     | Replaced with            |
+| --------------- | ------------------------ |
+| `%TITLE%`       | The document title       |
+| `%AUTHOR%`      | The author name          |
+| `%PAGE_NUMBER%` | The current page number  |
+| `%PAGE_TOTAL%`  | The total number of pages |
+
+#### Example header
+
+A header with a logo and title on the left, a centered "CONFIDENTIAL" note, and
+the author on the right:
+
+```json
+{
+  "backgroundColor": "#eba0ac",
+  "height": 40,
+  "left": [
+    {
+      "width": 71.3,
+      "height": 30,
+      "relativeX": 10,
+      "relativeY": 5,
+      "backgroundImage": "./assets/logo.png"
+    },
+    {
+      "height": 10,
+      "relativeX": 84,
+      "relativeY": 5,
+      "text": {
+        "text": "%TITLE%",
+        "fontSize": 11,
+        "fontStyle": ["B"],
+        "color": "#1a1a1a",
+        "horizontalAlignment": ["L"],
+        "verticalAlignment": ["M"]
+      }
+    }
+  ],
+  "center": [
+    {
+      "height": 10,
+      "relativeY": 5,
+      "text": {
+        "text": "CONFIDENTIAL",
+        "fontSize": 9,
+        "fontStyle": ["I"],
+        "color": "#d20f39",
+        "horizontalAlignment": ["C"],
+        "verticalAlignment": ["M"]
+      }
+    }
+  ],
+  "right": [
+    {
+      "height": 10,
+      "relativeX": 10,
+      "relativeY": 5,
+      "text": {
+        "text": "%AUTHOR%",
+        "fontSize": 9,
+        "fontStyle": ["I"],
+        "color": "#666666",
+        "horizontalAlignment": ["R"],
+        "verticalAlignment": ["M"]
+      }
+    }
+  ]
+}
+```
+
+#### Example footer
+
+A footer with the title on the left, `Page X of Y` in the center, and the author
+on the right:
+
+```json
+{
+  "backgroundColor": "#f2cdcd",
+  "height": 15,
+  "left": [
+    {
+      "height": 10,
+      "relativeX": 10,
+      "relativeY": 2,
+      "text": {
+        "text": "%TITLE%",
+        "fontSize": 8,
+        "fontStyle": ["I"],
+        "color": "#888888",
+        "horizontalAlignment": ["L"],
+        "verticalAlignment": ["M"]
+      }
+    }
+  ],
+  "center": [
+    {
+      "height": 10,
+      "relativeY": 2,
+      "text": {
+        "text": "Page %PAGE_NUMBER% of %PAGE_TOTAL%",
+        "fontSize": 9,
+        "color": "#333333",
+        "horizontalAlignment": ["C"],
+        "verticalAlignment": ["M"]
+      }
+    }
+  ],
+  "right": [
+    {
+      "height": 10,
+      "relativeX": 10,
+      "relativeY": 2,
+      "text": {
+        "text": "%AUTHOR%",
+        "fontSize": 8,
+        "fontStyle": ["I"],
+        "color": "#888888",
+        "horizontalAlignment": ["R"],
+        "verticalAlignment": ["M"]
+      }
+    }
+  ]
+}
 ```
 
 ## Tests
