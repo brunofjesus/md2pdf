@@ -60,7 +60,7 @@ func main() {
 
 			opts, err = addNeededOpts(cmd, opts)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 
 			params := renderer.PdfRendererParams{
@@ -90,12 +90,12 @@ func main() {
 
 			err = pf.Process(reader)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 
 			err = pf.OutputFileAndClose(flagOutput)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 
 			return nil
