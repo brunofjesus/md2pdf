@@ -86,8 +86,10 @@ func New(p Params) (*Md2Pdf, error) {
 		Theme:           theme,
 		CustomThemeFile: customThemeFile,
 		TracerFile:      "",
-		Metadata:        nil,
-		Opts:            nil,
+		Metadata: map[string]string{
+			renderer.MetadataKeyTitle: p.Title,
+		},
+		Opts: nil,
 	})
 
 	md2pdf := &Md2Pdf{
